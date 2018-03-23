@@ -37,6 +37,10 @@ class Vec3 {
             return Vec3(x / k, y / k, z / k);
         };
 
+        Vec3 operator-() const {
+            return Vec3(-x, -y, -z);
+        };
+
         float length() const {
             return std::sqrt(x*x + y*y + z*z);
         };
@@ -66,6 +70,11 @@ inline float dot(const Vec3& v1, const Vec3& v2) {
 }
 inline Vec3 cross(const Vec3& v1, const Vec3& v2) {
     return Vec3(v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x);
+}
+
+
+inline Vec3 normalize(const Vec3& v) {
+    return v/v.length();
 }
 
 
