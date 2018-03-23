@@ -5,7 +5,7 @@ class Ray {
     public:
         Vec3 origin;
         Vec3 direction;
-        float tmax;
+        mutable float tmax;
         float tmin;
 
         Ray() {};

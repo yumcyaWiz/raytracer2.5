@@ -4,6 +4,7 @@
 #include "ray.h"
 #include "shape.h"
 #include "camera.h"
+#include "primitive.h"
 
 int main() {
     Film film(512, 512);

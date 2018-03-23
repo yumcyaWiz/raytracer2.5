@@ -31,6 +31,7 @@ class Sphere : public Shape {
                 if(tHit > ray.tmax) return false;
             }
 
+            res.t = tHit;
             res.hitPos = ray(tHit);
             res.hitNormal = normalize(res.hitPos - center);
             return true;
