@@ -1,5 +1,7 @@
 #ifndef VEC3_H
 #define VEC3_H
+#include <iostream>
+#include <cmath>
 class Vec3 {
     public:
         float x;
@@ -64,5 +66,11 @@ inline float dot(const Vec3& v1, const Vec3& v2) {
 }
 inline Vec3 cross(const Vec3& v1, const Vec3& v2) {
     return Vec3(v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x);
+}
+
+
+inline std::ostream& operator<<(std::ostream& stream, const Vec3& v) {
+    stream << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+    return stream;
 }
 #endif
