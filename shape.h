@@ -4,9 +4,11 @@
 #include "vec3.h"
 #include "ray.h"
 #include "hit.h"
+#include "aabb.h"
 class Shape {
     public:
         virtual bool intersect(const Ray& ray, Hit& res) const = 0;
+        virtual AABB worldBound() const = 0;
 };
 
 
@@ -35,6 +37,9 @@ class Sphere : public Shape {
             res.hitPos = ray(tHit);
             res.hitNormal = normalize(res.hitPos - center);
             return true;
+        };
+        AABB worldBound() const {
+            return AABB(Vec3(-radius), Vec3(radius));
         };
 };
 #endif
