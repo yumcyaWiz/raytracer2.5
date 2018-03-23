@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "primitive.h"
 #include "accel.h"
+#include "aabb.h"
 
 int main() {
     Film film(512, 512);

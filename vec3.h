@@ -41,6 +41,13 @@ class Vec3 {
             return Vec3(-x, -y, -z);
         };
 
+        float operator[](int i) const {
+            if(i == 0) return x;
+            else if(i == 1) return y;
+            else return z;
+        };
+            
+
         float length() const {
             return std::sqrt(x*x + y*y + z*z);
         };
@@ -81,5 +88,13 @@ inline Vec3 normalize(const Vec3& v) {
 inline std::ostream& operator<<(std::ostream& stream, const Vec3& v) {
     stream << "(" << v.x << ", " << v.y << ", " << v.z << ")";
     return stream;
+}
+
+
+inline Vec3 max(const Vec3& v1, const Vec3& v2) {
+    return Vec3(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z));
+}
+inline Vec3 min(const Vec3& v1, const Vec3& v2) {
+    return Vec3(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z));
 }
 #endif
