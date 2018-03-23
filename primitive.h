@@ -7,6 +7,7 @@ class Primitive {
         std::shared_ptr<Shape> shape;
 
 
+        Primitive() {};
         Primitive(const std::shared_ptr<Shape> _shape) : shape(_shape) {};
 
 

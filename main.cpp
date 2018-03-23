@@ -5,6 +5,7 @@
 #include "shape.h"
 #include "camera.h"
 #include "primitive.h"
+#include "accel.h"
 
 int main() {
     Film film(512, 512);
