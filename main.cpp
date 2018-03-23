@@ -1,6 +1,7 @@
 #include <iostream>
 #include "vec3.h"
 #include "film.h"
+#include "ray.h"
 
 int main() {
     Film film(512, 512);
