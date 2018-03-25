@@ -8,17 +8,27 @@ class Sampler {
 
         Sampler() {};
 
-        virtual float getNext() const = 0;
-        virtual Vec2 getNext2D() const = 0;
-        virtual Vec3 getNext3D() const = 0;
+        virtual float getNext() = 0;
+        virtual Vec2 getNext2D() = 0;
 };
 
 
 class UniformSampler : public Sampler {
     public:
-        UniformSampler() {};
+        std::mt19937 mt;
+        std::random_device rnd_dev;
+        std::uniform_real_distribution<> rnd;
+
+        UniformSampler() {
+            mt.seed(rnd_dev());
+            rnd = std::uniform_real_distribution<>(0.0f, 1.0f);
+        };
 
         float getNext() {
+            return rnd(mt);
+        };
+        Vec2 getNext2D() {
+            return Vec2(getNext(), getNext());
         };
 };
 #endif

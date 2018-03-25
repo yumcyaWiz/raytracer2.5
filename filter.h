@@ -1,6 +1,7 @@
 #ifndef FILTER_H
 #define FILTER_H
 #include <cmath>
+#include "vec2.h"
 class Filter {
     public:
         Vec2 radius;

@@ -37,6 +37,32 @@ class Vec3 {
             return Vec3(x / k, y / k, z / k);
         };
 
+        void operator+=(const Vec3& v) {
+            x += v.x;
+            y += v.y;
+            z += v.z;
+        };
+        void operator-=(const Vec3& v) {
+            x -= v.x;
+            y -= v.y;
+            z -= v.z;
+        };
+        void operator*=(const Vec3& v) {
+            x *= v.x;
+            y *= v.y;
+            z += v.z;
+        };
+        void operator/=(const Vec3& v) {
+            x /= v.x;
+            y /= v.y;
+            z /= v.z;
+        };
+        void operator/=(float k) {
+            x /= k;
+            y /= k;
+            z /= k;
+        };
+
         Vec3 operator-() const {
             return Vec3(-x, -y, -z);
         };
