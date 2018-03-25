@@ -1,4 +1,5 @@
 #include <iostream>
+#include <omp.h>
 #include "vec3.h"
 #include "film.h"
 #include "ray.h"
@@ -7,18 +8,19 @@
 #include "primitive.h"
 #include "accel.h"
 #include "aabb.h"
+#include "objloader.h"
 
 int main() {
     Film film(512, 512);
-    PinholeCamera cam(Vec3(0, 0, -3), Vec3(0, 0, 1), 1.0f);
+    PinholeCamera cam(Vec3(0, 5, -10), Vec3(0, 0, 1), 1.0f);
     Sphere sphere(Vec3(0), 1.0f);
 
     std::vector<std::shared_ptr<Primitive>> prims;
     
-    Primitive* prim = new GeometricPrimitive(std::shared_ptr<Shape>(&sphere));
-    prims.push_back(std::shared_ptr<Primitive>(prim));
-    BVH bvh = BVH(prims, 1, BVH_PARTITION_TYPE::EQSIZE);
+    loadObj(prims, "dragon.obj", Vec3(), 1.0f);
+    BVH bvh = BVH(prims, 4, BVH_PARTITION_TYPE::SAH);
 
+    #pragma omp parallel for schedule(dynamic, 1)
     for(int i = 0; i < film.width; i++) {
         for(int j = 0; j < film.height; j++) {
             float u = (2.0*i - film.width)/film.width;
@@ -32,6 +34,8 @@ int main() {
                 film.setPixel(i, j, RGB(0));
             }
         }
+        if(omp_get_thread_num() == 1)
+            std::cout << progressbar(i, film.width) << " " << percentage(i, film.width) << "\r" << std::flush;
     }
     film.ppm_output("output.ppm");
 }

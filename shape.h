@@ -42,4 +42,46 @@ class Sphere : public Shape {
             return AABB(Vec3(-radius), Vec3(radius));
         };
 };
+
+
+class Triangle : public Shape {
+    public:
+        Vec3 p1, p2, p3;
+        Vec3 normal;
+
+        Triangle(const Vec3& _p1, const Vec3& _p2, const Vec3& _p3) : p1(_p1), p2(_p2), p3(_p3) {
+            normal = normalize(cross(p2 - p1, p3 - p1));
+        };
+
+        bool intersect(const Ray& ray, Hit& res) const {
+            const float eps = 0.000001;
+            const Vec3 edge1 = p2 - p1;
+            const Vec3 edge2 = p3 - p1;
+            const Vec3 h = cross(ray.direction, edge2);
+            const float a = dot(edge1, h);
+            if(a >= -eps && a <= eps)
+                return false;
+            const float f = 1/a;
+            const Vec3 s = ray.origin - p1;
+            const float u = f*dot(s, h);
+            if(u < 0.0 || u > 1.0)
+                return false;
+            const Vec3 q = cross(s, edge1);
+            const float v = f*dot(ray.direction, q);
+            if(v < 0.0 || u + v > 1.0)
+                return false;
+            const float t = f*dot(edge2, q);
+            if(t <= ray.tmin || t > ray.tmax)
+                return false;
+            
+            res.t = t;
+            res.hitPos = ray(t);
+            res.hitNormal = normal;
+            return true;
+        };
+
+        AABB worldBound() const {
+            return AABB(min(p1, min(p2, p3)), max(p1, max(p2, p3)));
+        };
+};
 #endif
