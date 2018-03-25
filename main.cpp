@@ -15,8 +15,9 @@ int main() {
 
     std::vector<std::shared_ptr<Primitive>> prims;
     
-    prims.push_back(std::shared_ptr<Primitive>(new GeometricPrimitive(std::shared_ptr<Shape>(&sphere))));
-    BVH bvh = BVH(prims, 1, BVH_PARTITION_TYPE::SAH);
+    Primitive* prim = new GeometricPrimitive(std::shared_ptr<Shape>(&sphere));
+    prims.push_back(std::shared_ptr<Primitive>(prim));
+    BVH bvh = BVH(prims, 1, BVH_PARTITION_TYPE::EQSIZE);
 
     for(int i = 0; i < film.width; i++) {
         for(int j = 0; j < film.height; j++) {

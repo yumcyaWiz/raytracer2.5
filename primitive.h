@@ -21,8 +21,7 @@ class GeometricPrimitive : public Primitive {
 
         bool intersect(const Ray& ray, Hit& res) const {
             if(!shape->intersect(ray, res)) return false;
-            if(res.t < ray.tmax)
-                ray.tmax = res.t;
+            ray.tmax = res.t;
             return true;
         };
 
@@ -30,6 +29,5 @@ class GeometricPrimitive : public Primitive {
         AABB worldBound() const {
             return shape->worldBound();
         };
-
 };
 #endif
