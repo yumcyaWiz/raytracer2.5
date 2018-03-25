@@ -3,6 +3,7 @@
 #include <memory>
 #include "shape.h"
 #include "aabb.h"
+#include "material.h"
 class Primitive {
     public:
 
@@ -16,9 +17,10 @@ class Primitive {
 class GeometricPrimitive : public Primitive {
     public:
         std::shared_ptr<Shape> shape;
+        std::shared_ptr<Material> material;
 
 
-        GeometricPrimitive(const std::shared_ptr<Shape> _shape) : shape(_shape) {};
+        GeometricPrimitive(const std::shared_ptr<Shape> _shape, const std::shared_ptr<Material> _material) : shape(_shape), material(_material) {};
 
 
         virtual bool intersect(const Ray& ray, Hit& res) const {

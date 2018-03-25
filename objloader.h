@@ -58,7 +58,7 @@ std::vector<std::string> space_split(const std::string& str) {
 }
 
 
-void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, const std::string& filename, const Vec3& center, float scale) {
+void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, const std::string& filename, const Vec3& center, float scale, std::shared_ptr<Material> material) {
     struct Face {
         int v1, v2, v3;
         int vt1, vt2, vt3;
@@ -161,7 +161,7 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, const std::string& 
         Vec3 p1 = scale*vertex[f.v1 - 1] + center;
         Vec3 p2 = scale*vertex[f.v2 - 1] + center;
         Vec3 p3 = scale*vertex[f.v3 - 1] + center;
-        Primitive* prim = new GeometricPrimitive(std::shared_ptr<Shape>(new Triangle(p1, p2, p3)));
+        Primitive* prim = new GeometricPrimitive(std::shared_ptr<Shape>(new Triangle(p1, p2, p3)), material);
         prims.push_back(std::shared_ptr<Primitive>(prim));
     }
     std::cout << "Triangles added" << std::endl;

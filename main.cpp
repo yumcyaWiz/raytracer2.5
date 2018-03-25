@@ -13,6 +13,7 @@
 #include "scene.h"
 #include "filter.h"
 #include "sampler.h"
+#include "material.h"
 
 int main() {
     Filter* filter = new BoxFilter(Vec2(1));
@@ -23,7 +24,7 @@ int main() {
 
     std::vector<std::shared_ptr<Primitive>> prims;
     
-    loadObj(prims, "teapot.obj", Vec3(), 1.0f);
+    loadObj(prims, "teapot.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(1.0f))));
     BVH bvh = BVH(prims, 4, BVH_PARTITION_TYPE::SAH);
 
     #pragma omp parallel for schedule(dynamic, 1)

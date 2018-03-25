@@ -3,6 +3,18 @@
 #include <random>
 #include "vec2.h"
 #include "vec3.h"
+inline Vec2 sampleDisk(const Vec2& u) {
+    float r = std::sqrt(u.x);
+    float theta = 2 * M_PI * u.y;
+    return Vec2(r * std::cos(theta), r * std::sin(theta));
+}
+inline Vec3 sampleCosineHemisphere(const Vec2& u) {
+    Vec2 d = sampleDisk(u);
+    float z = std::sqrt(std::max(0.0f, 1.0f - d.x*d.x - d.y*d.y));
+    return Vec3(d.x, d.y, z);
+}
+
+
 class Sampler {
     public:
 
