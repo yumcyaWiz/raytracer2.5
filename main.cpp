@@ -11,6 +11,7 @@
 #include "objloader.h"
 #include "light.h"
 #include "scene.h"
+#include "filter.h"
 
 int main() {
     Film film(512, 512);
