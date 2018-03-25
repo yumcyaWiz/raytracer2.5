@@ -9,6 +9,7 @@
 #include "accel.h"
 #include "aabb.h"
 #include "objloader.h"
+#include "light.h"
 
 int main() {
     Film film(512, 512);
