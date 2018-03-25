@@ -9,7 +9,7 @@ class Ray {
         float tmin;
 
         Ray() {};
-        Ray(const Vec3& _origin, const Vec3& _direction) : origin(_origin), direction(_direction), tmax(10000.0f), tmin(0.0f) {};
+        Ray(const Vec3& _origin, const Vec3& _direction) : origin(_origin), direction(_direction), tmax(10000.0f), tmin(0.001f) {};
 
         Vec3 operator()(float t) const {
             return origin + t*direction;

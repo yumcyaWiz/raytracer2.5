@@ -15,15 +15,15 @@
 #include "sampler.h"
 
 int main() {
-    Filter* filter = new TriangleFilter(Vec2(1));
+    Filter* filter = new BoxFilter(Vec2(1));
     Film film(512, 512, std::unique_ptr<Filter>(filter), "output.ppm");
-    PinholeCamera cam(Vec3(0, 5, -10), Vec3(0, 0, 1), 1.0f);
+    PinholeCamera cam(Vec3(0, 2, -5), Vec3(0, 0, 1), 1.0f);
     Sphere sphere(Vec3(0), 1.0f);
     UniformSampler sampler;
 
     std::vector<std::shared_ptr<Primitive>> prims;
     
-    loadObj(prims, "dragon.obj", Vec3(), 1.0f);
+    loadObj(prims, "teapot.obj", Vec3(), 1.0f);
     BVH bvh = BVH(prims, 4, BVH_PARTITION_TYPE::SAH);
 
     #pragma omp parallel for schedule(dynamic, 1)
@@ -39,10 +39,10 @@ int main() {
             Ray ray = cam.getRay(u, v);
             Hit res;
             if(bvh.intersect(ray, res)) {
-                film.addSample(px, py, (res.hitNormal + 1.0f)/2.0f);
+                film.addSample(i, j, (res.hitNormal + 1.0f)/2.0f);
             }
             else {
-                film.addSample(px, py, RGB(0.0f));
+                film.addSample(i, j, RGB(0.0f));
             }
             //std::cout << film.pixels[i + film.width+j].color_sum << std::endl;
             //std::cout << film.pixels[i + film.width+j].filter_sum << std::endl;

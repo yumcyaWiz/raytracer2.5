@@ -42,7 +42,10 @@ class Film {
         void setPixel(int i, int j, const Pixel& _pix) {
             pixels[i + width*j] = _pix;
         };
-        void addSample(float i, float j, const RGB& c) {
+        void addSample(int i, int j, const RGB& c) {
+            pixels[i + width*j].color_sum += c;
+        };
+        void addSampleByFilter(float i, float j, const RGB& c) {
             int pminX = inrangeX(std::ceil(i - filter->radius.x));
             int pmaxX = inrangeX(std::floor(i + filter->radius.x));
             int pminY = inrangeY(std::ceil(j - filter->radius.y));
@@ -69,7 +72,8 @@ class Film {
             for(int i = 0; i < width; i++) {
                 for(int j = 0; j < height; j++) {
                     float fsum = pixels[i + width*j].filter_sum;
-                    pixels[i + width*j].color_sum /= fsum;
+                    if(fsum > 0)
+                        pixels[i + width*j].color_sum /= fsum;
                 }
             }
         };
