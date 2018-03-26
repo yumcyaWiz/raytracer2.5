@@ -34,18 +34,19 @@ class Sphere : public Shape {
                 if(tHit > ray.tmax) return false;
             }
             Vec3 hitPos = ray(tHit);
+            Vec3 localHitPos = hitPos - center;
 
-            float phi = std::atan2(hitPos.z, hitPos.x);
-            float theta = std::acos(clamp(hitPos.y/radius, -1.0f, 1.0f));
+            float phi = std::atan2(localHitPos.z, localHitPos.x);
+            float theta = std::acos(clamp(localHitPos.y/radius, -1.0f, 1.0f));
 
             res.t = tHit;
             res.hitPos = hitPos;
-            res.hitNormal = normalize(res.hitPos - center);
             res.uv = Vec2(phi/(2*M_PI), theta/M_PI);
-            Vec3 dpdu = Vec3(-2*M_PI*hitPos.z, 0, 2*M_PI*hitPos.x);
-            Vec3 dpdv = M_PI * Vec3(hitPos.y*std::cos(phi), -radius*std::sin(theta), hitPos.y*std::sin(phi));
-            res.dpdu = dpdu;
-            res.dpdv = dpdv;
+            Vec3 dpdu = Vec3(-2*M_PI*localHitPos.z, 0, 2*M_PI*localHitPos.x);
+            Vec3 dpdv = M_PI * Vec3(localHitPos.y*std::cos(phi), -radius*std::sin(theta), localHitPos.y*std::sin(phi));
+            res.dpdu = normalize(dpdu);
+            res.dpdv = normalize(dpdv);
+            res.hitNormal = normalize(cross(dpdu, dpdv));
             return true;
         };
         AABB worldBound() const {

@@ -36,7 +36,6 @@ class NormalRenderer : public Integrator {
                     }
                 }
             }
-            film->gamma_correction();
             film->ppm_output();
         };
 };
@@ -65,7 +64,7 @@ class PathTrace : public Integrator {
                 //BRDFの計算と方向のサンプリング
                 Vec3 wo = -ray.direction;
                 Vec3 n = res.hitNormal;
-                Vec3 s = normalize(res.dpdu);
+                Vec3 s = res.dpdu;
                 Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
                 float brdf_pdf;
@@ -75,7 +74,8 @@ class PathTrace : public Integrator {
                 float cos_term = std::max(dot(wi, n), 0.0f);
 
                 //レンダリング方程式の計算
-                return brdf_f * cos_term/brdf_pdf * Li(Ray(res.hitPos, wi), scene, depth + 1);
+                Ray nextRay(res.hitPos, wi);
+                return brdf_f * cos_term/brdf_pdf * Li(nextRay, scene, depth + 1);
             }
             else {
                 return RGB(1.0f);
