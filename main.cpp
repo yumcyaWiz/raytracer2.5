@@ -24,7 +24,7 @@ int main() {
 
     std::vector<std::shared_ptr<Primitive>> prims;
     
-    loadObj(prims, "teapot.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(1.0f))));
+    loadObj(prims, "teapot.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(1.0f, 0, 0))));
     BVH bvh = BVH(prims, 4, BVH_PARTITION_TYPE::SAH);
 
     #pragma omp parallel for schedule(dynamic, 1)
@@ -40,7 +40,8 @@ int main() {
             Ray ray = cam.getRay(u, v);
             Hit res;
             if(bvh.intersect(ray, res)) {
-                film.addSample(i, j, (res.hitNormal + 1.0f)/2.0f);
+                std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
+                film.addSample(i, j, (hitMaterial->f(-ray.direction, res.hitNormal)));
             }
             else {
                 film.addSample(i, j, RGB(0.0f));

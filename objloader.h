@@ -161,7 +161,7 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, const std::string& 
         Vec3 p1 = scale*vertex[f.v1 - 1] + center;
         Vec3 p2 = scale*vertex[f.v2 - 1] + center;
         Vec3 p3 = scale*vertex[f.v3 - 1] + center;
-        Primitive* prim = new GeometricPrimitive(std::shared_ptr<Shape>(new Triangle(p1, p2, p3)), material);
+        Primitive* prim = new GeometricPrimitive(material, nullptr, std::shared_ptr<Shape>(new Triangle(p1, p2, p3)));
         prims.push_back(std::shared_ptr<Primitive>(prim));
     }
     std::cout << "Triangles added" << std::endl;

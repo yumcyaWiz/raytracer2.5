@@ -48,8 +48,12 @@ class Triangle : public Shape {
     public:
         Vec3 p1, p2, p3;
         Vec3 normal;
+        Vec3 dpdu;
+        Vec3 dpdv;
 
         Triangle(const Vec3& _p1, const Vec3& _p2, const Vec3& _p3) : p1(_p1), p2(_p2), p3(_p3) {
+            dpdu = normalize(p2 - p1);
+            dpdv = normalize(p3 - p1);
             normal = normalize(cross(p2 - p1, p3 - p1));
         };
 
@@ -77,6 +81,9 @@ class Triangle : public Shape {
             res.t = t;
             res.hitPos = ray(t);
             res.hitNormal = normal;
+            res.uv = Vec2(u, v);
+            res.dpdu = dpdu;
+            res.dpdv = dpdv;
             return true;
         };
 
