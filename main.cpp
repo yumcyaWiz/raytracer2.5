@@ -15,6 +15,7 @@
 #include "sampler.h"
 #include "material.h"
 #include "integrator.h"
+#include "sky.h"
 
 int main() {
     Filter* filter = new GaussianFilter(Vec2(1), 1.0f);
@@ -33,11 +34,12 @@ int main() {
     std::vector<std::shared_ptr<Primitive>> prims;
     prims.push_back(prim);
     prims.push_back(prim2);
-    loadObj(prims, "dragon.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.0f, 0.5f, 0.5f))));
+    loadObj(prims, "dragon.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.8f))));
 
     std::vector<std::shared_ptr<Light>> lights;
+    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("PaperMill_E_3k.hdr"));
 
-    Scene scene(prims, lights);
+    Scene scene(prims, lights, sky);
     Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 100, 10);
     //Integrator* integrator = new NormalRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 

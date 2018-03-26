@@ -98,7 +98,7 @@ class Film {
             for(int j = 0; j < height; j++) {
                 for(int i = 0; i < width; i++) {
                     RGB c = getPixel(i, j);
-                    file << (int)(255*c.x) << " " << (int)(255*c.y) << " " << (int)(255*c.z) << std::endl;
+                    file << (int)(255*clamp(c.x, 0.0f, 1.0f)) << " " << (int)(255*clamp(c.y, 0.0f, 1.0f)) << " " << (int)(255*clamp(c.z, 0.0f, 1.0f)) << std::endl;
                 }
             }
             file.close();

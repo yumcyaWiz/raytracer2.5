@@ -2,3 +2,5 @@
 *.ppm
 *.png
 *.obj
+stb_image.h
+*.hdr

@@ -87,7 +87,7 @@ class PathTrace : public Integrator {
                 return 1.0f/brdf_pdf * cos_term * brdf_f * Li(nextRay, scene, depth + 1, roulette);
             }
             else {
-                return RGB(1.0f);
+                return scene.sky->getSky(ray);
             }
         };
 
