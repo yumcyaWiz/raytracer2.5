@@ -33,7 +33,7 @@ int main() {
     std::vector<std::shared_ptr<Light>> lights;
 
     Scene scene(prims, lights);
-    Integrator* integrator = new NormalRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
+    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10, 10);
 
     integrator->render(scene);
 }

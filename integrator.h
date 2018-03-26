@@ -1,5 +1,6 @@
 #ifndef INTEGRATOR_H
 #define INTEGRATOR_H
+#include <omp.h>
 #include <memory>
 #include "camera.h"
 #include "film.h"
@@ -83,6 +84,7 @@ class PathTrace : public Integrator {
 
         void render(const Scene& scene) const {
             for(int k = 0; k < pixelSamples; k++) {
+                #pragma omp parallel for schedule(dynamic, 1)
                 for(int i = 0; i < film->width; i++) {
                     for(int j = 0; j < film->height; j++) {
                         float rx = sampler->getNext();
@@ -95,6 +97,8 @@ class PathTrace : public Integrator {
                         RGB col = Li(ray, scene);
                         film->addSample(i, j, col);
                     }
+                    if(omp_get_thread_num() == 0)
+                        std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
                 }
             }
             film->divide(pixelSamples);
