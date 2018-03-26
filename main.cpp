@@ -30,8 +30,8 @@ int main() {
 
     std::vector<std::shared_ptr<Primitive>> prims;
     prims.push_back(prim);
-    prims.push_back(prim2);
-    //loadObj(prims, "dragon.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.0f, 1.0f, 0.0f))));
+    //prims.push_back(prim2);
+    loadObj(prims, "dragon.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.0f, 1.0f, 0.0f))));
 
     std::vector<std::shared_ptr<Light>> lights;
 

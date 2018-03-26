@@ -37,11 +37,12 @@ class Sphere : public Shape {
             Vec3 localHitPos = hitPos - center;
 
             float phi = std::atan2(localHitPos.z, localHitPos.x);
+            if(phi < 0) phi += 2*M_PI;
             float theta = std::acos(clamp(localHitPos.y/radius, -1.0f, 1.0f));
 
             res.t = tHit;
             res.hitPos = hitPos;
-            res.uv = Vec2(phi/(2*M_PI), theta/M_PI);
+            res.uv = Vec2(phi/(2*M_PI), 1.0f - theta/M_PI);
             Vec3 dpdu = Vec3(-2*M_PI*localHitPos.z, 0, 2*M_PI*localHitPos.x);
             Vec3 dpdv = M_PI * Vec3(localHitPos.y*std::cos(phi), -radius*std::sin(theta), localHitPos.y*std::sin(phi));
             res.dpdu = normalize(dpdu);
