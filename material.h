@@ -35,7 +35,9 @@ class Material {
     public:
         Material() {};
 
+        //BRDFを計算する ワールド座標系の方向ベクトルを受け取る
         virtual RGB f(const Vec3& wo, const Vec3& wi) const = 0;
+        //BRDFを計算し、BRDFに比例した方向のサンプリングを行う
         virtual RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const = 0;
 };
 
@@ -47,12 +49,13 @@ class Lambert : public Material {
         Lambert(const RGB& _reflectance) : reflectance(_reflectance) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
-            return reflectance;
+            return reflectance/M_PI;
         };
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
-            wi = localToWorld(sampleCosineHemisphere(u), n, s, t);
-            pdf = cosTheta(wi)/M_PI;
-            return reflectance;
+            Vec3 wi_local = sampleCosineHemisphere(u);
+            pdf = absCosTheta(wi_local)/M_PI;
+            wi = localToWorld(wi_local, n, s, t);
+            return f(wo, wi);
         };
 };
 #endif

@@ -5,6 +5,7 @@
 #include "ray.h"
 #include "hit.h"
 #include "aabb.h"
+#include "util.h"
 class Shape {
     public:
         virtual bool intersect(const Ray& ray, Hit& res) const = 0;
@@ -32,10 +33,19 @@ class Sphere : public Shape {
                 tHit = t1;
                 if(tHit > ray.tmax) return false;
             }
+            Vec3 hitPos = ray(tHit);
+
+            float phi = std::atan2(hitPos.z, hitPos.x);
+            float theta = std::acos(clamp(hitPos.y/radius, -1.0f, 1.0f));
 
             res.t = tHit;
-            res.hitPos = ray(tHit);
+            res.hitPos = hitPos;
             res.hitNormal = normalize(res.hitPos - center);
+            res.uv = Vec2(phi/(2*M_PI), theta/M_PI);
+            Vec3 dpdu = Vec3(-2*M_PI*hitPos.z, 0, 2*M_PI*hitPos.x);
+            Vec3 dpdv = M_PI * Vec3(hitPos.y*std::cos(phi), -radius*std::sin(theta), hitPos.y*std::sin(phi));
+            res.dpdu = dpdu;
+            res.dpdv = dpdv;
             return true;
         };
         AABB worldBound() const {

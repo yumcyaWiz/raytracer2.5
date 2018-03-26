@@ -79,6 +79,17 @@ class Film {
         };
 
 
+        void gamma_correction() {
+            for(int i = 0; i < width; i++) {
+                for(int j = 0; j < height; j++) {
+                    RGB c = getPixel(i, j);
+                    c = RGB(std::pow(c.x, 1.0f/2.2f), std::pow(c.y, 1.0f/2.2f), std::pow(c.z, 1.0f/2.2f));
+                    setPixel(i, j, c);
+                }
+            }
+        };
+
+
         void ppm_output() const {
             std::ofstream file(filename);
             file << "P3" << std::endl;

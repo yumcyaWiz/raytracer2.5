@@ -19,15 +19,21 @@
 int main() {
     Filter* filter = new BoxFilter(Vec2(1));
     Film film(512, 512, std::unique_ptr<Filter>(filter), "output.ppm");
-    PinholeCamera cam(Vec3(0, 2, -5), Vec3(0, 0, 1), 1.0f);
+    PinholeCamera cam(Vec3(0, 5, -10), Vec3(0, 0, 1), 1.0f);
     UniformSampler sampler;
+    
+    std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Lambert(RGB(0.8f)));
+    std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(Vec3(0, -1000, 0), 1000.0f));
+    std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
 
     std::vector<std::shared_ptr<Primitive>> prims;
-    loadObj(prims, "teapot.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.8f))));
+    prims.push_back(prim);
+    loadObj(prims, "dragon.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.0f, 1.0f, 0.0f))));
+
     std::vector<std::shared_ptr<Light>> lights;
 
     Scene scene(prims, lights);
-    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10, 10);
+    Integrator* integrator = new NormalRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 
     integrator->render(scene);
 }

@@ -16,6 +16,31 @@ class Integrator {
 };
 
 
+class NormalRenderer : public Integrator {
+    public:
+        NormalRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+
+        void render(const Scene& scene) const {
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float u = (2.0*i - film->width)/film->width;
+                    float v = -(2.0*j - film->height)/film->height;
+                    Ray ray = cam->getRay(u, v);
+                    Hit res;
+                    if(scene.intersect(ray, res)) {
+                        film->setPixel(i, j, (res.hitNormal + 1.0f)/2.0f);
+                    }
+                    else {
+                        film->setPixel(i, j, RGB(0.0f));
+                    }
+                }
+            }
+            film->gamma_correction();
+            film->ppm_output();
+        };
+};
+
+
 class PathTrace : public Integrator {
     public:
         int pixelSamples;
@@ -37,17 +62,22 @@ class PathTrace : public Integrator {
                 //マテリアル
                 std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
                 //BRDFの計算と方向のサンプリング
+                Vec3 wo = -ray.direction;
                 Vec3 n = res.hitNormal;
                 Vec3 s = normalize(res.dpdu);
                 Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
                 float brdf_pdf;
-                RGB brdf_f = hitMaterial->sample(-ray.direction, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
 
-                return brdf_f * dot(res.hitNormal, wi)/brdf_pdf * Li(Ray(res.hitPos, wi), scene, depth + 1);
+                //コサイン項
+                float cos_term = std::max(dot(wi, n), 0.0f);
+
+                //レンダリング方程式の計算
+                return brdf_f * cos_term/brdf_pdf * Li(Ray(res.hitPos, wi), scene, depth + 1);
             }
             else {
-                return RGB(0.5f);
+                return RGB(1.0f);
             }
         };
 
@@ -68,6 +98,7 @@ class PathTrace : public Integrator {
                 }
             }
             film->divide(pixelSamples);
+            film->gamma_correction();
             film->ppm_output();
         };
 };
