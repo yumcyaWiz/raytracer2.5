@@ -31,19 +31,32 @@ class Sampler {
 };
 
 
+enum class RNG_TYPE {
+    MT,
+    MINSTD
+};
+
+
 class UniformSampler : public Sampler {
     public:
         std::mt19937 mt;
+        std::minstd_rand minstd;
         std::random_device rnd_dev;
         std::uniform_real_distribution<> rnd;
+        RNG_TYPE type;
 
-        UniformSampler() {
+        UniformSampler() {};
+        UniformSampler(RNG_TYPE _type) : type(_type) {
             mt.seed(rnd_dev());
+            minstd.seed(rnd_dev());
             rnd = std::uniform_real_distribution<>(0.0f, 1.0f);
         };
 
         float getNext() {
-            return rnd(mt);
+            if(type == RNG_TYPE::MT)
+                return rnd(mt);
+            else
+                return rnd(minstd);
         };
         Vec2 getNext2D() {
             return Vec2(getNext(), getNext());

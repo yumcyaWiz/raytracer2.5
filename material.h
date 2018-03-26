@@ -31,6 +31,11 @@ inline float absCosTheta(const Vec3& w) {
 }
 
 
+inline Vec3 reflect(const Vec3& w, const Vec3& n) {
+    return -w + 2.0f*dot(w, n)*n;
+}
+
+
 class Material {
     public:
         Material() {};
@@ -56,6 +61,23 @@ class Lambert : public Material {
             pdf = absCosTheta(wi_local)/M_PI;
             wi = localToWorld(wi_local, n, s, t);
             return f(wo, wi);
+        };
+};
+
+
+class Mirror : public Material {
+    public:
+        const RGB reflectance;
+
+        Mirror(const RGB& _reflectance) : reflectance(_reflectance) {};
+
+        RGB f(const Vec3& wo, const Vec3& wi) const {
+            return 0.0f;
+        };
+        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
+            pdf = 1.0f;
+            wi = reflect(wo, n);
+            return 1.0f/dot(wi, n)*reflectance;
         };
 };
 #endif
