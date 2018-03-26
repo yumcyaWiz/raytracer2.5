@@ -21,6 +21,7 @@ int main() {
     Film film(512, 512, std::unique_ptr<Filter>(filter), "output.ppm");
     PinholeCamera cam(Vec3(0, 5, -10), Vec3(0, 0, 1), 1.0f);
     UniformSampler sampler;
+
     
     std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Lambert(RGB(0.8f)));
     std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(Vec3(0, -3000, 0), 3000.0f));
@@ -36,7 +37,7 @@ int main() {
     std::vector<std::shared_ptr<Light>> lights;
 
     Scene scene(prims, lights);
-    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10, 100);
+    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 100, 10);
     //Integrator* integrator = new NormalRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 
     integrator->render(scene);

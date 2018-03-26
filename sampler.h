@@ -8,6 +8,12 @@ inline Vec2 sampleDisk(const Vec2& u) {
     float theta = 2 * M_PI * u.y;
     return Vec2(r * std::cos(theta), r * std::sin(theta));
 }
+inline Vec3 sampleHemisphere(const Vec2& u) {
+    float z = u.x;
+    float r = std::sqrt(std::max(0.0f, 1.0f - z*z));
+    float phi = 2.0f*M_PI*u.y;
+    return Vec3(r*std::cos(phi), z, r*std::sin(phi));
+}
 inline Vec3 sampleCosineHemisphere(const Vec2& u) {
     Vec2 d = sampleDisk(u);
     float z = std::sqrt(std::max(0.0f, 1.0f - d.x*d.x - d.y*d.y));

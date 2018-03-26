@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "film.h"
 #include "sampler.h"
+#include "timer.h"
 class Integrator {
     public:
         std::shared_ptr<Camera> cam;
@@ -25,7 +26,7 @@ class NormalRenderer : public Integrator {
             for(int i = 0; i < film->width; i++) {
                 for(int j = 0; j < film->height; j++) {
                     float u = (2.0*i - film->width)/film->width;
-                    float v = -(2.0*j - film->height)/film->height;
+                    float v = (2.0*j - film->height)/film->height;
                     Ray ray = cam->getRay(u, v);
                     Hit res;
                     if(scene.intersect(ray, res)) {
@@ -51,8 +52,9 @@ class PathTrace : public Integrator {
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
             if(depth > maxDepth/2) {
-                if(sampler->getNext() < roulette)
-                    return RGB(0.0f);
+                if(sampler->getNext() < roulette) {
+                    //return RGB(0.0f);
+                }
                 roulette *= 0.9f;
             }
 
@@ -71,7 +73,7 @@ class PathTrace : public Integrator {
                 //BRDFの計算と方向のサンプリング
                 Vec3 wo = -ray.direction;
                 Vec3 n = res.hitNormal;
-                Vec3 s = res.dpdu;
+                Vec3 s = res.dpdv;
                 Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
                 float brdf_pdf;
@@ -82,7 +84,7 @@ class PathTrace : public Integrator {
 
                 //レンダリング方程式の計算
                 Ray nextRay(res.hitPos, wi);
-                return 1.0f/roulette * brdf_f * cos_term/brdf_pdf * Li(nextRay, scene, depth + 1, roulette);
+                return 1.0f/brdf_pdf * cos_term * brdf_f * Li(nextRay, scene, depth + 1, roulette);
             }
             else {
                 return RGB(1.0f);
@@ -90,6 +92,8 @@ class PathTrace : public Integrator {
         };
 
         void render(const Scene& scene) const {
+            Timer timer;
+            timer.start();
             for(int k = 0; k < pixelSamples; k++) {
                 #pragma omp parallel for schedule(dynamic, 1)
                 for(int i = 0; i < film->width; i++) {
@@ -108,6 +112,7 @@ class PathTrace : public Integrator {
                         std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
                 }
             }
+            timer.stop("Rendering Finished");
             film->divide(pixelSamples);
             film->gamma_correction();
             film->ppm_output();
