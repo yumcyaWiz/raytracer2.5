@@ -48,7 +48,14 @@ class PathTrace : public Integrator {
 
         PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
 
-        RGB Li(const Ray& ray, const Scene& scene, int depth = 0) const {
+        RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
+            //ロシアンルーレット
+            if(depth > maxDepth/2) {
+                if(sampler->getNext() < roulette)
+                    return RGB(0.0f);
+                roulette *= 0.9f;
+            }
+
             if(depth > maxDepth)
                 return RGB(0.0f);
 
@@ -75,7 +82,7 @@ class PathTrace : public Integrator {
 
                 //レンダリング方程式の計算
                 Ray nextRay(res.hitPos, wi);
-                return brdf_f * cos_term/brdf_pdf * Li(nextRay, scene, depth + 1);
+                return 1.0f/roulette * brdf_f * cos_term/brdf_pdf * Li(nextRay, scene, depth + 1, roulette);
             }
             else {
                 return RGB(1.0f);

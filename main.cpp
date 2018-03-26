@@ -17,7 +17,7 @@
 #include "integrator.h"
 
 int main() {
-    Filter* filter = new BoxFilter(Vec2(1));
+    Filter* filter = new GaussianFilter(Vec2(1), 1.0f);
     Film film(512, 512, std::unique_ptr<Filter>(filter), "output.ppm");
     PinholeCamera cam(Vec3(0, 5, -10), Vec3(0, 0, 1), 1.0f);
     UniformSampler sampler;
@@ -31,13 +31,13 @@ int main() {
     std::vector<std::shared_ptr<Primitive>> prims;
     prims.push_back(prim);
     //prims.push_back(prim2);
-    loadObj(prims, "dragon.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.0f, 1.0f, 0.0f))));
+    loadObj(prims, "dragon.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.0f, 0.5f, 0.5f))));
 
     std::vector<std::shared_ptr<Light>> lights;
 
     Scene scene(prims, lights);
-    //Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10, 10);
-    Integrator* integrator = new NormalRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
+    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10, 100);
+    //Integrator* integrator = new NormalRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 
     integrator->render(scene);
 }

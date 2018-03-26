@@ -29,7 +29,7 @@ class Sphere : public Shape {
             const float t1 = -b + std::sqrt(D);
             if(t0 > ray.tmax || t1 <= ray.tmin) return false;
             float tHit = t0;
-            if(t1 < ray.tmax) {
+            if(tHit < ray.tmin) {
                 tHit = t1;
                 if(tHit > ray.tmax) return false;
             }
