@@ -88,15 +88,15 @@ class PathTraceDepthRenderer : public Integrator {
             RGB col;
             if(scene.intersect(ray, res)) {
                 //マテリアル
-                std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
+                const std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
                 //BRDFの計算と方向のサンプリング
-                Vec3 wo = -ray.direction;
-                Vec3 n = res.hitNormal;
-                Vec3 s = res.dpdu;
-                Vec3 t = normalize(cross(s, n));
+                const Vec3 wo = -ray.direction;
+                const Vec3 n = res.hitNormal;
+                const Vec3 s = res.dpdu;
+                const Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
                 float brdf_pdf;
-                RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
 
                 Ray nextRay(res.hitPos, wi);
                 return Li(nextRay, scene, depth + 1, roulette);
@@ -148,15 +148,17 @@ class PathTrace : public Integrator {
                     col += res.hitPrimitive->areaLight->Le(res);
                 }
                 //マテリアル
-                std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
+                const std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
                 //BRDFの計算と方向のサンプリング
-                Vec3 wo = -ray.direction;
+                const Vec3 wo = -ray.direction;
                 Vec3 n = res.hitNormal;
-                Vec3 s = res.dpdu;
-                Vec3 t = normalize(cross(s, n));
+                std::cout << depth << std::endl;
+                std::cout << dot(wo, n) << std::endl;
+                const Vec3 s = res.dpdu;
+                const Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
                 float brdf_pdf;
-                RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
 
                 //コサイン項
                 float cos_term = std::max(dot(wi, n), 0.0f);
