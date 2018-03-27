@@ -16,6 +16,17 @@ class Sky {
 };
 
 
+class SimpleSky : public Sky {
+    public:
+        SimpleSky() {};
+
+        RGB getSky(const Ray& ray) const {
+            float t = (ray.direction.y + 1.0f)*0.5f;
+            return (1.0f - t)*RGB(1.0f) + t*RGB(0.5f, 0.7f, 1.0f);
+        };
+};
+
+
 class IBL : public Sky {
     public:
         int width;

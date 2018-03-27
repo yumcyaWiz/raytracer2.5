@@ -51,9 +51,9 @@ class PathTrace : public Integrator {
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
-            if(depth > maxDepth/2) {
+            if(depth > 10) {
                 if(sampler->getNext() < roulette) {
-                    //return RGB(0.0f);
+                    return RGB(0.0f);
                 }
                 roulette *= 0.9f;
             }
@@ -84,7 +84,7 @@ class PathTrace : public Integrator {
 
                 //レンダリング方程式の計算
                 Ray nextRay(res.hitPos, wi);
-                return 1.0f/brdf_pdf * cos_term * brdf_f * Li(nextRay, scene, depth + 1, roulette);
+                return 1.0f/(brdf_pdf*roulette) * cos_term * brdf_f * Li(nextRay, scene, depth + 1, roulette);
             }
             else {
                 return scene.sky->getSky(ray);

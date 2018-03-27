@@ -37,10 +37,10 @@ int main() {
     loadObj(prims, "dragon.obj", Vec3(), 1.0f, std::shared_ptr<Material>(new Lambert(RGB(0.8f))));
 
     std::vector<std::shared_ptr<Light>> lights;
-    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("PaperMill_E_3k.hdr"));
+    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new SimpleSky());
 
     Scene scene(prims, lights, sky);
-    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 100, 10);
+    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10, 100);
     //Integrator* integrator = new NormalRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 
     integrator->render(scene);
