@@ -42,6 +42,38 @@ class NormalRenderer : public Integrator {
 };
 
 
+class BRDFRenderer : public Integrator {
+    public:
+        BRDFRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+
+        void render(const Scene& scene) const {
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float u = (2.0*i - film->width)/film->width;
+                    float v = -(2.0*j - film->height)/film->height;
+                    Ray ray = cam->getRay(u, v);
+                    Hit res;
+                    if(scene.intersect(ray, res)) {
+                        std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
+                        Vec3 wo = -ray.direction;
+                        Vec3 n = res.hitNormal;
+                        Vec3 s = res.dpdu;
+                        Vec3 t = normalize(cross(s, n));
+                        Vec3 wi;
+                        float brdf_pdf;
+                        RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                        film->setPixel(i, j, (wi + 1.0f)/2.0f);
+                    }
+                    else {
+                        film->setPixel(i, j, RGB(0.0f));
+                    }
+                }
+            }
+            film->ppm_output();
+        };
+};
+
+
 class PathTrace : public Integrator {
     public:
         int pixelSamples;
@@ -73,7 +105,7 @@ class PathTrace : public Integrator {
                 //BRDFの計算と方向のサンプリング
                 Vec3 wo = -ray.direction;
                 Vec3 n = res.hitNormal;
-                Vec3 s = res.dpdv;
+                Vec3 s = res.dpdu;
                 Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
                 float brdf_pdf;
