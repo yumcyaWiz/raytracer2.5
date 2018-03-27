@@ -164,7 +164,7 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, const std::string& 
         Primitive* prim = new GeometricPrimitive(material, nullptr, std::shared_ptr<Shape>(new Triangle(p1, p2, p3)));
         prims.push_back(std::shared_ptr<Primitive>(prim));
     }
-    std::cout << "Triangles added" << std::endl;
+    std::cout << face.size() << " Triangles added" << std::endl;
 
     //summary
     std::cout << "Vertex:" << 3*vertex.size() << std::endl;

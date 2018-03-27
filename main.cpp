@@ -47,22 +47,23 @@ int main(int argc, char** argv) {
     std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Lambert(RGB(0.8f)));
     std::shared_ptr<Material> mat2 = std::shared_ptr<Material>(new Mirror(RGB(0.8f)));
     std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(Vec3(0, -3000, 0), 3000.0f));
-    std::shared_ptr<Shape> shape2 = std::shared_ptr<Shape>(new Sphere(Vec3(0.0f, 1.0f, 0.0f), 1.0f));
+    std::shared_ptr<Shape> shape2 = std::shared_ptr<Shape>(new Sphere(Vec3(0.0f, 3.0f, 0.0f), 3.0f));
     std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
     std::shared_ptr<Primitive> prim2 = std::shared_ptr<Primitive>(new GeometricPrimitive(mat2, nullptr, shape2));
 
     std::vector<std::shared_ptr<Primitive>> prims;
-    prims.push_back(prim);
+    //prims.push_back(prim);
     //prims.push_back(prim2);
-    loadObj(prims, "dragon.obj", Vec3(), 1.0f, mat);
+    loadObj(prims, "plane.obj", Vec3(), 10.0f, mat);
+    loadObj(prims, "teapot.obj", Vec3(), 2.0f, mat2);
 
     std::vector<std::shared_ptr<Light>> lights;
-    //std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("PaperMill_E_3k.hdr"));
-    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new SimpleSky());
+    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("PaperMill_E_3k.hdr"));
+    //std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new SimpleSky());
 
     Scene scene(prims, lights, sky);
-    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), samples, 100);
-    //Integrator* integrator = new PathTraceDepthRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10);
+    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), samples, 10);
+    //Integrator* integrator = new NormalRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 
     integrator->render(scene);
 }

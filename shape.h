@@ -29,10 +29,11 @@ class Sphere : public Shape {
             const float t1 = -b + std::sqrt(D);
             if(t0 > ray.tmax || t1 <= ray.tmin) return false;
             float tHit = t0;
-            if(tHit < ray.tmin) {
+            if(tHit <= ray.tmin) {
                 tHit = t1;
                 if(tHit > ray.tmax) return false;
             }
+            tHit -= 1e-3;
             Vec3 hitPos = ray(tHit);
             Vec3 localHitPos = hitPos - center;
 
@@ -47,11 +48,11 @@ class Sphere : public Shape {
             res.dpdu = normalize(dpdu);
             res.dpdv = normalize(dpdv);
             res.hitNormal = normalize(cross(dpdu, dpdv));
-            res.hitPos = hitPos + 0.01f*res.hitNormal;
+            res.hitPos = hitPos;
             return true;
         };
         AABB worldBound() const {
-            return AABB(Vec3(-radius), Vec3(radius));
+            return AABB(Vec3(-radius) + center, Vec3(radius) + center);
         };
 };
 
@@ -66,7 +67,7 @@ class Triangle : public Shape {
         Triangle(const Vec3& _p1, const Vec3& _p2, const Vec3& _p3) : p1(_p1), p2(_p2), p3(_p3) {
             dpdu = normalize(p2 - p1);
             dpdv = normalize(p3 - p1);
-            normal = normalize(cross(p2 - p1, p3 - p1));
+            normal = normalize(cross(dpdu, dpdv));
         };
 
         bool intersect(const Ray& ray, Hit& res) const {
@@ -86,16 +87,23 @@ class Triangle : public Shape {
             const float v = f*dot(ray.direction, q);
             if(v < 0.0f || u + v > 1.0f)
                 return false;
-            const float t = f*dot(edge2, q);
+            float t = f*dot(edge2, q);
             if(t <= ray.tmin || t > ray.tmax)
                 return false;
             
+            t -= 1e-5;
             res.t = t;
             res.hitPos = ray(t);
             res.hitNormal = normal;
             res.uv = Vec2(u, v);
             res.dpdu = dpdu;
             res.dpdv = dpdv;
+
+            if(dot(-ray.direction, res.hitNormal) < 0.0f) {
+                res.hitNormal = -res.hitNormal;
+                res.dpdu = -res.dpdu;
+                res.dpdv = -res.dpdv;
+            }
             return true;
         };
 

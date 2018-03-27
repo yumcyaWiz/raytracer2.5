@@ -26,7 +26,7 @@ class NormalRenderer : public Integrator {
             for(int i = 0; i < film->width; i++) {
                 for(int j = 0; j < film->height; j++) {
                     float u = (2.0*i - film->width)/film->width;
-                    float v = (2.0*j - film->height)/film->height;
+                    float v = -(2.0*j - film->height)/film->height;
                     Ray ray = cam->getRay(u, v);
                     Hit res;
                     if(scene.intersect(ray, res)) {
@@ -152,8 +152,6 @@ class PathTrace : public Integrator {
                 //BRDFの計算と方向のサンプリング
                 const Vec3 wo = -ray.direction;
                 Vec3 n = res.hitNormal;
-                std::cout << depth << std::endl;
-                std::cout << dot(wo, n) << std::endl;
                 const Vec3 s = res.dpdu;
                 const Vec3 t = normalize(cross(s, n));
                 Vec3 wi;

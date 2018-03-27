@@ -44,10 +44,10 @@ class IBL : public Sky {
         RGB getSky(const Ray& ray) const {
             float phi = std::atan2(ray.direction.z, ray.direction.x);
             if(phi < 0) phi += 2*M_PI;
-            float theta = std::atan(ray.direction.y/std::sqrt(ray.direction.x*ray.direction.x + ray.direction.z*ray.direction.z)) + M_PI/2;
+            float theta = std::acos(clamp(ray.direction.y, -1.0f, 1.0f));
 
             float u = phi/(2.0*M_PI);
-            float v = 1.0f - theta/M_PI;
+            float v = theta/M_PI;
 
             int w = (int)(u * width);
             int h = (int)(v * height);
