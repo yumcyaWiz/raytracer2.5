@@ -40,8 +40,8 @@ int main() {
     std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new SimpleSky());
 
     Scene scene(prims, lights, sky);
-    //Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10, 100);
-    Integrator* integrator = new BRDFRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
+    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10, 100);
+    //Integrator* integrator = new PathTraceDepthRenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), 10);
 
     integrator->render(scene);
 }

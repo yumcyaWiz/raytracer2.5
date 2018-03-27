@@ -70,21 +70,21 @@ class Triangle : public Shape {
         };
 
         bool intersect(const Ray& ray, Hit& res) const {
-            const float eps = 0.000001;
+            const float eps = 1e-6;
             const Vec3 edge1 = p2 - p1;
             const Vec3 edge2 = p3 - p1;
             const Vec3 h = cross(ray.direction, edge2);
             const float a = dot(edge1, h);
             if(a >= -eps && a <= eps)
                 return false;
-            const float f = 1/a;
+            const float f = 1.0f/a;
             const Vec3 s = ray.origin - p1;
             const float u = f*dot(s, h);
-            if(u < 0.0 || u > 1.0)
+            if(u < 0.0f || u > 1.0f)
                 return false;
             const Vec3 q = cross(s, edge1);
             const float v = f*dot(ray.direction, q);
-            if(v < 0.0 || u + v > 1.0)
+            if(v < 0.0f || u + v > 1.0f)
                 return false;
             const float t = f*dot(edge2, q);
             if(t <= ray.tmin || t > ray.tmax)

@@ -74,6 +74,53 @@ class BRDFRenderer : public Integrator {
 };
 
 
+class PathTraceDepthRenderer : public Integrator {
+    public:
+        int maxDepth;
+
+        PathTraceDepthRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _maxDepth) : Integrator(_cam, _film, _sampler), maxDepth(_maxDepth) {};
+
+        RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
+            if(depth > maxDepth)
+                return RGB(1.0f);
+
+            Hit res;
+            RGB col;
+            if(scene.intersect(ray, res)) {
+                //マテリアル
+                std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
+                //BRDFの計算と方向のサンプリング
+                Vec3 wo = -ray.direction;
+                Vec3 n = res.hitNormal;
+                Vec3 s = res.dpdu;
+                Vec3 t = normalize(cross(s, n));
+                Vec3 wi;
+                float brdf_pdf;
+                RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+
+                Ray nextRay(res.hitPos, wi);
+                return Li(nextRay, scene, depth + 1, roulette);
+            }
+            else {
+                return RGB((float)depth/maxDepth);
+            }
+        };
+
+        void render(const Scene& scene) const {
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float u = (2.0*i - film->width)/film->width;
+                    float v = -(2.0*j - film->height)/film->height;
+                    Ray ray = cam->getRay(u, v);
+                    RGB col = Li(ray, scene);
+                    film->setPixel(i, j, col);
+                }
+            }
+            film->ppm_output();
+        };
+};
+
+
 class PathTrace : public Integrator {
     public:
         int pixelSamples;
