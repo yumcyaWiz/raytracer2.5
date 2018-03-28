@@ -1,5 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
+#include <cmath>
 #include "vec3.h"
 #include "ray.h"
 class Camera {
@@ -15,7 +16,7 @@ class Camera {
             camUp = normalize(cross(camRight, camForward));
         };
 
-        virtual Ray getRay(float u, float v) const = 0;
+        virtual Ray getRay(float u, float v, float &w) const = 0;
 };
 
 
@@ -25,8 +26,10 @@ class PinholeCamera : public Camera {
 
         PinholeCamera(const Vec3& _camPos, const Vec3& _camForward, float _focus) : Camera(_camPos, _camForward), focus(_focus) {};
 
-        Ray getRay(float u, float v) const {
-            return Ray(camPos, normalize(focus*camForward + u*camRight + v*camUp));
+        Ray getRay(float u, float v, float &w) const {
+            Vec3 rayDir = normalize(focus*camForward + u*camRight + v*camUp);
+            w = std::pow(dot(camForward, rayDir), 4.0f);
+            return Ray(camPos, rayDir);
         };
 };
 #endif

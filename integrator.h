@@ -27,13 +27,14 @@ class NormalRenderer : public Integrator {
                 for(int j = 0; j < film->height; j++) {
                     float u = (2.0*i - film->width)/film->width;
                     float v = -(2.0*j - film->height)/film->height;
-                    Ray ray = cam->getRay(u, v);
+                    float w;
+                    Ray ray = cam->getRay(u, v, w);
                     Hit res;
                     if(scene.intersect(ray, res)) {
-                        film->setPixel(i, j, (res.hitNormal + 1.0f)/2.0f);
+                        film->setPixel(i, j, w*(res.hitNormal + 1.0f)/2.0f);
                     }
                     else {
-                        film->setPixel(i, j, RGB(0.0f));
+                        film->setPixel(i, j, w*RGB(0.0f));
                     }
                 }
             }
@@ -51,7 +52,8 @@ class BRDFRenderer : public Integrator {
                 for(int j = 0; j < film->height; j++) {
                     float u = (2.0*i - film->width)/film->width;
                     float v = -(2.0*j - film->height)/film->height;
-                    Ray ray = cam->getRay(u, v);
+                    float w;
+                    Ray ray = cam->getRay(u, v, w);
                     Hit res;
                     if(scene.intersect(ray, res)) {
                         std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
@@ -62,10 +64,10 @@ class BRDFRenderer : public Integrator {
                         Vec3 wi;
                         float brdf_pdf;
                         RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
-                        film->setPixel(i, j, (wi + 1.0f)/2.0f);
+                        film->setPixel(i, j, w*(wi + 1.0f)/2.0f);
                     }
                     else {
-                        film->setPixel(i, j, RGB(0.0f));
+                        film->setPixel(i, j, w*RGB(0.0f));
                     }
                 }
             }
@@ -111,9 +113,10 @@ class PathTraceDepthRenderer : public Integrator {
                 for(int j = 0; j < film->height; j++) {
                     float u = (2.0*i - film->width)/film->width;
                     float v = -(2.0*j - film->height)/film->height;
-                    Ray ray = cam->getRay(u, v);
+                    float w;
+                    Ray ray = cam->getRay(u, v, w);
                     RGB col = Li(ray, scene);
-                    film->setPixel(i, j, col);
+                    film->setPixel(i, j, w*col);
                 }
             }
             film->ppm_output();
@@ -183,9 +186,10 @@ class PathTrace : public Integrator {
                         float py = j + ry;
                         float u = (2.0*i - film->width + rx)/film->width;
                         float v = -(2.0*j - film->height + ry)/film->height;
-                        Ray ray = cam->getRay(u, v);
+                        float w;
+                        Ray ray = cam->getRay(u, v, w);
                         RGB col = Li(ray, scene);
-                        film->addSample(i, j, col);
+                        film->addSample(i, j, w*col);
                     }
                     if(omp_get_thread_num() == 0)
                         std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;

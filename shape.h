@@ -100,7 +100,7 @@ class Triangle : public Shape {
             if(t <= ray.tmin || t > ray.tmax)
                 return false;
             
-            t -= 1e-5;
+            t -= 1e-3;
             res.t = t;
             res.hitPos = ray(t);
             if(vertex_normal) {

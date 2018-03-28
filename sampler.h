@@ -4,19 +4,19 @@
 #include "vec2.h"
 #include "vec3.h"
 inline Vec2 sampleDisk(const Vec2& u) {
-    float r = std::sqrt(u.x);
-    float theta = 2 * M_PI * u.y;
+    const float r = std::sqrt(u.x);
+    const float theta = 2 * M_PI * u.y;
     return Vec2(r * std::cos(theta), r * std::sin(theta));
 }
 inline Vec3 sampleHemisphere(const Vec2& u) {
-    float z = u.x;
-    float r = std::sqrt(std::max(0.0f, 1.0f - z*z));
-    float phi = 2.0f*M_PI*u.y;
+    const float z = u.x;
+    const float r = std::sqrt(std::max(0.0f, 1.0f - z*z));
+    const float phi = 2.0f*M_PI*u.y;
     return Vec3(r*std::cos(phi), z, r*std::sin(phi));
 }
 inline Vec3 sampleCosineHemisphere(const Vec2& u) {
-    Vec2 d = sampleDisk(u);
-    float z = std::sqrt(std::max(0.0f, 1.0f - d.x*d.x - d.y*d.y));
+    const Vec2 d = sampleDisk(u);
+    const float z = std::sqrt(std::max(0.0f, 1.0f - d.x*d.x - d.y*d.y));
     return Vec3(d.x, z, d.y);
 }
 
