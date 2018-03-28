@@ -16,6 +16,16 @@ class Sky {
 };
 
 
+class TestSky : public Sky {
+    public:
+        TestSky() {};
+
+        RGB getSky(const Ray& ray) const {
+            return (ray.direction + 1.0f)/2.0f;
+        };
+};
+
+
 class SimpleSky : public Sky {
     public:
         SimpleSky() {};

@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
     std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(Vec3(0, -3000, 0), 3000.0f));
     std::shared_ptr<Shape> shape2 = std::shared_ptr<Shape>(new Sphere(Vec3(0.0f, 1.0f, 0.0f), 1.0f));
     std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
-    std::shared_ptr<Primitive> prim2 = std::shared_ptr<Primitive>(new GeometricPrimitive(mat2, nullptr, shape2));
+    std::shared_ptr<Primitive> prim2 = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape2));
 
     std::vector<std::shared_ptr<Primitive>> prims;
     //prims.push_back(prim);
@@ -59,8 +59,8 @@ int main(int argc, char** argv) {
     //loadObj(prims, "teapot.obj", Vec3(0, 0, 0), 0.15f, mat2);
 
     std::vector<std::shared_ptr<Light>> lights;
-    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("PaperMill_E_3k.hdr"));
-    //std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new SimpleSky());
+    //std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("PaperMill_E_3k.hdr"));
+    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new TestSky());
 
     Scene scene(prims, lights, sky);
     Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), samples, 100);

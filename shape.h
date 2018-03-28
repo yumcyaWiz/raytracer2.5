@@ -33,7 +33,6 @@ class Sphere : public Shape {
                 tHit = t1;
                 if(tHit > ray.tmax) return false;
             }
-            tHit -= 1e-3;
             Vec3 hitPos = ray(tHit);
             Vec3 localHitPos = hitPos - center;
 
@@ -48,11 +47,11 @@ class Sphere : public Shape {
             res.dpdu = normalize(dpdu);
             res.dpdv = normalize(dpdv);
             res.hitNormal = normalize(cross(dpdu, dpdv));
-            res.hitPos = hitPos;
+            res.hitPos = hitPos + 1e-3*res.hitNormal;
             return true;
         };
         AABB worldBound() const {
-            return AABB(Vec3(-radius) + center, Vec3(radius) + center);
+            return AABB(Vec3(-radius - 1e-2) + center, Vec3(radius + 1e-2) + center);
         };
 };
 
@@ -100,7 +99,6 @@ class Triangle : public Shape {
             if(t <= ray.tmin || t > ray.tmax)
                 return false;
             
-            t -= 1e-3;
             res.t = t;
             res.hitPos = ray(t);
             if(vertex_normal) {
@@ -118,11 +116,12 @@ class Triangle : public Shape {
                 res.dpdu = -res.dpdu;
                 res.dpdv = -res.dpdv;
             }
+            res.hitPos = res.hitPos + 1e-3*res.hitNormal;
             return true;
         };
 
         AABB worldBound() const {
-            return AABB(min(p1, min(p2, p3)), max(p1, max(p2, p3)));
+            return AABB((1.0f + 1e-3)*min(p1, min(p2, p3)), (1.0f + 1e-3)*max(p1, max(p2, p3)));
         };
 };
 #endif

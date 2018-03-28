@@ -166,7 +166,7 @@ class PathTrace : public Integrator {
 
                 //レンダリング方程式の計算
                 Ray nextRay(res.hitPos, wi);
-                return 1.0f/(brdf_pdf*roulette) * cos_term * brdf_f * Li(nextRay, scene, depth + 1, roulette);
+                return 1.0f/(roulette*brdf_pdf) * cos_term * brdf_f * Li(nextRay, scene, depth + 1, roulette);
             }
             else {
                 return scene.sky->getSky(ray);
