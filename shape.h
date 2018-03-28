@@ -59,15 +59,24 @@ class Sphere : public Shape {
 
 class Triangle : public Shape {
     public:
-        Vec3 p1, p2, p3;
-        Vec3 normal;
-        Vec3 dpdu;
+        Vec3 p1, p2, p3; //頂点座標
+        Vec3 n1, n2, n3; //頂点法線
+        Vec2 t1, t2, t3; //頂点UV座標
+        Vec3 face_normal; //面法線
+        Vec3 dpdu; 
         Vec3 dpdv;
+        bool vertex_normal;
 
         Triangle(const Vec3& _p1, const Vec3& _p2, const Vec3& _p3) : p1(_p1), p2(_p2), p3(_p3) {
             dpdu = normalize(p2 - p1);
             dpdv = normalize(p3 - p1);
-            normal = normalize(cross(dpdu, dpdv));
+            face_normal = normalize(cross(dpdu, dpdv));
+            vertex_normal = false;
+        };
+        Triangle(const Vec3& _p1, const Vec3& _p2, const Vec3& _p3, const Vec3& _n1, const Vec3& _n2, const Vec3& _n3) : p1(_p1), p2(_p2), p3(_p3), n1(_n1), n2(_n2), n3(_n3) {
+            dpdu = normalize(p2 - p1);
+            dpdv = normalize(p3 - p1);
+            vertex_normal = true;
         };
 
         bool intersect(const Ray& ray, Hit& res) const {
@@ -94,7 +103,12 @@ class Triangle : public Shape {
             t -= 1e-5;
             res.t = t;
             res.hitPos = ray(t);
-            res.hitNormal = normal;
+            if(vertex_normal) {
+                res.hitNormal = normalize((1.0f - u - v)*n1 + u*n2 + v*n3);
+            }
+            else {
+                res.hitNormal = face_normal;
+            }
             res.uv = Vec2(u, v);
             res.dpdu = dpdu;
             res.dpdv = dpdv;

@@ -4,3 +4,4 @@
 *.obj
 stb_image.h
 *.hdr
+tiny_obj_loader.h

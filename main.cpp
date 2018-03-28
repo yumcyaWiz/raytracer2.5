@@ -18,6 +18,7 @@
 #include "integrator.h"
 #include "sky.h"
 
+
 int main(int argc, char** argv) {
     int width = 512;
     int height = 512;
@@ -40,7 +41,7 @@ int main(int argc, char** argv) {
 
     Filter* filter = new GaussianFilter(Vec2(1), 1.0f);
     Film film(width, height, std::unique_ptr<Filter>(filter), "output.ppm");
-    PinholeCamera cam(Vec3(0, 5, -10), Vec3(0, 0, 1), 1.0f);
+    PinholeCamera cam(Vec3(0, 1, -3), Vec3(0, 0, 1), 1.0f);
     UniformSampler sampler(RNG_TYPE::MT);
 
     
@@ -54,8 +55,8 @@ int main(int argc, char** argv) {
     std::vector<std::shared_ptr<Primitive>> prims;
     //prims.push_back(prim);
     //prims.push_back(prim2);
-    loadObj(prims, "plane.obj", Vec3(), 10.0f, mat);
-    loadObj(prims, "teapot.obj", Vec3(), 2.0f, mat2);
+    loadObj(prims, "plane.obj", Vec3(), 1.0f, mat);
+    loadObj(prims, "teapot.obj", Vec3(0, 0, 0), 0.15f, mat2);
 
     std::vector<std::shared_ptr<Light>> lights;
     std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("PaperMill_E_3k.hdr"));
