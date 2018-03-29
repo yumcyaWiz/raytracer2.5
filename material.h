@@ -16,7 +16,8 @@ inline Vec3 worldToLocal(const Vec3& w, const Vec3& n, const Vec3& s, const Vec3
     return Vec3(dot(s, w), dot(n, w), dot(t, w));
 }
 inline Vec3 localToWorld(const Vec3& w, const Vec3& n, const Vec3& s, const Vec3& t) {
-    return Vec3(s.x*w.x + n.x*w.y + t.x*w.z, s.y*w.x + n.y*w.y + t.y*w.z, s.z*w.x + n.z*w.y + t.z*w.z);
+    //return Vec3(s.x*w.x + n.x*w.y + t.x*w.z, s.y*w.x + n.y*w.y + t.y*w.z, s.z*w.x + n.z*w.y + t.z*w.z);
+    return w.x*s + w.y*n + w.z*t;
 }
 
 

@@ -35,6 +35,7 @@ class Sphere : public Shape {
             }
             Vec3 hitPos = ray(tHit);
             Vec3 localHitPos = hitPos - center;
+            if(localHitPos.x == 0 && localHitPos.z == 0) localHitPos.x -= 1e-5*radius;
 
             float phi = std::atan2(localHitPos.z, localHitPos.x);
             if(phi < 0) phi += 2*M_PI;
@@ -47,11 +48,11 @@ class Sphere : public Shape {
             res.dpdu = normalize(dpdu);
             res.dpdv = normalize(dpdv);
             res.hitNormal = normalize(cross(dpdu, dpdv));
-            res.hitPos = hitPos + 1e-3*res.hitNormal;
+            res.hitPos = hitPos;
             return true;
         };
         AABB worldBound() const {
-            return AABB(Vec3(-radius - 1e-2) + center, Vec3(radius + 1e-2) + center);
+            return AABB(Vec3(-radius - 1e-3) + center, Vec3(radius + 1e-3) + center);
         };
 };
 
@@ -116,7 +117,7 @@ class Triangle : public Shape {
                 res.dpdu = -res.dpdu;
                 res.dpdv = -res.dpdv;
             }
-            res.hitPos = res.hitPos + 1e-3*res.hitNormal;
+            res.hitPos = res.hitPos;
             return true;
         };
 

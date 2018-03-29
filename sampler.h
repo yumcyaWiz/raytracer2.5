@@ -16,7 +16,7 @@ inline Vec3 sampleHemisphere(const Vec2& u) {
 }
 inline Vec3 sampleCosineHemisphere(const Vec2& u) {
     const Vec2 d = sampleDisk(u);
-    const float z = std::sqrt(std::max(0.0f, 1.0f - d.x*d.x - d.y*d.y));
+    const float z = std::sqrt(std::max(0.0f, 1.0f - u.x));
     return Vec3(d.x, z, d.y);
 }
 

@@ -76,6 +76,46 @@ class BRDFRenderer : public Integrator {
 };
 
 
+class AORenderer : public Integrator {
+    public:
+        AORenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+
+        void render(const Scene& scene) const {
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float u = (2.0*i - film->width)/film->width;
+                    float v = -(2.0*j - film->height)/film->height;
+                    float w;
+                    Ray ray = cam->getRay(u, v, w);
+                    Hit res;
+                    if(scene.intersect(ray, res)) {
+                        std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
+                        Vec3 wo = -ray.direction;
+                        Vec3 n = res.hitNormal;
+                        Vec3 s = res.dpdu;
+                        Vec3 t = normalize(cross(s, n));
+                        Vec3 wi;
+                        float brdf_pdf;
+                        int hit_count = 0;
+                        for(int k = 0; k < 100; k++) {
+                            RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                            Ray nextRay(res.hitPos, wi);
+                            Hit res2;
+                            if(scene.intersect(nextRay, res2))
+                                hit_count++;
+                        }
+                        film->setPixel(i, j, hit_count/100.0f*RGB(1.0f));
+                    }
+                    else {
+                        film->setPixel(i, j, w*RGB(0.0f));
+                    }
+                }
+            }
+            film->ppm_output();
+        };
+};
+
+
 class PathTraceDepthRenderer : public Integrator {
     public:
         int maxDepth;

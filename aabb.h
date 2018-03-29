@@ -66,7 +66,7 @@ class AABB {
             if(tzMin > tMin) tMin = tzMin;
             if(tzMax < tMax) tMax = tzMax;
 
-            return (tMin < ray.tmax) && (tMax > ray.tmin);
+            return (tMin < ray.tmax) && (tMax >= ray.tmin);
         };
 
 
