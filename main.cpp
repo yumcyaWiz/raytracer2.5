@@ -69,8 +69,8 @@ int main(int argc, char** argv) {
     //loadObj(prims, "teapot.obj", Vec3(0, 0, 0), 0.15f, mat2);
 
     std::vector<std::shared_ptr<Light>> lights;
-    //std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("PaperMill_E_3k.hdr"));
-    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new TestSky());
+    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("NarrowPath_3k.hdr", 4.0f, 0.0f));
+    //std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new TestSky());
 
     Scene scene(prims, lights, sky);
     Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), samples, 100);

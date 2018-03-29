@@ -42,8 +42,10 @@ class IBL : public Sky {
         int width;
         int height;
         float *HDRI;
+        float offsetX;
+        float offsetY;
 
-        IBL(const std::string& filename) {
+        IBL(const std::string& filename, float _offsetX, float _offsetY) : offsetX(_offsetX), offsetY(_offsetY) {
             int n;
             HDRI = stbi_loadf(filename.c_str(), &width, &height, &n, 0);
         };
@@ -54,7 +56,11 @@ class IBL : public Sky {
         RGB getSky(const Ray& ray) const {
             float phi = std::atan2(ray.direction.z, ray.direction.x);
             if(phi < 0) phi += 2*M_PI;
+            phi += offsetX;
+            if(phi > 2*M_PI) phi -= 2*M_PI;
             float theta = std::acos(clamp(ray.direction.y, -1.0f, 1.0f));
+            theta += offsetY;
+            if(theta > M_PI) theta -= M_PI;
 
             float u = phi/(2.0*M_PI);
             float v = theta/M_PI;
