@@ -58,8 +58,11 @@ class Lambert : public Material {
             return reflectance/M_PI;
         };
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
+            //コサインに比例した半球サンプリング
             Vec3 wi_local = sampleCosineHemisphere(u);
+            //入射レイのpdf
             pdf = absCosTheta(wi_local)/M_PI;
+            //ローカルの入射レイをワールド座標に変換
             wi = localToWorld(wi_local, n, s, t);
             return f(wo, wi);
         };
@@ -79,6 +82,34 @@ class Mirror : public Material {
             pdf = 1.0f;
             wi = reflect(wo, n);
             return 1.0f/dot(wi, n)*reflectance;
+        };
+};
+
+
+class Phong : public Material {
+    public:
+        const RGB reflectance;
+        const float alpha;
+
+        Phong(const RGB& _reflectance, float _alpha) : reflectance(_reflectance), alpha(_alpha) {};
+
+        RGB f(const Vec3& wo, const Vec3& wi) const {
+            //ハーフベクトル
+            const Vec3 wh = normalize(wo + wi);
+            return reflectance * (alpha + 2.0f)/(2.0f*M_PI) * std::pow(absCosTheta(wh), alpha);
+        };
+        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
+            //ハーフベクトルのサンプリング
+            Vec3 wh = sampleNCosineHemisphere(u, alpha);
+            Vec3 wo_local = worldToLocal(wo, n, s, t);
+            //サンプリング方向は出射レイをハーフベクトルで反射したもの
+            Vec3 wi_local = reflect(wo_local, wh);
+            //ハーフベクトルのpdf
+            float pdf_wh = (alpha + 1.0f)/(2*M_PI) * absCosTheta(wh);
+            //入射ベクトルのpdf
+            pdf = pdf_wh/(4.0f*std::abs(dot(wo_local, wh)));
+            wi = localToWorld(wi_local, n, s, t);
+            return f(wo, wi);
         };
 };
 #endif

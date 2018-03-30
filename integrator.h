@@ -184,11 +184,10 @@ class PathTrace : public Integrator {
                 return RGB(0.0f);
 
             Hit res;
-            RGB col;
             if(scene.intersect(ray, res)) {
                 //もし光源に当たったら放射輝度を蓄積
                 if(res.hitPrimitive->areaLight != nullptr) {
-                    col += res.hitPrimitive->areaLight->Le(res);
+                    //col += res.hitPrimitive->areaLight->Le(res);
                 }
                 //マテリアル
                 const std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
@@ -202,16 +201,20 @@ class PathTrace : public Integrator {
                 const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
 
                 //コサイン項
-                float cos_term = std::max(dot(wi, n), 0.0f);
+                const float cos_term = std::max(dot(wi, n), 0.0f);
+
+                //係数
+                const RGB k = 1.0f/(roulette*brdf_pdf) * cos_term * brdf_f;
 
                 //レンダリング方程式の計算
                 Ray nextRay(res.hitPos, wi);
-                return 1.0f/(roulette*brdf_pdf) * cos_term * brdf_f * Li(nextRay, scene, depth + 1, roulette);
+                return k * Li(nextRay, scene, depth + 1, roulette);
             }
             else {
                 return scene.sky->getSky(ray);
             }
         };
+
 
         void render(const Scene& scene) const {
             Timer timer;
@@ -224,8 +227,8 @@ class PathTrace : public Integrator {
                         float ry = sampler->getNext();
                         float px = i + rx;
                         float py = j + ry;
-                        float u = (2.0*i - film->width + rx)/film->width;
-                        float v = -(2.0*j - film->height + ry)/film->height;
+                        float u = (2.0*(i + rx) - film->width)/film->width;
+                        float v = -(2.0*(j + ry) - film->height)/film->height;
                         float w;
                         Ray ray = cam->getRay(u, v, w);
                         RGB col = Li(ray, scene);
