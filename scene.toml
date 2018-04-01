@@ -8,14 +8,14 @@ resolution = [512, 512]
 
 [sky]
 type = "ibl"
-path = "PaperMill_E_3k.hdr"
+path = "NarrowPath_3k.hdr"
 theta-offset = 0
-phi-offset = 0
+phi-offset = 4.0
 
 [camera]
 type = "ideal-pinhole"
 fov = 90.0
-[[camera.transform]]
+[camera.transform]
 type = "look-at"
 origin = [0, 3, -5]
 target = [0, 0, 0]
@@ -33,7 +33,7 @@ albedo = 0.9
 [[material]]
 name = "mat3"
 type = "phong"
-alpha = 100.0
+alpha = 1000.0
 
 [[mesh]]
 name = "floor"
@@ -47,9 +47,19 @@ path = "dragon.obj"
 
 [[mesh]]
 name = "sphere1"
+type = "sphere"
 radius = 1.0
 
 [[object]]
 mesh = "floor"
-material = "mat2"
+material = "mat3"
+[[object.transform]]
+type = "translate"
+vector = [0, 0, 0]
 
+[[object]]
+mesh = "sphere1"
+material = "mat1"
+[[object.transform]]
+type = "translate"
+vector = [0, 1, 0]

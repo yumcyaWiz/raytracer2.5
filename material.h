@@ -88,15 +88,14 @@ class Mirror : public Material {
 
 class Phong : public Material {
     public:
-        const RGB reflectance;
         const float alpha;
 
-        Phong(const RGB& _reflectance, float _alpha) : reflectance(_reflectance), alpha(_alpha) {};
+        Phong(float _alpha) : alpha(_alpha) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
             //ハーフベクトル
             const Vec3 wh = normalize(wo + wi);
-            return reflectance * (alpha + 2.0f)/(2.0f*M_PI) * std::pow(absCosTheta(wh), alpha);
+            return RGB(1.0f) * (alpha + 2.0f)/(2.0f*M_PI) * std::pow(absCosTheta(wh), alpha);
         };
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
             //ハーフベクトルのサンプリング

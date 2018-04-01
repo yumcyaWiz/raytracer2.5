@@ -1,4 +1,7 @@
+#include "cpptoml.h"
+
 #include <iostream>
+#include <map>
 #include <omp.h>
 #include <unistd.h>
 #include "vec3.h"
@@ -17,66 +20,158 @@
 #include "material.h"
 #include "integrator.h"
 #include "sky.h"
-#include "cpptoml.h"
 
 
 int main(int argc, char** argv) {
-    int width = 512;
-    int height = 512;
-    int samples = 100;
+    //ファイルパスの読み込み ./a.out -i scene.toml  のように読み込む
+    std::string filepath;
     int opt;
-    while((opt = getopt(argc, argv, "w:h:s:on")) != -1) {
+    while((opt = getopt(argc, argv, "i:on")) != -1) {
         switch(opt) {
-            case 'w':
-                width = std::stoi(optarg);
-                break;
-            case 'h':
-                height = std::stoi(optarg);
-                break;
-            case 's':
-                samples = std::stoi(optarg);
+            case 'i':
+                filepath = optarg;
                 break;
         }
     }
 
+    //tomlの読み込み
+    auto toml = cpptoml::parse_file(filepath);
 
+    //film
+    auto film_toml = toml->get_table("film");
+    if(!film_toml) { std::cerr << "[film] missing" << std::endl; std::exit(1); }
+    auto resolution = *film_toml->get_array_of<int64_t>("resolution");
     Filter* filter = new GaussianFilter(Vec2(1), 1.0f);
-    Film film(width, height, std::unique_ptr<Filter>(filter), "output.ppm");
-    
-    Vec3 camPos = Vec3(0, 1, -3.5);
-    PinholeCamera cam(camPos, Vec3(0, 0, 1), 1.0f);
-    UniformSampler sampler(RNG_TYPE::MT);
-    
-    std::shared_ptr<Material> mat = std::shared_ptr<Material>(new Lambert(RGB(0.9f)));
-    std::shared_ptr<Material> mat2 = std::shared_ptr<Material>(new Mirror(0.9f));
-    std::shared_ptr<Material> mat3 = std::shared_ptr<Material>(new Phong(RGB(0.9f), 1000.0f));
-    std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(Vec3(0, -3000, 0), 3000.0f));
-    std::shared_ptr<Shape> shape2 = std::shared_ptr<Shape>(new Sphere(Vec3(1.0f, 1.0f, -1.0f), 1.0f));
-    std::shared_ptr<Shape> shape3 = std::shared_ptr<Shape>(new Sphere(Vec3(-1.0f, 1.0f, -1.0f), 1.0f));
-    std::shared_ptr<Shape> shape4 = std::shared_ptr<Shape>(new Sphere(Vec3(0.0f, 1.0f, 0.0f), 1.0f));
-    std::shared_ptr<Shape> shape5 = std::shared_ptr<Shape>(new Sphere(Vec3(0.0f, 2.6329f, -0.422f), 1.0f));
-    std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
-    std::shared_ptr<Primitive> prim2 = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape2));
-    std::shared_ptr<Primitive> prim3 = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape3));
-    std::shared_ptr<Primitive> prim4 = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape4));
-    std::shared_ptr<Primitive> prim5 = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape5));
+    Film* film = new Film(resolution[0], resolution[1], std::unique_ptr<Filter>(filter), "output.ppm");
+    std::cout << "film loaded" << std::endl;
 
+    //sky
+    auto sky = toml->get_table("sky");
+    auto sky_type = *sky->get_as<std::string>("type");
+    Sky* sky_ptr;
+    if(sky_type == "ibl") {
+        auto path = *sky->get_as<std::string>("path");
+        auto theta_offset = *sky->get_as<double>("theta-offset");
+        auto phi_offset = *sky->get_as<double>("phi-offset");
+        sky_ptr = new IBL(path, phi_offset, theta_offset);
+    }
+    std::cout << "sky loaded" << std::endl;
+
+    //camera
+    auto camera = toml->get_table("camera");
+    auto camera_type = *camera->get_as<std::string>("type");
+    auto camera_fov = *camera->get_as<int>("fov");
+    auto camera_transform = camera->get_table("transform");
+    auto camera_transform_type = *camera_transform->get_as<std::string>("type");
+    auto camera_transform_origin = *camera_transform->get_array_of<double>("origin");
+    auto camera_transform_target = *camera_transform->get_array_of<double>("target");
+    Vec3 camPos(camera_transform_origin[0], camera_transform_origin[1], camera_transform_origin[2]);
+    Vec3 camTarget(camera_transform_target[0], camera_transform_target[1], camera_transform_target[2]);
+    Vec3 camForward = normalize(camTarget - camPos);
+    PinholeCamera* cam = new PinholeCamera(camPos, camForward, 1.0f);
+    std::cout << "camera loaded" << std::endl;
+
+    //materials
+    std::map<std::string, Material*> material_map;
+    auto materials = toml->get_table_array("material");
+    for(const auto& material : *materials) {
+        auto name = *material->get_as<std::string>("name");
+        auto type = *material->get_as<std::string>("type");
+        Material* mat;
+        if(type == "lambert") {
+            auto albedo = *material->get_array_of<double>("albedo");
+            Vec3 reflectance(albedo[0], albedo[1], albedo[2]);
+            mat = new Lambert(reflectance);
+        }
+        else if(type == "mirror") {
+            auto albedo = *material->get_as<double>("albedo");
+            mat = new Mirror(albedo);
+        }
+        else if(type == "phong") {
+            auto alpha = *material->get_as<double>("alpha");
+            mat = new Phong(alpha);
+        }
+        material_map.insert(std::make_pair(name, mat));
+    }
+    std::cout << "material loaded" << std::endl;
+
+    //meshes
+    struct ShapeData {
+        std::string type;
+        std::string path;
+        float radius;
+
+        ShapeData() {};
+        ShapeData(const std::string& _type, const std::string& _path, float _radius) : type(_type), path(_path), radius(_radius) {};
+    };
+    std::map<std::string, ShapeData> mesh_map;
+    auto meshes = toml->get_table_array("mesh");
+    for(const auto& mesh : *meshes) {
+        auto name = *mesh->get_as<std::string>("name");
+        auto type = *mesh->get_as<std::string>("type");
+        ShapeData shapedata;
+        if(type == "sphere") {
+            auto radius = *mesh->get_as<double>("radius");
+            shapedata = ShapeData(type, "", radius);
+        }
+        else if(type == "obj") {
+            std::string path = *mesh->get_as<std::string>("path");
+            shapedata = ShapeData(type, path, 0.0f);
+        }
+        mesh_map.insert(std::make_pair(name, shapedata));
+    }
+    std::cout << "mesh loaded" << std::endl;
+
+
+    //objects
+    auto objects = toml->get_table_array("object");
     std::vector<std::shared_ptr<Primitive>> prims;
-    //prims.push_back(prim);
-    //prims.push_back(prim2);
-    //prims.push_back(prim3);
-    //prims.push_back(prim4);
-    //prims.push_back(prim5);
-    loadObj(prims, "plane.obj", Vec3(), 1.0f, mat3);
-    loadObj(prims, "dragon.obj", Vec3(0, 1.0f, 0), 2.0f, mat);
+    for(const auto& object : *objects) {
+        std::string mesh = *object->get_as<std::string>("mesh");
+        std::string material = *object->get_as<std::string>("material");
+        auto transforms = object->get_table_array("transform");
+        Vec3 center;
+        for(const auto& transform : *transforms) {
+            std::string transform_type = *transform->get_as<std::string>("type");
+            if(transform_type == "translate") {
+                auto vector = *transform->get_array_of<double>("vector");
+                center = Vec3(vector[0], vector[1], vector[2]);
+            }
+        }
+        
+        ShapeData shapedata = mesh_map.at(mesh);
+        Material* mat = material_map.at(material);
+        if(shapedata.type == "sphere") {
+            std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(center, shapedata.radius));
+            std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(std::shared_ptr<Material>(mat), nullptr, shape));
+            prims.push_back(prim);
+        }
+        else if(shapedata.type == "obj") {
+            loadObj(prims, shapedata.path, center, 1.0f, std::shared_ptr<Material>(mat));
+        }
+    }
+    std::cout << "objects loaded" << std::endl;
 
+
+    UniformSampler sampler(RNG_TYPE::MT);
     std::vector<std::shared_ptr<Light>> lights;
-    std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new IBL("NarrowPath_3k.hdr", 4.0f, 0.0f));
-    //std::shared_ptr<Sky> sky = std::shared_ptr<Sky>(new TestSky());
+    Scene scene(prims, lights, std::shared_ptr<Sky>(sky_ptr));
 
-    Scene scene(prims, lights, sky);
-    Integrator* integrator = new PathTrace(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler), samples, 100);
+    //renderer
+    auto renderer = toml->get_table("renderer");
+    if(!renderer) { std::cerr << "[renderer] missing" << std::endl; std::exit(1); }
+    int samples = *renderer->get_as<int>("samples");
+    int depth_limit = *renderer->get_as<int>("depth-limit");
+    std::string integrator = *renderer->get_as<std::string>("integrator");
+
+    Integrator* integ;
+    if(integrator == "pt") {
+        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), std::shared_ptr<Sampler>(&sampler), samples, depth_limit);
+    }
+    else {
+        integ = new NormalRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), std::shared_ptr<Sampler>(&sampler));
+    }
     //Integrator* integrator = new AORenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 
-    integrator->render(scene);
+    integ->render(scene);
 }
