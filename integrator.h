@@ -199,6 +199,8 @@ class PathTrace : public Integrator {
                 Vec3 wi;
                 float brdf_pdf;
                 const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                if(brdf_f == RGB(0))
+                    return RGB(0);
 
                 //コサイン項
                 const float cos_term = std::max(dot(wi, n), 0.0f);

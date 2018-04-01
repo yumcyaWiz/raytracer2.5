@@ -1,0 +1,55 @@
+[renderer]
+samples = 100
+depth-limit = 10
+integrator = "pt"
+
+[film]
+resolution = [512, 512]
+
+[sky]
+type = "ibl"
+path = "PaperMill_E_3k.hdr"
+theta-offset = 0
+phi-offset = 0
+
+[camera]
+type = "ideal-pinhole"
+fov = 90.0
+[[camera.transform]]
+type = "look-at"
+origin = [0, 3, -5]
+target = [0, 0, 0]
+
+[[material]]
+name = "mat1"
+type = "lambert"
+albedo = [0.9, 0.9, 0.9]
+
+[[material]]
+name = "mat2"
+type = "mirror"
+albedo = 0.9
+
+[[material]]
+name = "mat3"
+type = "phong"
+alpha = 100.0
+
+[[mesh]]
+name = "floor"
+type = "obj"
+path = "plane.obj"
+
+[[mesh]]
+name = "dragon"
+type = "obj"
+path = "dragon.obj"
+
+[[mesh]]
+name = "sphere1"
+radius = 1.0
+
+[[object]]
+mesh = "floor"
+material = "mat2"
+

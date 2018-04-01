@@ -71,9 +71,9 @@ class Lambert : public Material {
 
 class Mirror : public Material {
     public:
-        const RGB reflectance;
+        const float reflectance;
 
-        Mirror(const RGB& _reflectance) : reflectance(_reflectance) {};
+        Mirror(const float _reflectance) : reflectance(_reflectance) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
             return 0.0f;
@@ -81,7 +81,7 @@ class Mirror : public Material {
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
             pdf = 1.0f;
             wi = reflect(wo, n);
-            return 1.0f/dot(wi, n)*reflectance;
+            return 1.0f/dot(wi, n)*RGB(1.0f)*reflectance;
         };
 };
 

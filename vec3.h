@@ -67,11 +67,16 @@ class Vec3 {
             return Vec3(-x, -y, -z);
         };
 
+        bool operator==(const Vec3& v) const {
+            return x == v.x && y == v.y && z == v.z;
+        };
+
         float operator[](int i) const {
             if(i == 0) return x;
             else if(i == 1) return y;
             else return z;
         };
+
             
 
         float length() const {
