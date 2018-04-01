@@ -24,16 +24,44 @@ inline Vec3 localToWorld(const Vec3& w, const Vec3& n, const Vec3& s, const Vec3
 inline float cosTheta(const Vec3& w) {
     return w.y;
 }
+inline float absCosTheta(const Vec3& w) {
+    return std::abs(w.y);
+}
 inline float cos2Theta(const Vec3& w) {
     return w.y*w.y;
 }
-inline float absCosTheta(const Vec3& w) {
-    return std::abs(w.y);
+inline float sinTheta(const Vec3& w) {
+    return std::sqrt(1.0f - cos2Theta(w));
+}
+inline float sin2Theta(const Vec3& w) {
+    return 1.0f - cos2Theta(w);
 }
 
 
 inline Vec3 reflect(const Vec3& w, const Vec3& n) {
     return -w + 2.0f*dot(w, n)*n;
+}
+inline bool refract(const Vec3& wi, Vec3& wt, const Vec3& n, float ior1, float ior2) {
+    float eta = ior1/ior2;
+    //入射角のコサイン
+    float cosThetaI = dot(wi, n);
+    //入射角のサインの二乗
+    float sin2ThetaI = std::max(0.0f, 1.0f - cosThetaI*cosThetaI);
+    //屈折角のサインの二乗
+    float sin2ThetaT = eta*eta*sin2ThetaI;
+    //全反射
+    if(sin2ThetaT >= 1.0f) return false;
+    float cosThetaT = std::sqrt(1.0f - sin2ThetaT);
+    //屈折方向の計算
+    wt = eta*(-wi) + (eta*cosThetaI - cosThetaT)*n;
+    return true;
+}
+
+
+//Schlick近似によるフレネル項の計算
+inline float fresnel(const Vec3& w, const Vec3& n, float ior1, float ior2) {
+    float f0 = std::pow((ior1 - ior2)/(ior1 + ior2), 2.0f);
+    return f0 + (1.0f - f0)*std::pow(1.0f - dot(w, n), 5.0f);
 }
 
 
@@ -109,6 +137,21 @@ class Phong : public Material {
             pdf = pdf_wh/(4.0f*std::abs(dot(wo_local, wh)));
             wi = localToWorld(wi_local, n, s, t);
             return f(wo, wi);
+        };
+};
+
+
+class Glass : public Material {
+    public:
+        const float ior;
+
+        Glass(const float _ior) : ior(_ior) {};
+
+        RGB f(const Vec3& wo, const Vec3& wi) const {
+            return 0.0f;
+        };
+        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
+
         };
 };
 #endif

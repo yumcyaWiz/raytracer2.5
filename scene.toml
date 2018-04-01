@@ -8,7 +8,7 @@ resolution = [512, 512]
 
 [sky]
 type = "ibl"
-path = "NarrowPath_3k.hdr"
+path = "PaperMill_E_3k.hdr"
 theta-offset = 0
 phi-offset = 4.0
 

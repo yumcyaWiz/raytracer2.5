@@ -70,7 +70,7 @@ class Triangle : public Shape {
         Triangle(const Vec3& _p1, const Vec3& _p2, const Vec3& _p3) : p1(_p1), p2(_p2), p3(_p3) {
             dpdu = normalize(p2 - p1);
             dpdv = normalize(p3 - p1);
-            face_normal = normalize(cross(dpdu, dpdv));
+            face_normal = -normalize(cross(dpdu, dpdv));
             vertex_normal = false;
         };
         Triangle(const Vec3& _p1, const Vec3& _p2, const Vec3& _p3, const Vec3& _n1, const Vec3& _n2, const Vec3& _n3) : p1(_p1), p2(_p2), p3(_p3), n1(_n1), n2(_n2), n3(_n3) {
@@ -112,11 +112,13 @@ class Triangle : public Shape {
             res.dpdu = dpdu;
             res.dpdv = dpdv;
 
+            /*
             if(dot(-ray.direction, res.hitNormal) < 0.0f) {
                 res.hitNormal = -res.hitNormal;
                 res.dpdu = -res.dpdu;
                 res.dpdv = -res.dpdv;
             }
+            */
             res.hitPos = res.hitPos;
             return true;
         };
