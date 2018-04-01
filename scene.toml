@@ -1,5 +1,5 @@
 [renderer]
-samples = 100
+samples = 1000
 depth-limit = 10
 integrator = "pt"
 
@@ -14,7 +14,7 @@ phi-offset = 4.0
 
 [camera]
 type = "ideal-pinhole"
-fov = 90.0
+fov = 60.0
 [camera.transform]
 type = "look-at"
 origin = [0, 3, -5]
@@ -58,8 +58,11 @@ type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
-mesh = "sphere1"
+mesh = "dragon"
 material = "mat1"
 [[object.transform]]
 type = "translate"
 vector = [0, 1, 0]
+[[object.transform]]
+type = "scale"
+vector = [2, 2, 2]

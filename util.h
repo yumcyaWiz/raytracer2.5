@@ -1,7 +1,8 @@
 #ifndef UTIL_H
 #define UTIL_H
+#include <cmath>
 template <typename T>
-T clamp(T x, T min, T max) {
+inline T clamp(T x, T min, T max) {
     if(x < min)
         return min;
     else if(x > max)
@@ -11,10 +12,10 @@ T clamp(T x, T min, T max) {
 }
 
 
-std::string percentage(float x, float max) {
+inline std::string percentage(float x, float max) {
     return std::to_string(x/max*100) + "%";
 }
-std::string progressbar(float x, float max) {
+inline std::string progressbar(float x, float max) {
     const int max_count = 40;
     int cur_count = (int)(x/max * max_count);
     std::string str;
@@ -25,5 +26,10 @@ std::string progressbar(float x, float max) {
         str += " ";
     str += "]";
     return str;
+}
+
+
+inline float toRad(float deg) {
+    return deg/180.0f * M_PI;
 }
 #endif

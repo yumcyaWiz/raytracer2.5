@@ -24,7 +24,9 @@ class PinholeCamera : public Camera {
     public:
         float focus;
 
-        PinholeCamera(const Vec3& _camPos, const Vec3& _camForward, float _focus) : Camera(_camPos, _camForward), focus(_focus) {};
+        PinholeCamera(const Vec3& _camPos, const Vec3& _camForward, float fov) : Camera(_camPos, _camForward) {
+            focus = 1.0f/std::tan(fov/2.0f);
+        };
 
         Ray getRay(float u, float v, float &w) const {
             Vec3 rayDir = normalize(focus*camForward + u*camRight + v*camUp);

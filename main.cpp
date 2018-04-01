@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     //camera
     auto camera = toml->get_table("camera");
     auto camera_type = *camera->get_as<std::string>("type");
-    auto camera_fov = *camera->get_as<int>("fov");
+    auto camera_fov = *camera->get_as<double>("fov");
     auto camera_transform = camera->get_table("transform");
     auto camera_transform_type = *camera_transform->get_as<std::string>("type");
     auto camera_transform_origin = *camera_transform->get_array_of<double>("origin");
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
     Vec3 camPos(camera_transform_origin[0], camera_transform_origin[1], camera_transform_origin[2]);
     Vec3 camTarget(camera_transform_target[0], camera_transform_target[1], camera_transform_target[2]);
     Vec3 camForward = normalize(camTarget - camPos);
-    PinholeCamera* cam = new PinholeCamera(camPos, camForward, 1.0f);
+    PinholeCamera* cam = new PinholeCamera(camPos, camForward, toRad(camera_fov));
     std::cout << "camera loaded" << std::endl;
 
     //materials
@@ -131,11 +131,16 @@ int main(int argc, char** argv) {
         std::string material = *object->get_as<std::string>("material");
         auto transforms = object->get_table_array("transform");
         Vec3 center;
+        float scale = 1.0f;
         for(const auto& transform : *transforms) {
             std::string transform_type = *transform->get_as<std::string>("type");
             if(transform_type == "translate") {
                 auto vector = *transform->get_array_of<double>("vector");
                 center = Vec3(vector[0], vector[1], vector[2]);
+            }
+            else if(transform_type == "scale") {
+                auto scale_v = *transform->get_array_of<double>("vector");
+                scale = scale_v[0];
             }
         }
         
@@ -147,7 +152,7 @@ int main(int argc, char** argv) {
             prims.push_back(prim);
         }
         else if(shapedata.type == "obj") {
-            loadObj(prims, shapedata.path, center, 1.0f, std::shared_ptr<Material>(mat));
+            loadObj(prims, shapedata.path, center, scale, std::shared_ptr<Material>(mat));
         }
     }
     std::cout << "objects loaded" << std::endl;
