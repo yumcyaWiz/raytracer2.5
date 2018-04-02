@@ -1,7 +1,7 @@
 [renderer]
-samples = 1000
-depth-limit = 10
-integrator = "pt"
+samples = 1
+depth-limit = 1
+integrator = "dot"
 
 [film]
 resolution = [512, 512]
@@ -14,7 +14,7 @@ phi-offset = 4.0
 
 [camera]
 type = "ideal-pinhole"
-fov = 60.0
+fov = 30.0
 [camera.transform]
 type = "look-at"
 origin = [0, 3, -5]
@@ -35,6 +35,11 @@ name = "mat3"
 type = "phong"
 alpha = 1000.0
 
+[[material]]
+name = "mat4"
+type = "glass"
+ior = 1.4
+
 [[mesh]]
 name = "floor"
 type = "obj"
@@ -44,6 +49,11 @@ path = "plane.obj"
 name = "dragon"
 type = "obj"
 path = "dragon.obj"
+
+[[mesh]]
+name = "teapot"
+type = "obj"
+path = "teapot.obj"
 
 [[mesh]]
 name = "sphere1"
@@ -58,11 +68,11 @@ type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
-mesh = "dragon"
-material = "mat1"
+mesh = "teapot"
+material = "mat4"
 [[object.transform]]
 type = "translate"
-vector = [0, 1, 0]
+vector = [0, 0, 0]
 [[object.transform]]
 type = "scale"
-vector = [2, 2, 2]
+vector = [0.02, 0.02, 0.02]

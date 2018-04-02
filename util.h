@@ -12,6 +12,13 @@ inline T clamp(T x, T min, T max) {
 }
 
 
+template <typename T>
+inline T sign(T x) {
+    if(x > 0) return 1;
+    else return -1;
+}
+
+
 inline std::string percentage(float x, float max) {
     return std::to_string(x/max*100) + "%";
 }

@@ -145,13 +145,45 @@ class Glass : public Material {
     public:
         const float ior;
 
-        Glass(const float _ior) : ior(_ior) {};
+        Glass(float _ior) : ior(_ior) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
             return 0.0f;
         };
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
+            float ior1, ior2;
+            //物体に入っているか?
+            bool entering = dot(wo, n) > 0.0f;
+            if(entering) {
+                ior1 = 1.0f;
+                ior2 = ior;
+            }
+            else {
+                ior1 = ior;
+                ior2 = 1.0f;
+            }
 
+            float eta = ior1/ior2;
+
+            float fr = fresnel(wo, n, ior1, ior2);
+            //反射
+            if(u.x < fr) {
+                wi = reflect(wo, n);
+                pdf = 1.0f;
+                return fr * 1.0f/dot(wi, n)*RGB(1.0f);
+            }
+            //屈折
+            else {
+                if(refract(wo, wi, n, ior1, ior2)) {
+                    pdf = 1.0f;
+                    return (1.0 - fr) * eta*eta * 1.0f/dot(wi, n)*RGB(1.0f);
+                }
+                //全反射
+                else {
+                    pdf = 1.0f;
+                    return RGB(0.0f);
+                }
+            }
         };
 };
 #endif

@@ -205,7 +205,7 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, const std::string& 
                 tinyobj::real_t vx = attrib.vertices[3*idx.vertex_index+0];
                 tinyobj::real_t vy = attrib.vertices[3*idx.vertex_index+1];
                 tinyobj::real_t vz = attrib.vertices[3*idx.vertex_index+2];
-                vertex.push_back(scale*Vec3((float)vx, (float)vy, (float)vz));
+                vertex.push_back(Vec3((float)vx, (float)vy, (float)vz));
 
                 if(idx.normal_index > 0) {
                     tinyobj::real_t nx = attrib.normals[3*idx.normal_index+0];

@@ -91,6 +91,10 @@ int main(int argc, char** argv) {
             auto alpha = *material->get_as<double>("alpha");
             mat = new Phong(alpha);
         }
+        else if(type == "glass") {
+            auto ior = *material->get_as<double>("ior");
+            mat = new Glass(ior);
+        }
         material_map.insert(std::make_pair(name, mat));
     }
     std::cout << "material loaded" << std::endl;
@@ -173,8 +177,13 @@ int main(int argc, char** argv) {
     if(integrator == "pt") {
         integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), std::shared_ptr<Sampler>(&sampler), samples, depth_limit);
     }
-    else {
+    else if(integrator == "normal") {
         integ = new NormalRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), std::shared_ptr<Sampler>(&sampler));
+    }
+    else if(integrator == "dot") {
+        integ = new DotRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), std::shared_ptr<Sampler>(&sampler));
+    }
+    else {
     }
     //Integrator* integrator = new AORenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 

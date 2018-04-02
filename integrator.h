@@ -43,6 +43,33 @@ class NormalRenderer : public Integrator {
 };
 
 
+class DotRenderer : public Integrator {
+    public:
+        DotRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+
+        void render(const Scene& scene) const {
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float u = (2.0*i - film->width)/film->width;
+                    float v = -(2.0*j - film->height)/film->height;
+                    float w;
+                    Ray ray = cam->getRay(u, v, w);
+                    Hit res;
+                    if(scene.intersect(ray, res)) {
+                        float d = dot(-ray.direction, res.hitNormal);
+                        std::cout << d << std::endl;
+                        film->setPixel(i, j, w*(std::max(dot(-ray.direction, res.hitNormal), 0.0f)));
+                    }
+                    else {
+                        film->setPixel(i, j, w*RGB(0.0f));
+                    }
+                }
+            }
+            film->ppm_output();
+        };
+};
+
+
 class BRDFRenderer : public Integrator {
     public:
         BRDFRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
@@ -194,6 +221,7 @@ class PathTrace : public Integrator {
                 //BRDFの計算と方向のサンプリング
                 const Vec3 wo = -ray.direction;
                 Vec3 n = res.hitNormal;
+                std::cout << dot(wo, n) << std::endl;
                 const Vec3 s = res.dpdu;
                 const Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
@@ -222,7 +250,7 @@ class PathTrace : public Integrator {
             Timer timer;
             timer.start();
             for(int k = 0; k < pixelSamples; k++) {
-                #pragma omp parallel for schedule(dynamic, 1)
+                //#pragma omp parallel for schedule(dynamic, 1)
                 for(int i = 0; i < film->width; i++) {
                     for(int j = 0; j < film->height; j++) {
                         float rx = sampler->getNext();

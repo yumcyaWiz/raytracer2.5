@@ -262,10 +262,10 @@ class BVH : public Accel {
 
 
         bool intersect(const Ray& ray, Hit& isect) const {
-            Vec3 invDir = 1.0f/ray.direction;
-            if(std::isinf(invDir.x)) invDir.x = 1e6;
-            if(std::isinf(invDir.y)) invDir.y = 1e6;
-            if(std::isinf(invDir.z)) invDir.z = 1e6;
+            Vec3 invDir = 1.0f/(ray.direction);
+            if(std::abs(invDir.x) > ray.tmax) invDir.x += sign(invDir.x)*ray.tmax;
+            if(std::abs(invDir.y) > ray.tmax) invDir.y += sign(invDir.y)*ray.tmax;
+            if(std::abs(invDir.z) > ray.tmax) invDir.z += sign(invDir.z)*ray.tmax;
             const int dirIsNeg[3] = {ray.direction.x < 0, ray.direction.y < 0, ray.direction.z < 0};
             return intersect(ray, isect, invDir, dirIsNeg);
         };
