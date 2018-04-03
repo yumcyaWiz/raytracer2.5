@@ -156,8 +156,8 @@ class Glass : public Material {
         };
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
             float ior1, ior2;
-            //物体に入っているか?
             Vec3 normal;
+            //物体に入っているか?
             bool entering = dot(wo, n) > 0.0f;
             if(entering) {
                 ior1 = 1.0f;
@@ -172,23 +172,25 @@ class Glass : public Material {
 
             float eta = ior1/ior2;
 
+            //フレネル反射率
             float fr = fresnel(wo, normal, ior1, ior2);
             //反射
             if(u.x < fr) {
                 wi = reflect(wo, normal);
-                pdf = 1.0f;
+                pdf = fr;
                 return fr * 1.0f/dot(wi, n)*RGB(1.0f);
             }
             //屈折
             else {
                 if(refract(wo, wi, normal, ior1, ior2)) {
-                    pdf = 1.0f;
+                    pdf = 1.0f - fr;
                     return (1.0 - fr) * eta*eta * 1.0f/dot(wi, n)*RGB(1.0f);
                 }
                 //全反射
                 else {
-                    pdf = 1.0f;
-                    return RGB(0.0f);
+                    wi = reflect(wo, normal);
+                    pdf = 1.0f - fr;
+                    return (1.0f - fr) * 1.0f/dot(wi, n)*RGB(1.0f);
                 }
             }
         };

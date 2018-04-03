@@ -1,6 +1,6 @@
 [renderer]
 samples = 1000
-depth-limit = 10
+depth-limit = 100
 integrator = "pt"
 
 [film]
@@ -17,7 +17,7 @@ type = "thin-lens"
 fov = 60.0
 lens-distance = 1.5
 focus-point = [0, 1, 0]
-f-number = 8.0
+f-number = 5.6
 [camera.transform]
 type = "look-at"
 origin = [0, 2, -5]
@@ -71,8 +71,11 @@ type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
-mesh = "sphere1"
+mesh = "teapot"
 material = "mat4"
 [[object.transform]]
 type = "translate"
-vector = [0, 1, 0]
+vector = [0, 0, 0]
+[[object.transform]]
+type = "scale"
+vector = [0.02, 0.02, 0.02]
