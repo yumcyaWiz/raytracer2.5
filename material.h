@@ -177,13 +177,13 @@ class Glass : public Material {
             if(u.x < fr) {
                 wi = reflect(wo, normal);
                 pdf = 1.0f;
-                return fr * 1.0f/dot(wi, normal)*RGB(1.0f);
+                return fr * 1.0f/dot(wi, n)*RGB(1.0f);
             }
             //屈折
             else {
                 if(refract(wo, wi, normal, ior1, ior2)) {
                     pdf = 1.0f;
-                    return (1.0 - fr) * eta*eta * 1.0f/dot(wi, normal)*RGB(1.0f);
+                    return (1.0 - fr) * eta*eta * 1.0f/dot(wi, n)*RGB(1.0f);
                 }
                 //全反射
                 else {

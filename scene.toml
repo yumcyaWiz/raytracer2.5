@@ -1,5 +1,5 @@
 [renderer]
-samples = 100
+samples = 10
 depth-limit = 10
 integrator = "pt"
 
@@ -7,7 +7,7 @@ integrator = "pt"
 resolution = [512, 512]
 
 [sky]
-type = "test"
+type = "ibl"
 path = "PaperMill_E_3k.hdr"
 theta-offset = 0
 phi-offset = 4.0
@@ -62,17 +62,14 @@ radius = 1.0
 
 [[object]]
 mesh = "floor"
-material = "mat3"
+material = "mat1"
 [[object.transform]]
 type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
-mesh = "teapot"
-material = "mat1"
+mesh = "sphere1"
+material = "mat4"
 [[object.transform]]
 type = "translate"
-vector = [0, 0, 0]
-[[object.transform]]
-type = "scale"
-vector = [0.02, 0.02, 0.02]
+vector = [0, 1, 0]

@@ -43,12 +43,7 @@ class Film {
             pixels[i + width*j] = _pix;
         };
         void addSample(int i, int j, const RGB& c) {
-            if(c.length() < 1e6) {
-                pixels[i + width*j].color_sum += c;
-            }
-            else {
-                std::cout << "too bright pixel sample" << std::endl;
-            }
+            pixels[i + width*j].color_sum += c;
         };
         void addSampleByFilter(float i, float j, const RGB& c) {
             int pminX = inrangeX(std::ceil(i - filter->radius.x));
