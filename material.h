@@ -104,7 +104,7 @@ class Mirror : public Material {
         Mirror(const float _reflectance) : reflectance(_reflectance) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
-            return 0.0f;
+            return RGB(0.0f);
         };
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
             pdf = 1.0f;
@@ -140,7 +140,7 @@ class Phong : public Material {
             //入射ベクトルのpdf
             pdf = pdf_wh/(4.0f*std::abs(dot(wo_local, wh)));
             wi = localToWorld(wi_local, n, s, t);
-            return f(wo, wi);
+            return f(wo_local, wi_local);
         };
 };
 
@@ -152,7 +152,7 @@ class Glass : public Material {
         Glass(float _ior) : ior(_ior) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
-            return 0.0f;
+            return RGB(0.0f);
         };
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
             float ior1, ior2;

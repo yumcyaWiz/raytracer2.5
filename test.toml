@@ -36,7 +36,7 @@ albedo = 0.9
 [[material]]
 name = "mat3"
 type = "phong"
-alpha = 50.0
+alpha = 5000.0
 
 [[material]]
 name = "mat4"
@@ -59,23 +59,20 @@ type = "obj"
 path = "teapot.obj"
 
 [[mesh]]
-name = "sphere1"
+name = "sphere"
 type = "sphere"
 radius = 1.0
 
 [[object]]
 mesh = "floor"
-material = "mat1"
+material = "mat3"
 [[object.transform]]
 type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
-mesh = "dragon"
-material = "mat2"
+mesh = "sphere"
+material = "mat4"
 [[object.transform]]
 type = "translate"
-vector = [0, 0, 0]
-[[object.transform]]
-type = "scale"
-vector = [0.2, 0.2, 0.2]
+vector = [0, 1, 0]
