@@ -72,7 +72,7 @@ class Material {
         //BRDFを計算する ワールド座標系の方向ベクトルを受け取る
         virtual RGB f(const Vec3& wo, const Vec3& wi) const = 0;
         //BRDFを計算し、BRDFに比例した方向のサンプリングを行う
-        virtual RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const = 0;
+        virtual RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, Sampler& sampler, float &pdf) const = 0;
 };
 
 
@@ -85,8 +85,9 @@ class Lambert : public Material {
         RGB f(const Vec3& wo, const Vec3& wi) const {
             return reflectance/M_PI;
         };
-        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
+        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, Sampler& sampler, float &pdf) const {
             //コサインに比例した半球サンプリング
+            Vec2 u = sampler.getNext2D();
             Vec3 wi_local = sampleCosineHemisphere(u);
             //入射レイのpdf
             pdf = absCosTheta(wi_local)/M_PI;
@@ -106,7 +107,7 @@ class Mirror : public Material {
         RGB f(const Vec3& wo, const Vec3& wi) const {
             return RGB(0.0f);
         };
-        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
+        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, Sampler& sampler, float &pdf) const {
             pdf = 1.0f;
             wi = reflect(wo, n);
             return 1.0f/dot(wi, n)*RGB(1.0f)*reflectance;
@@ -116,31 +117,47 @@ class Mirror : public Material {
 
 class Phong : public Material {
     public:
+        const Vec3 reflectance;
+        const float kd;
         const float alpha;
 
-        Phong(float _alpha) : alpha(_alpha) {};
+        Phong(const Vec3& _reflectance, float _kd, float _alpha) : reflectance(_reflectance), kd(_kd), alpha(_alpha) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
             //ハーフベクトル
             const Vec3 wh = normalize(wo + wi);
-            return RGB(1.0f) * (alpha + 2.0f)/(2.0f*M_PI) * std::pow(absCosTheta(wh), alpha);
+            return (1.0f - kd)*RGB(1.0f)*(alpha + 2.0f)/(2.0f*M_PI) * std::pow(absCosTheta(wh), alpha);
         };
-        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
-            //ハーフベクトルのサンプリング
-            Vec3 wh = sampleNCosineHemisphere(u, alpha);
-            Vec3 wo_local = worldToLocal(wo, n, s, t);
-            //ハーフベクトルが裏を向いている場合は黒を返す
-            if(dot(wo_local, wh) < 0.0f) return RGB(0.0f);
-            //サンプリング方向は出射レイをハーフベクトルで反射したもの
-            Vec3 wi_local = reflect(wo_local, wh);
-            //物体表面より下の方向がサンプリングされたら黒を返す
-            if(wi_local.y < 0.0f) return RGB(0.0f);
-            //ハーフベクトルのpdf
-            float pdf_wh = (alpha + 2.0f)/(2*M_PI) * std::pow(absCosTheta(wh), alpha);
-            //入射ベクトルのpdf
-            pdf = pdf_wh/(4.0f*std::abs(dot(wo_local, wh)));
-            wi = localToWorld(wi_local, n, s, t);
-            return f(wo_local, wi_local);
+        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, Sampler& sampler, float &pdf) const {
+            Vec2 u = sampler.getNext2D();
+            //diffuse
+            if(sampler.getNext() < kd) {
+                //コサインに比例した半球サンプリング
+                Vec3 wi_local = sampleCosineHemisphere(u);
+                //入射レイのpdf
+                pdf = kd * absCosTheta(wi_local)/M_PI;
+                //ローカルの入射レイをワールド座標に変換
+                wi = localToWorld(wi_local, n, s, t);
+                return kd * reflectance/M_PI;
+            }
+            //specular
+            else {
+                //ハーフベクトルのサンプリング
+                Vec3 wh = sampleNCosineHemisphere(u, alpha);
+                Vec3 wo_local = worldToLocal(wo, n, s, t);
+                //ハーフベクトルが裏を向いている場合は黒を返す
+                if(dot(wo_local, wh) < 0.0f) return RGB(0.0f);
+                //サンプリング方向は出射レイをハーフベクトルで反射したもの
+                Vec3 wi_local = reflect(wo_local, wh);
+                //物体表面より下の方向がサンプリングされたら黒を返す
+                if(wi_local.y < 0.0f) return RGB(0.0f);
+                //ハーフベクトルのpdf
+                float pdf_wh = (alpha + 2.0f)/(2*M_PI) * std::pow(absCosTheta(wh), alpha);
+                //入射ベクトルのpdf
+                pdf = (1.0f - kd) * pdf_wh/(4.0f*std::abs(dot(wo_local, wh)));
+                wi = localToWorld(wi_local, n, s, t);
+                return f(wo_local, wi_local);
+            }
         };
 };
 
@@ -154,7 +171,7 @@ class Glass : public Material {
         RGB f(const Vec3& wo, const Vec3& wi) const {
             return RGB(0.0f);
         };
-        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
+        RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, Sampler& sampler, float &pdf) const {
             float ior1, ior2;
             Vec3 normal;
             //物体に入っているか?
@@ -175,7 +192,7 @@ class Glass : public Material {
             //フレネル反射率
             float fr = fresnel(wo, normal, ior1, ior2);
             //反射
-            if(u.x < fr) {
+            if(sampler.getNext() < fr) {
                 wi = reflect(wo, normal);
                 pdf = fr;
                 return fr * 1.0f/dot(wi, n)*RGB(1.0f);

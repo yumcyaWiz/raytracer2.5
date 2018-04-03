@@ -114,8 +114,11 @@ int main(int argc, char** argv) {
             mat = new Mirror(albedo);
         }
         else if(type == "phong") {
+            auto albedo = *material->get_array_of<double>("albedo");
+            auto kd = *material->get_as<double>("kd");
             auto alpha = *material->get_as<double>("alpha");
-            mat = new Phong(alpha);
+            Vec3 reflectance(albedo[0], albedo[1], albedo[2]);
+            mat = new Phong(reflectance, kd, alpha);
         }
         else if(type == "glass") {
             auto ior = *material->get_as<double>("ior");

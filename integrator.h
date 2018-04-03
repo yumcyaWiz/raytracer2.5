@@ -90,7 +90,7 @@ class BRDFRenderer : public Integrator {
                         Vec3 t = normalize(cross(s, n));
                         Vec3 wi;
                         float brdf_pdf;
-                        RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                        RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, *sampler, brdf_pdf);
                         film->setPixel(i, j, w*(wi + 1.0f)/2.0f);
                     }
                     else {
@@ -125,7 +125,7 @@ class AORenderer : public Integrator {
                         float brdf_pdf;
                         int hit_count = 0;
                         for(int k = 0; k < 100; k++) {
-                            RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                            RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, *sampler, brdf_pdf);
                             Ray nextRay(res.hitPos, wi);
                             Hit res2;
                             if(scene.intersect(nextRay, res2))
@@ -165,7 +165,7 @@ class PathTraceDepthRenderer : public Integrator {
                 const Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
                 float brdf_pdf;
-                const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, *sampler, brdf_pdf);
 
                 Ray nextRay(res.hitPos, wi);
                 return Li(nextRay, scene, depth + 1, roulette);
@@ -225,7 +225,7 @@ class PathTrace : public Integrator {
                 const Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
                 float brdf_pdf;
-                const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, sampler->getNext2D(), brdf_pdf);
+                const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, *sampler, brdf_pdf);
                 if(brdf_f == RGB(0))
                     return RGB(0);
 
