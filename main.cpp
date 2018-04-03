@@ -34,8 +34,12 @@ int main(int argc, char** argv) {
         }
     }
 
+
+
     //tomlの読み込み
     auto toml = cpptoml::parse_file(filepath);
+
+
 
     //film
     auto film_toml = toml->get_table("film");
@@ -44,6 +48,8 @@ int main(int argc, char** argv) {
     Filter* filter = new GaussianFilter(Vec2(1), 1.0f);
     Film* film = new Film(resolution[0], resolution[1], std::unique_ptr<Filter>(filter), "output.ppm");
     std::cout << "film loaded" << std::endl;
+
+
 
     //sky
     auto sky = toml->get_table("sky");
@@ -60,6 +66,8 @@ int main(int argc, char** argv) {
     }
     std::cout << "sky loaded" << std::endl;
 
+
+
     //camera
     auto camera = toml->get_table("camera");
     auto camera_type = *camera->get_as<std::string>("type");
@@ -71,8 +79,23 @@ int main(int argc, char** argv) {
     Vec3 camPos(camera_transform_origin[0], camera_transform_origin[1], camera_transform_origin[2]);
     Vec3 camTarget(camera_transform_target[0], camera_transform_target[1], camera_transform_target[2]);
     Vec3 camForward = normalize(camTarget - camPos);
-    PinholeCamera* cam = new PinholeCamera(camPos, camForward, toRad(camera_fov));
+    Camera* cam;
+    if(camera_type == "ideal-pinhole") {
+        cam = new PinholeCamera(camPos, camForward, toRad(camera_fov));
+    }
+    else if(camera_type == "thin-lens") {
+        auto lensDistance = *camera->get_as<double>("lens-distance");
+        auto focusPoint = *camera->get_array_of<double>("focus-point");
+        auto fnumber = *camera->get_as<double>("f-number");
+        cam = new ThinLensCamera(camPos, camForward, lensDistance, Vec3(focusPoint[0], focusPoint[1], focusPoint[2]), fnumber);
+    }
+    else {
+        std::cerr << "invalid camera type" << std::endl;
+        std::exit(1);
+    }
     std::cout << "camera loaded" << std::endl;
+
+
 
     //materials
     std::map<std::string, Material*> material_map;
@@ -102,6 +125,8 @@ int main(int argc, char** argv) {
     }
     std::cout << "material loaded" << std::endl;
 
+
+
     //meshes
     struct ShapeData {
         std::string type;
@@ -130,8 +155,10 @@ int main(int argc, char** argv) {
     std::cout << "mesh loaded" << std::endl;
 
 
+
     //objects
     auto objects = toml->get_table_array("object");
+    //プリミティブの配列
     std::vector<std::shared_ptr<Primitive>> prims;
     for(const auto& object : *objects) {
         std::string mesh = *object->get_as<std::string>("mesh");
@@ -165,9 +192,15 @@ int main(int argc, char** argv) {
     std::cout << "objects loaded" << std::endl;
 
 
+
+    //サンプラーの用意
     UniformSampler sampler(RNG_TYPE::MT);
+    //ライト
     std::vector<std::shared_ptr<Light>> lights;
+    //シーンの初期化
     Scene scene(prims, lights, std::shared_ptr<Sky>(sky_ptr));
+
+
 
     //renderer
     auto renderer = toml->get_table("renderer");

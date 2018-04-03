@@ -1,5 +1,5 @@
 [renderer]
-samples = 10
+samples = 1000
 depth-limit = 10
 integrator = "pt"
 
@@ -10,15 +10,18 @@ resolution = [512, 512]
 type = "ibl"
 path = "PaperMill_E_3k.hdr"
 theta-offset = 0
-phi-offset = 4.0
+phi-offset = 3.14
 
 [camera]
-type = "ideal-pinhole"
+type = "thin-lens"
 fov = 60.0
+lens-distance = 1.5
+focus-point = [0, 1, 0]
+f-number = 8.0
 [camera.transform]
 type = "look-at"
-origin = [0, 3, -5]
-target = [0, 0, 0]
+origin = [0, 2, -5]
+target = [0, 1, 0]
 
 [[material]]
 name = "mat1"

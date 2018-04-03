@@ -28,7 +28,7 @@ class NormalRenderer : public Integrator {
                     float u = (2.0*i - film->width)/film->width;
                     float v = -(2.0*j - film->height)/film->height;
                     float w;
-                    Ray ray = cam->getRay(u, v, w);
+                    Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
                         film->setPixel(i, j, w*(res.hitNormal + 1.0f)/2.0f);
@@ -53,7 +53,7 @@ class DotRenderer : public Integrator {
                     float u = (2.0*i - film->width)/film->width;
                     float v = -(2.0*j - film->height)/film->height;
                     float w;
-                    Ray ray = cam->getRay(u, v, w);
+                    Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
                         float d = dot(-ray.direction, res.hitNormal);
@@ -80,7 +80,7 @@ class BRDFRenderer : public Integrator {
                     float u = (2.0*i - film->width)/film->width;
                     float v = -(2.0*j - film->height)/film->height;
                     float w;
-                    Ray ray = cam->getRay(u, v, w);
+                    Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
                         std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
@@ -113,7 +113,7 @@ class AORenderer : public Integrator {
                     float u = (2.0*i - film->width)/film->width;
                     float v = -(2.0*j - film->height)/film->height;
                     float w;
-                    Ray ray = cam->getRay(u, v, w);
+                    Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
                         std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
@@ -181,7 +181,7 @@ class PathTraceDepthRenderer : public Integrator {
                     float u = (2.0*i - film->width)/film->width;
                     float v = -(2.0*j - film->height)/film->height;
                     float w;
-                    Ray ray = cam->getRay(u, v, w);
+                    Ray ray = cam->getRay(u, v, w, *sampler);
                     RGB col = Li(ray, scene);
                     film->setPixel(i, j, w*col);
                 }
@@ -262,7 +262,7 @@ class PathTrace : public Integrator {
                         float u = (2.0*(i + rx) - film->width)/film->width;
                         float v = -(2.0*(j + ry) - film->height)/film->height;
                         float w;
-                        Ray ray = cam->getRay(u, v, w);
+                        Ray ray = cam->getRay(u, v, w, *sampler);
                         RGB col = Li(ray, scene);
                         film->addSample(i, j, w*col);
                     }
