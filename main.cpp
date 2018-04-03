@@ -55,6 +55,9 @@ int main(int argc, char** argv) {
         auto phi_offset = *sky->get_as<double>("phi-offset");
         sky_ptr = new IBL(path, phi_offset, theta_offset);
     }
+    else if(sky_type == "test") {
+        sky_ptr = new TestSky();
+    }
     std::cout << "sky loaded" << std::endl;
 
     //camera
