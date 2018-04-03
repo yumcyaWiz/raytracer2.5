@@ -129,10 +129,14 @@ class Phong : public Material {
             //ハーフベクトルのサンプリング
             Vec3 wh = sampleNCosineHemisphere(u, alpha);
             Vec3 wo_local = worldToLocal(wo, n, s, t);
+            //ハーフベクトルが裏を向いている場合は黒を返す
+            if(dot(wo_local, wh) < 0.0f) return RGB(0.0f);
             //サンプリング方向は出射レイをハーフベクトルで反射したもの
             Vec3 wi_local = reflect(wo_local, wh);
+            //物体表面より下の方向がサンプリングされたら黒を返す
+            if(wi_local.y < 0.0f) return RGB(0.0f);
             //ハーフベクトルのpdf
-            float pdf_wh = (alpha + 1.0f)/(2*M_PI) * absCosTheta(wh);
+            float pdf_wh = (alpha + 2.0f)/(2*M_PI) * std::pow(absCosTheta(wh), alpha);
             //入射ベクトルのpdf
             pdf = pdf_wh/(4.0f*std::abs(dot(wo_local, wh)));
             wi = localToWorld(wi_local, n, s, t);
@@ -153,30 +157,33 @@ class Glass : public Material {
         RGB sample(const Vec3& wo, Vec3& wi, const Vec3& n, const Vec3& s, const Vec3& t, const Vec2& u, float &pdf) const {
             float ior1, ior2;
             //物体に入っているか?
+            Vec3 normal;
             bool entering = dot(wo, n) > 0.0f;
             if(entering) {
                 ior1 = 1.0f;
                 ior2 = ior;
+                normal = n;
             }
             else {
                 ior1 = ior;
                 ior2 = 1.0f;
+                normal = -n;
             }
 
             float eta = ior1/ior2;
 
-            float fr = fresnel(wo, n, ior1, ior2);
+            float fr = fresnel(wo, normal, ior1, ior2);
             //反射
             if(u.x < fr) {
-                wi = reflect(wo, n);
+                wi = reflect(wo, normal);
                 pdf = 1.0f;
-                return fr * 1.0f/dot(wi, n)*RGB(1.0f);
+                return fr * 1.0f/dot(wi, normal)*RGB(1.0f);
             }
             //屈折
             else {
-                if(refract(wo, wi, n, ior1, ior2)) {
+                if(refract(wo, wi, normal, ior1, ior2)) {
                     pdf = 1.0f;
-                    return (1.0 - fr) * eta*eta * 1.0f/dot(wi, n)*RGB(1.0f);
+                    return (1.0 - fr) * eta*eta * 1.0f/dot(wi, normal)*RGB(1.0f);
                 }
                 //全反射
                 else {

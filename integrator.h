@@ -221,7 +221,6 @@ class PathTrace : public Integrator {
                 //BRDFの計算と方向のサンプリング
                 const Vec3 wo = -ray.direction;
                 Vec3 n = res.hitNormal;
-                std::cout << dot(wo, n) << std::endl;
                 const Vec3 s = res.dpdu;
                 const Vec3 t = normalize(cross(s, n));
                 Vec3 wi;
@@ -231,10 +230,13 @@ class PathTrace : public Integrator {
                     return RGB(0);
 
                 //コサイン項
-                const float cos_term = std::max(dot(wi, n), 0.0f);
+                const float cos_term = dot(wi, n);
 
                 //係数
                 const RGB k = 1.0f/(roulette*brdf_pdf) * cos_term * brdf_f;
+                if(k.x < 0.0f || k.y < 0.0f || k.z < 0.0f) {
+                    std::cout << "minus k detected" << std::endl;
+                }
 
                 //レンダリング方程式の計算
                 Ray nextRay(res.hitPos, wi);
@@ -250,7 +252,7 @@ class PathTrace : public Integrator {
             Timer timer;
             timer.start();
             for(int k = 0; k < pixelSamples; k++) {
-                //#pragma omp parallel for schedule(dynamic, 1)
+                #pragma omp parallel for schedule(dynamic, 1)
                 for(int i = 0; i < film->width; i++) {
                     for(int j = 0; j < film->height; j++) {
                         float rx = sampler->getNext();

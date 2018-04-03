@@ -1,7 +1,7 @@
 [renderer]
-samples = 1
-depth-limit = 1
-integrator = "dot"
+samples = 100
+depth-limit = 10
+integrator = "pt"
 
 [film]
 resolution = [512, 512]
@@ -14,7 +14,7 @@ phi-offset = 4.0
 
 [camera]
 type = "ideal-pinhole"
-fov = 30.0
+fov = 60.0
 [camera.transform]
 type = "look-at"
 origin = [0, 3, -5]
@@ -33,7 +33,7 @@ albedo = 0.9
 [[material]]
 name = "mat3"
 type = "phong"
-alpha = 1000.0
+alpha = 50.0
 
 [[material]]
 name = "mat4"
@@ -69,7 +69,7 @@ vector = [0, 0, 0]
 
 [[object]]
 mesh = "teapot"
-material = "mat4"
+material = "mat1"
 [[object.transform]]
 type = "translate"
 vector = [0, 0, 0]
