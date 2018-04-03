@@ -71,7 +71,6 @@ int main(int argc, char** argv) {
     //camera
     auto camera = toml->get_table("camera");
     auto camera_type = *camera->get_as<std::string>("type");
-    auto camera_fov = *camera->get_as<double>("fov");
     auto camera_transform = camera->get_table("transform");
     auto camera_transform_type = *camera_transform->get_as<std::string>("type");
     auto camera_transform_origin = *camera_transform->get_array_of<double>("origin");
@@ -81,7 +80,8 @@ int main(int argc, char** argv) {
     Vec3 camForward = normalize(camTarget - camPos);
     Camera* cam;
     if(camera_type == "ideal-pinhole") {
-        cam = new PinholeCamera(camPos, camForward, toRad(camera_fov));
+        auto fov = *camera->get_as<double>("fov");
+        cam = new PinholeCamera(camPos, camForward, toRad(fov));
     }
     else if(camera_type == "thin-lens") {
         auto lensDistance = *camera->get_as<double>("lens-distance");

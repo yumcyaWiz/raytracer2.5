@@ -68,6 +68,8 @@ class ThinLensCamera : public Camera {
         };
 
         Ray getRay(float u, float v, float &w, Sampler& sampler) const {
+            //像が逆になるので修正する
+            u = -u;
             v = -v;
             //センサー面上の位置
             Vec3 sensorPos = camPos + u*camRight + v*camUp;
