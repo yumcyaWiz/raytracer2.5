@@ -158,6 +158,8 @@ int main(int argc, char** argv) {
     std::cout << "mesh loaded" << std::endl;
 
 
+    //lights
+    std::vector<std::shared_ptr<Light>> lights;
 
     //objects
     auto objects = toml->get_table_array("object");
@@ -195,11 +197,18 @@ int main(int argc, char** argv) {
     std::cout << "objects loaded" << std::endl;
 
 
+    //sampler
+    std::shared_ptr<Sampler> sampler;
+    auto sampler_toml = toml->get_table("sampler");
+    auto sampler_type = *sampler_toml->get_as<std::string>("type");
+    if(sampler_type == "mt") {
+        sampler = std::shared_ptr<Sampler>(new UniformSampler(RNG_TYPE::MT));
+    }
+    else {
+        sampler = std::shared_ptr<Sampler>(new UniformSampler(RNG_TYPE::MINSTD));
+    }
 
-    //サンプラーの用意
-    UniformSampler sampler(RNG_TYPE::MT);
-    //ライト
-    std::vector<std::shared_ptr<Light>> lights;
+
     //シーンの初期化
     Scene scene(prims, lights, std::shared_ptr<Sky>(sky_ptr));
 
@@ -214,13 +223,13 @@ int main(int argc, char** argv) {
 
     Integrator* integ;
     if(integrator == "pt") {
-        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), std::shared_ptr<Sampler>(&sampler), samples, depth_limit);
+        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit);
     }
     else if(integrator == "normal") {
-        integ = new NormalRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), std::shared_ptr<Sampler>(&sampler));
+        integ = new NormalRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
     }
     else if(integrator == "dot") {
-        integ = new DotRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), std::shared_ptr<Sampler>(&sampler));
+        integ = new DotRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
     }
     else {
     }

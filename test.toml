@@ -1,7 +1,10 @@
 [renderer]
 samples = 10
 depth-limit = 100
-integrator = "pt"
+integrator = "mt"
+
+[sampler]
+type = "minstd"
 
 [film]
 resolution = [512, 512]
