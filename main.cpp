@@ -12,8 +12,8 @@
 #include "primitive.h"
 #include "accel.h"
 #include "aabb.h"
-#include "objloader.h"
 #include "light.h"
+#include "objloader.h"
 #include "scene.h"
 #include "filter.h"
 #include "sampler.h"
@@ -158,38 +158,15 @@ int main(int argc, char** argv) {
     std::cout << "mesh loaded" << std::endl;
 
 
-    //lights
-    std::vector<std::shared_ptr<Light>> lights;
-    auto light_toml = toml->get_table_array("light");
-    if(light_toml) {
-        for(const auto& light : *light_toml) {
-            if(!light) continue;
-
-            auto light_emission = *light->get_array_of<double>("emission");
-            Vec3 emission(light_emission[0], light_emission[1], light_emission[2]);
-            auto light_type = *light->get_as<std::string>("type");
-
-            std::shared_ptr<Light> lightPtr;
-            if(light_type == "point") {
-                auto lightPos = *light->get_array_of<double>("light-pos");
-                Vec3 pos(lightPos[0], lightPos[1], lightPos[2]);
-                lightPtr = std::shared_ptr<Light>(new PointLight(pos, emission));
-            }
-            else if(light_type == "directional") {
-            }
-            else if(light_type == "area") {
-            }
-            lights.push_back(lightPtr);
-        }
-    }
-    std::cout << "lights loaded" << std::endl;
-
 
     //objects
     auto objects = toml->get_table_array("object");
     //プリミティブの配列
     std::vector<std::shared_ptr<Primitive>> prims;
+    //プリミティブの連想配列(lightの読み込みで名前で参照するときに使用する)
+    std::map<std::string, std::shared_ptr<Primitive>> prims_map;
     for(const auto& object : *objects) {
+        std::string name = *object->get_as<std::string>("name");
         std::string mesh = *object->get_as<std::string>("mesh");
         std::string material = *object->get_as<std::string>("material");
         auto transforms = object->get_table_array("transform");
@@ -213,12 +190,42 @@ int main(int argc, char** argv) {
             std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(center, shapedata.radius));
             std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(std::shared_ptr<Material>(mat), nullptr, shape));
             prims.push_back(prim);
+            prims_map.insert(std::make_pair(name, prim));
         }
         else if(shapedata.type == "obj") {
             loadObj(prims, shapedata.path, center, scale, std::shared_ptr<Material>(mat));
         }
     }
     std::cout << "objects loaded" << std::endl;
+
+
+
+    //lights
+    std::vector<std::shared_ptr<Light>> lights;
+    auto light_toml = toml->get_table_array("light");
+    if(light_toml) {
+        for(const auto& light : *light_toml) {
+            auto light_emission = *light->get_array_of<double>("emission");
+            Vec3 emission(light_emission[0], light_emission[1], light_emission[2]);
+            auto light_type = *light->get_as<std::string>("type");
+
+            std::shared_ptr<Light> lightPtr;
+            if(light_type == "point") {
+                auto lightPos = *light->get_array_of<double>("light-pos");
+                Vec3 pos(lightPos[0], lightPos[1], lightPos[2]);
+                lightPtr = std::shared_ptr<Light>(new PointLight(pos, emission));
+            }
+            else if(light_type == "directional") {
+            }
+            else if(light_type == "area") {
+                auto object = *light->get_as<std::string>("object");
+                std::shared_ptr<Primitive> prim = prims_map.at(object);
+                lightPtr = std::shared_ptr<Light>(new AreaLight(prim, emission));
+            }
+            lights.push_back(lightPtr);
+        }
+    }
+    std::cout << "lights loaded" << std::endl;
 
 
     //sampler

@@ -1,5 +1,5 @@
 [renderer]
-samples = 1000
+samples = 10
 depth-limit = 100
 integrator = "pt"
 
@@ -85,6 +85,7 @@ path = "diamond.obj"
 
 
 [[object]]
+name = "floor"
 mesh = "floor"
 material = "mat2"
 [[object.transform]]
@@ -92,6 +93,7 @@ type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
+name = "diamond"
 mesh = "diamond"
 material = "diamond"
 [[object.transform]]

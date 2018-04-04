@@ -1,14 +1,15 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 #include "vec3.h"
-#include "shape.h"
+#include "primitive.h"
+
+
 class Light {
     public:
-        Vec3 lightPos;
         RGB power;
 
         Light() {};
-        Light(const Vec3& _lightPos, const RGB& _power) : lightPos(_lightPos), power(_power) {};
+        Light(const RGB& _power) : power(_power) {};
 
         virtual RGB Le(const Hit& res) const = 0;
         virtual RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const = 0;
@@ -17,8 +18,9 @@ class Light {
 
 class PointLight : public Light {
     public:
-        PointLight(const Vec3& _lightPos, const RGB& _power) : Light(_lightPos, _power) {};
+        Vec3 lightPos;
 
+        PointLight(const Vec3& _lightPos, const RGB& _power) : Light(_power), lightPos(_lightPos) {};
 
         RGB Le(const Hit& res) const {
             return power;
@@ -33,10 +35,10 @@ class PointLight : public Light {
 
 class AreaLight : public Light {
     public:
-        std::shared_ptr<Shape> shape;
+        std::shared_ptr<Primitive> prim;
 
 
-        AreaLight(const Vec3& _lightPos, const RGB& _power, const std::shared_ptr<Shape> _shape) : Light(_lightPos, _power), shape(_shape) {};
+        AreaLight(std::shared_ptr<Primitive> _prim, const RGB& _power) : Light(_power), prim(_prim) {};
 
         
         RGB Le(const Hit& res) const {
