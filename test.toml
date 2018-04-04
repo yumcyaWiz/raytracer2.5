@@ -1,5 +1,5 @@
 [renderer]
-samples = 10
+samples = 1000
 depth-limit = 100
 integrator = "pt"
 
@@ -16,8 +16,8 @@ theta-offset = 0
 phi-offset = 3.14
 
 [camera]
-type = "thin-lens"
-fov = 60.0
+type = "ideal-pinhole"
+fov = 40.0
 lens-distance = 1.5
 focus-point = [0.0, 0.5, 0.0]
 f-number = 8.0 
