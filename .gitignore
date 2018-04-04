@@ -1,6 +1,7 @@
 *.out
 *.ppm
 *.png
+*.jpg
 *.obj
 stb_image.h
 *.hdr
