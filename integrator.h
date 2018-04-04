@@ -6,6 +6,7 @@
 #include "film.h"
 #include "sampler.h"
 #include "timer.h"
+#include "util.h"
 class Integrator {
     public:
         std::shared_ptr<Camera> cam;
@@ -88,9 +89,11 @@ class BRDFRenderer : public Integrator {
                         Vec3 n = res.hitNormal;
                         Vec3 s = res.dpdu;
                         Vec3 t = normalize(cross(s, n));
-                        Vec3 wi;
+                        Vec3 wo_local = worldToLocal(wo, n, s, t);
+                        Vec3 wi_local;
                         float brdf_pdf;
-                        RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, *sampler, brdf_pdf);
+                        RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
+                        Vec3 wi = localToWorld(wi_local, n, s, t);
                         film->setPixel(i, j, w*(wi + 1.0f)/2.0f);
                     }
                     else {
@@ -121,11 +124,13 @@ class AORenderer : public Integrator {
                         Vec3 n = res.hitNormal;
                         Vec3 s = res.dpdu;
                         Vec3 t = normalize(cross(s, n));
-                        Vec3 wi;
+                        Vec3 wo_local = worldToLocal(wo, n, s, t);
+                        Vec3 wi_local;
                         float brdf_pdf;
                         int hit_count = 0;
                         for(int k = 0; k < 100; k++) {
-                            RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, *sampler, brdf_pdf);
+                            RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
+                            Vec3 wi = localToWorld(wi, n, s, t);
                             Ray nextRay(res.hitPos, wi);
                             Hit res2;
                             if(scene.intersect(nextRay, res2))
@@ -163,9 +168,11 @@ class PathTraceDepthRenderer : public Integrator {
                 const Vec3 n = res.hitNormal;
                 const Vec3 s = res.dpdu;
                 const Vec3 t = normalize(cross(s, n));
-                Vec3 wi;
+                Vec3 wo_local = worldToLocal(wo, n, s, t);
+                Vec3 wi_local;
                 float brdf_pdf;
-                const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, *sampler, brdf_pdf);
+                const RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
+                Vec3 wi = localToWorld(wi, n, s, t);
 
                 Ray nextRay(res.hitPos, wi);
                 return Li(nextRay, scene, depth + 1, roulette);
@@ -218,24 +225,44 @@ class PathTrace : public Integrator {
                 }
                 //マテリアル
                 const std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
-                //BRDFの計算と方向のサンプリング
+
+                //ローカル座標系の構築
                 const Vec3 wo = -ray.direction;
-                Vec3 n = res.hitNormal;
+                const Vec3 n = res.hitNormal;
                 const Vec3 s = res.dpdu;
                 const Vec3 t = normalize(cross(s, n));
-                Vec3 wi;
+                const Vec3 wo_local = worldToLocal(wo, n, s, t);
+
+
+                //BRDFの計算と方向のサンプリング
+                Vec3 wi_local;
                 float brdf_pdf;
-                const RGB brdf_f = hitMaterial->sample(wo, wi, n, s, t, *sampler, brdf_pdf);
+                const RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
+                //サンプリングされた方向をワールド座標系に戻す
+                Vec3 wi = localToWorld(wi_local, n, s, t);
+                //もしbrdfが真っ黒だったらterminate
                 if(brdf_f == RGB(0))
                     return RGB(0);
 
+
                 //コサイン項
-                const float cos_term = dot(wi, n);
+                const float cos_term = std::abs(wi_local.y);
+
 
                 //係数
-                const RGB k = 1.0f/(roulette*brdf_pdf) * cos_term * brdf_f;
+                RGB k = 1.0f/(roulette*brdf_pdf) * cos_term * brdf_f;
                 if(k.x < 0.0f || k.y < 0.0f || k.z < 0.0f) {
                     std::cout << "minus k detected" << std::endl;
+                    std::cout << "wo: " << wo << std::endl;
+                    std::cout << "wo_local: " << wo_local << std::endl;
+                    std::cout << "n: " << n << std::endl;
+                    std::cout << "wi: " << wi << std::endl;
+                    std::cout << "wi_local: " << wi_local << std::endl;
+                    std::cout << "cos_term: " << cos_term << std::endl;
+                    std::cout << "brdf_f:" << brdf_f << std::endl;
+                    std::cout << "k: " << k << std::endl;
+                    k = -k;
+                    k = omitNA(k);
                 }
 
                 //レンダリング方程式の計算

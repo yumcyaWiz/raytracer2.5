@@ -43,7 +43,7 @@ class Film {
             pixels[i + width*j] = _pix;
         };
         void addSample(int i, int j, const RGB& c) {
-            if(c.length() > 1e9) {
+            if(c.length() > 1e3) {
                 std::cout << "too bright pixel detected" << std::endl;
                 return;
             }

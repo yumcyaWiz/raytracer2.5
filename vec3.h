@@ -128,4 +128,19 @@ inline Vec3 max(const Vec3& v1, const Vec3& v2) {
 inline Vec3 min(const Vec3& v1, const Vec3& v2) {
     return Vec3(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z));
 }
+
+
+inline Vec3 omitNA(const Vec3& v) {
+    Vec3 ret(v);
+    if(std::isnan(v.x) || std::isinf(v.x)) {
+        ret.x = 0.0f;
+    }
+    if(std::isnan(v.y) || std::isinf(v.y)) {
+        ret.y = 0.0f;
+    }
+    if(std::isnan(v.z) || std::isinf(v.z)) {
+        ret.z = 0.0f;
+    }
+    return ret;
+}
 #endif
