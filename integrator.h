@@ -352,16 +352,19 @@ class PathTraceExplicit : public Integrator {
                     Ray shadowRay(res.hitPos, wi_light);
                     Hit shadow_res;
                     //シャドウレイが物体に当たったとき、それがサンプリング生成元の光源だった場合は寄与を蓄積
+                    //光源が対象な物体であると仮定して、裏側がサンプリングされても寄与を取るようにしている
                     if(scene.intersect(shadowRay, shadow_res)) {
                         if(shadow_res.hitPrimitive->areaLight == light)
-                            col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::max(dot(wi_light, n), 0.0f);
+                            col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::abs(wi_light_local.y);
                     }
                 };
 
+                /*
                 //もし光源に当たったら放射輝度を蓄積
                 if(res.hitPrimitive->areaLight != nullptr) {
                     col += res.hitPrimitive->areaLight->Le(res);
                 }
+                */
 
 
                 //BRDFの計算と方向のサンプリング

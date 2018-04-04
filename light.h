@@ -52,7 +52,7 @@ class AreaLight : public Light {
             float distance2 = (primPos - res.hitPos).length2();
             //衝突点からサンプリングされた点に向かう方向ベクトルを生成
             wi = normalize(primPos - res.hitPos);
-            float cos_term = std::max(dot(-wi, normal), 0.0f);
+            float cos_term = std::abs(dot(-wi, normal));
             //面積測度を立体角測度に変換
             pdf = point_pdf * distance2/cos_term;
             return power;
