@@ -54,6 +54,13 @@ class Sphere : public Shape {
         AABB worldBound() const {
             return AABB(Vec3(-radius - 1e-3) + center, Vec3(radius + 1e-3) + center);
         };
+
+        float surfaceArea() const {
+            return 4*M_PI*radius*radius;
+        };
+
+        Vec3 sample(float &pdf) const {
+        };
 };
 
 
