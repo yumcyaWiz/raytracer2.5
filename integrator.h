@@ -290,7 +290,7 @@ class PathTrace : public Integrator {
                         float ry = sampler->getNext();
                         float px = i + rx;
                         float py = j + ry;
-                        float u = (2.0*(i + rx) - film->width)/film->width;
+                        float u = (2.0*(i + rx) - film->width)/film->height;
                         float v = -(2.0*(j + ry) - film->height)/film->height;
                         float w;
                         Ray ray = cam->getRay(u, v, w, *sampler);
