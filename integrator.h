@@ -218,10 +218,11 @@ class PathTrace : public Integrator {
                 return RGB(0.0f);
 
             Hit res;
+            RGB col;
             if(scene.intersect(ray, res)) {
                 //もし光源に当たったら放射輝度を蓄積
                 if(res.hitPrimitive->areaLight != nullptr) {
-                    //col += res.hitPrimitive->areaLight->Le(res);
+                    col += res.hitPrimitive->areaLight->Le(res);
                 }
                 //マテリアル
                 const std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
@@ -241,8 +242,7 @@ class PathTrace : public Integrator {
                 //サンプリングされた方向をワールド座標系に戻す
                 Vec3 wi = localToWorld(wi_local, n, s, t);
                 //もしbrdfが真っ黒だったらterminate
-                if(brdf_f == RGB(0))
-                    return RGB(0);
+                if(brdf_f == RGB(0)) return RGB(0);
 
 
                 //コサイン項
@@ -262,16 +262,20 @@ class PathTrace : public Integrator {
                     std::cout << "brdf_f:" << brdf_f << std::endl;
                     std::cout << "k: " << k << std::endl;
                     k = -k;
-                    k = omitNA(k);
+                }
+                if(isnan(k) || isinf(k)) {
+                    std::cout << "inf or nan k detected" << std::endl;
+                    return RGB(0);
                 }
 
                 //レンダリング方程式の計算
                 Ray nextRay(res.hitPos, wi);
-                return k * Li(nextRay, scene, depth + 1, roulette);
+                col += k * Li(nextRay, scene, depth + 1, roulette);
             }
             else {
-                return scene.sky->getSky(ray);
+                col = scene.sky->getSky(ray);
             }
+            return col;
         };
 
 

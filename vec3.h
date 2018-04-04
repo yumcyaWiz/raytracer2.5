@@ -143,4 +143,12 @@ inline Vec3 omitNA(const Vec3& v) {
     }
     return ret;
 }
+
+
+inline bool isnan(const Vec3& v) {
+    return std::isnan(v.x) || std::isnan(v.y) || std::isnan(v.z);
+}
+inline bool isinf(const Vec3& v) {
+    return std::isinf(v.x) || std::isinf(v.y) || std::isinf(v.z);
+}
 #endif
