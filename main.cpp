@@ -268,8 +268,9 @@ int main(int argc, char** argv) {
         integ = new DotRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
     }
     else {
+        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, 10, 100);
     }
-    //Integrator* integrator = new AORenderer(std::shared_ptr<Camera>(&cam), std::shared_ptr<Film>(&film), std::shared_ptr<Sampler>(&sampler));
 
+    //レンダリング
     integ->render(scene);
 }

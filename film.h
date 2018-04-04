@@ -106,6 +106,7 @@ class Film {
                 }
             }
             file.close();
+            std::cout << filename << " written out" << std::endl;
         };
 
 

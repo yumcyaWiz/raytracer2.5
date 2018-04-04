@@ -11,6 +11,7 @@ class Timer {
         decltype(std::chrono::system_clock::now()) tend;
 
         Timer() {};
+        ~Timer() {};
 
         void start() {
             tstart = std::chrono::system_clock::now();

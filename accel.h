@@ -33,6 +33,10 @@ class BVH : public Accel {
             int nPrims;
 
             BVHNode() {};
+            ~BVHNode() {
+                delete left;
+                delete right;
+            };
 
             void initLeaf(int _indexOffset, int _nPrims, const AABB& _bbox) {
                 bbox = _bbox;

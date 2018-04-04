@@ -19,6 +19,7 @@ class Sphere : public Shape {
         float radius;
 
         Sphere(const Vec3& _center, float _radius) : center(_center), radius(_radius) {};
+        ~Sphere() {};
 
         bool intersect(const Ray& ray, Hit& res) const {
             const float b = dot(ray.direction, ray.origin - center);
@@ -78,6 +79,7 @@ class Triangle : public Shape {
             dpdv = normalize(p3 - p1);
             vertex_normal = true;
         };
+        ~Triangle() {};
 
         bool intersect(const Ray& ray, Hit& res) const {
             const float eps = 1e-8;
