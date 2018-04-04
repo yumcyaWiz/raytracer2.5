@@ -26,6 +26,18 @@ class TestSky : public Sky {
 };
 
 
+class UniformSky : public Sky {
+    public:
+        const Vec3 color;
+
+        UniformSky(const Vec3& _color) : color(_color) {};
+
+        RGB getSky(const Ray& ray) const {
+            return color;
+        };
+};
+
+
 class SimpleSky : public Sky {
     public:
         SimpleSky() {};

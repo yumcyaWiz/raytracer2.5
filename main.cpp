@@ -64,6 +64,10 @@ int main(int argc, char** argv) {
     else if(sky_type == "test") {
         sky_ptr = new TestSky();
     }
+    else if(sky_type == "uniform") {
+        auto color = *sky->get_array_of<double>("color");
+        sky_ptr = new UniformSky(Vec3(color[0], color[1], color[2]));
+    }
     std::cout << "sky loaded" << std::endl;
 
 
@@ -221,6 +225,7 @@ int main(int argc, char** argv) {
                 auto object = *light->get_as<std::string>("object");
                 std::shared_ptr<Primitive> prim = prims_map.at(object);
                 lightPtr = std::shared_ptr<Light>(new AreaLight(prim, emission));
+                prim->areaLight = lightPtr;
             }
             lights.push_back(lightPtr);
         }

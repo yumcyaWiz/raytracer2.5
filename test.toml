@@ -10,14 +10,15 @@ type = "minstd"
 resolution = [512, 512]
 
 [sky]
-type = "ibl"
+type = "uniform"
+color = [0, 0, 0]
 path = "Mans_Outside_2k.hdr"
 theta-offset = 0
 phi-offset = 3.14
 
 [camera]
 type = "ideal-pinhole"
-fov = 40.0
+fov = 90.0
 lens-distance = 1.5
 focus-point = [0.0, 0.5, 0.0]
 f-number = 8.0 
@@ -87,18 +88,21 @@ path = "diamond.obj"
 [[object]]
 name = "floor"
 mesh = "floor"
-material = "mat2"
+material = "mat1"
 [[object.transform]]
 type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
-name = "diamond"
-mesh = "diamond"
-material = "diamond"
+name = "sphere"
+mesh = "sphere"
+material = "mat1"
 [[object.transform]]
 type = "translate"
-vector = [0.0, -0.7, 0.0]
-[[object.transform]]
-type = "scale"
-vector = [1, 1, 1]
+vector = [0.0, 0.0, 0.0]
+
+
+[[light]]
+type = "area"
+object = "sphere"
+emission = [1.0, 1.0, 1.0]
