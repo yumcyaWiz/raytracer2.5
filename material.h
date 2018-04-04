@@ -62,7 +62,7 @@ class Material {
     public:
         Material() {};
 
-        //BRDFを計算する ワールド座標系の方向ベクトルを受け取る
+        //BRDFを計算する ローカル座標系の方向ベクトルを受け取る
         virtual RGB f(const Vec3& wo, const Vec3& wi) const = 0;
         //BRDFを計算し、BRDFに比例した方向のサンプリングを行う
         virtual RGB sample(const Vec3& wo, Vec3& wi, Sampler& sampler, float &pdf) const = 0;

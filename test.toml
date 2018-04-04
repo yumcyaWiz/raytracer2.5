@@ -1,7 +1,7 @@
 [renderer]
-samples = 10
+samples = 100
 depth-limit = 100
-integrator = "pt"
+integrator = "pt-explicit"
 
 [sampler]
 type = "minstd"

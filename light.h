@@ -46,7 +46,15 @@ class AreaLight : public Light {
         };
         RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const {
             float point_pdf;
-            //Vec3 shapePos = shape->samplePoint(u, point_pdf);
+            //Primitive上で点をサンプリング
+            Vec3 normal;
+            Vec3 primPos = prim->sample(u, normal, point_pdf);
+            float distance2 = (primPos - res.hitPos).length2();
+            //衝突点からサンプリングされた点に向かう方向ベクトルを生成
+            wi = normalize(primPos - res.hitPos);
+            float cos_term = std::max(dot(-wi, normal), 0.0f);
+            //面積測度を立体角測度に変換
+            pdf = point_pdf * distance2/cos_term;
             return power;
         };
 };

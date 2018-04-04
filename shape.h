@@ -10,6 +10,8 @@ class Shape {
     public:
         virtual bool intersect(const Ray& ray, Hit& res) const = 0;
         virtual AABB worldBound() const = 0;
+        virtual float surfaceArea() const = 0;
+        virtual Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const = 0;
 };
 
 
@@ -59,7 +61,13 @@ class Sphere : public Shape {
             return 4*M_PI*radius*radius;
         };
 
-        Vec3 sample(float &pdf) const {
+        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
+            float theta = M_PI*u.x;
+            float phi = 2*M_PI*u.y;
+            Vec3 samplingPos = center + radius*Vec3(std::cos(phi)*std::sin(theta), std::cos(theta), std::sin(phi)*std::sin(theta));
+            normal = normalize(samplingPos - center);
+            pdf = 1.0f;
+            return samplingPos;
         };
 };
 
@@ -131,6 +139,14 @@ class Triangle : public Shape {
 
         AABB worldBound() const {
             return AABB((1.0f + 1e-3)*min(p1, min(p2, p3)), (1.0f + 1e-3)*max(p1, max(p2, p3)));
+        };
+
+        float surfaceArea() const {
+            return 1.0f;
+        };
+
+        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
+            return Vec3();
         };
 };
 #endif

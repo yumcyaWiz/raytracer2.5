@@ -13,6 +13,10 @@ class Accel : public Primitive {
         Accel() {};
         Accel(const std::vector<std::shared_ptr<Primitive>> &_prims) : prims(_prims) {};
         virtual ~Accel() {};
+
+        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
+            return Vec3();
+        };
 };
 
 
