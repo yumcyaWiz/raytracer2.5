@@ -4,33 +4,31 @@ depth-limit = 100
 integrator = "pt"
 
 [sampler]
-type = "minstd"
+type = "mt"
 
 [film]
 resolution = [2138, 1536]
 
 [sky]
-type = "uniform"
-color = [0, 0, 0]
-path = "Mans_Outside_2k.hdr"
+type = "ibl"
+path = "PaperMill_E_3k.hdr"
 theta-offset = 0
-phi-offset = 3.14
+phi-offset = 2.0
 
 [camera]
 type = "thin-lens"
-fov = 90.0
-lens-distance = 1.1
-focus-point = [0.0, 1.0, 0.0]
-f-number = 14.0
+fov = 40.0
+lens-distance = 1.5
+focus-point = [0.0, 1.6329, 1.1547]
+f-number = 8.0
 [camera.transform]
 type = "look-at"
-origin = [0.0, 2.0, -3.0]
-target = [0.0, 1.0, 0.0]
-
+origin = [3.0, 4.0, -4.5]
+target = [0.0, 1.6329, 1.1547]
 [[material]]
 name = "mat1"
 type = "lambert"
-albedo = [0.9, 0.9, 0.9]
+albedo = [0.2, 0.5, 0.9]
 
 [[material]]
 name = "mat2"
@@ -45,7 +43,7 @@ albedo = [1.0, 1.0, 1.0]
 alpha = 500.0 
 
 [[material]]
-name = "mat4"
+name = "glass"
 type = "glass"
 ior = 1.5
 
@@ -91,29 +89,39 @@ mesh = "floor"
 material = "mat1"
 [[object.transform]]
 type = "translate"
-vector = [0, 0, 0]
-
-[[object]]
-name = "dragon"
-mesh = "dragon"
-material = "mat2"
-[[object.transform]]
-type = "translate"
-vector = [0.0, 0.0, 0.0]
+vector = [0.0, 0.0, 1.1547]
 [[object.transform]]
 type = "scale"
-vector = [0.2, 0.2, 0.2]
+vector = [1.5, 1.5, 1.5]
 
 [[object]]
 name = "sphere"
 mesh = "sphere"
-material = "mat1"
+material = "glass"
 [[object.transform]]
 type = "translate"
-vector = [0.0, 4.0, 0.0]
+vector = [0.0, 1.0, 0.0]
 
+[[object]]
+name = "sphere2"
+mesh = "sphere"
+material = "glass"
+[[object.transform]]
+type = "translate"
+vector = [1.0, 1.0, 1.7320]
 
-[[light]]
-type = "area"
-object = "sphere"
-emission = [30.0, 30.0, 30.0]
+[[object]]
+name = "sphere3"
+mesh = "sphere"
+material = "glass"
+[[object.transform]]
+type = "translate"
+vector = [-1.0, 1.0, 1.7320]
+
+[[object]]
+name = "sphere4"
+mesh = "sphere"
+material = "glass"
+[[object.transform]]
+type = "translate"
+vector = [0.0, 2.6329, 1.1547]
