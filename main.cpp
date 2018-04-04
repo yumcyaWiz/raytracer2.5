@@ -102,12 +102,12 @@ int main(int argc, char** argv) {
 
 
     //materials
-    std::map<std::string, Material*> material_map;
+    std::map<std::string, std::shared_ptr<Material>> material_map;
     auto materials = toml->get_table_array("material");
     for(const auto& material : *materials) {
         auto name = *material->get_as<std::string>("name");
         auto type = *material->get_as<std::string>("type");
-        Material* mat;
+        Material* mat = nullptr;
         if(type == "lambert") {
             auto albedo = *material->get_array_of<double>("albedo");
             Vec3 reflectance(albedo[0], albedo[1], albedo[2]);
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
             auto ior = *material->get_as<double>("ior");
             mat = new Glass(ior);
         }
-        material_map.insert(std::make_pair(name, mat));
+        material_map.insert(std::make_pair(name, std::shared_ptr<Material>(mat)));
     }
     std::cout << "material loaded" << std::endl;
 
@@ -189,15 +189,15 @@ int main(int argc, char** argv) {
         }
         
         ShapeData shapedata = mesh_map.at(mesh);
-        Material* mat = material_map.at(material);
+        std::shared_ptr<Material> mat = material_map.at(material);
         if(shapedata.type == "sphere") {
             std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(center, shapedata.radius));
-            std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(std::shared_ptr<Material>(mat), nullptr, shape));
+            std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
             prims.push_back(prim);
             prims_map.insert(std::make_pair(name, prim));
         }
         else if(shapedata.type == "obj") {
-            loadObj(prims, shapedata.path, center, scale, std::shared_ptr<Material>(mat));
+            loadObj(prims, shapedata.path, center, scale, mat);
         }
     }
     std::cout << "objects loaded" << std::endl;
