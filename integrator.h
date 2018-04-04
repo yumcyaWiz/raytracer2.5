@@ -341,28 +341,30 @@ class PathTraceExplicit : public Integrator {
 
 
                 //各光源からの寄与を計算
-                for(const std::shared_ptr<Light> light : scene.lights) {
-                    //光源上で点をサンプリング
-                    float light_pdf;
-                    Vec3 wi_light;
-                    const RGB le = light->sample(res, sampler->getNext2D(), wi_light, light_pdf);
-                    const Vec3 wi_light_local = worldToLocal(wi_light, n, s, t);
+                if(hitMaterial->type == MATERIAL_TYPE::DIFFUSE) {
+                    for(const std::shared_ptr<Light> light : scene.lights) {
+                        //光源上で点をサンプリング
+                        float light_pdf;
+                        Vec3 wi_light;
+                        const RGB le = light->sample(res, sampler->getNext2D(), wi_light, light_pdf);
+                        const Vec3 wi_light_local = worldToLocal(wi_light, n, s, t);
 
-                    //光源に向かうシャドウレイを生成
-                    Ray shadowRay(res.hitPos, wi_light);
-                    Hit shadow_res;
-                    //シャドウレイが物体に当たったとき、それがサンプリング生成元の光源だった場合は寄与を蓄積
-                    //光源が対象な物体であると仮定して、裏側がサンプリングされても寄与を取るようにしている
-                    if(scene.intersect(shadowRay, shadow_res)) {
-                        if(shadow_res.hitPrimitive->areaLight == light)
-                            col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::abs(wi_light_local.y);
+                        //光源に向かうシャドウレイを生成
+                        Ray shadowRay(res.hitPos, wi_light);
+                        Hit shadow_res;
+                        //シャドウレイが物体に当たったとき、それがサンプリング生成元の光源だった場合は寄与を蓄積
+                        //光源が対象な物体であると仮定して、裏側がサンプリングされても寄与を取るようにしている
+                        if(scene.intersect(shadowRay, shadow_res)) {
+                            if(shadow_res.hitPrimitive->areaLight == light)
+                                col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::abs(wi_light_local.y);
+                        }
                     }
-                };
+                }
 
                 /*
                 //もし光源に当たったら放射輝度を蓄積
                 if(res.hitPrimitive->areaLight != nullptr) {
-                    col += res.hitPrimitive->areaLight->Le(res);
+                    col += res.hitPrimitive->areaLight->Le(res) * std::max(wo_local.y, 0.0f);
                 }
                 */
 

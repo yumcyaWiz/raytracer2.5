@@ -58,9 +58,18 @@ inline float fresnel(const Vec3& w, const Vec3& n, float ior1, float ior2) {
 }
 
 
+enum class MATERIAL_TYPE {
+    DIFFUSE,
+    SPECULAR,
+    GLOSSY
+};
+
+
 class Material {
     public:
-        Material() {};
+        const MATERIAL_TYPE type;
+
+        Material(const MATERIAL_TYPE& _type) : type(_type) {};
 
         //BRDFを計算する ローカル座標系の方向ベクトルを受け取る
         virtual RGB f(const Vec3& wo, const Vec3& wi) const = 0;
@@ -73,7 +82,7 @@ class Lambert : public Material {
     public:
         const RGB reflectance;
 
-        Lambert(const RGB& _reflectance) : reflectance(_reflectance) {};
+        Lambert(const RGB& _reflectance) : Material(MATERIAL_TYPE::DIFFUSE), reflectance(_reflectance) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
             return reflectance/M_PI;
@@ -92,8 +101,9 @@ class Lambert : public Material {
 class Mirror : public Material {
     public:
         const float reflectance;
+        const MATERIAL_TYPE type = MATERIAL_TYPE::SPECULAR;
 
-        Mirror(const float _reflectance) : reflectance(_reflectance) {};
+        Mirror(const float _reflectance) : Material(MATERIAL_TYPE::SPECULAR), reflectance(_reflectance) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
             return RGB(0.0f);
@@ -112,7 +122,7 @@ class Phong : public Material {
         const float kd;
         const float alpha;
 
-        Phong(const Vec3& _reflectance, float _kd, float _alpha) : reflectance(_reflectance), kd(_kd), alpha(_alpha) {};
+        Phong(const Vec3& _reflectance, float _kd, float _alpha) : Material(MATERIAL_TYPE::GLOSSY), reflectance(_reflectance), kd(_kd), alpha(_alpha) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
             //ハーフベクトル
@@ -153,7 +163,7 @@ class Glass : public Material {
     public:
         const float ior;
 
-        Glass(float _ior) : ior(_ior) {};
+        Glass(float _ior) : Material(MATERIAL_TYPE::SPECULAR), ior(_ior) {};
 
         RGB f(const Vec3& wo, const Vec3& wi) const {
             return RGB(0.0f);
