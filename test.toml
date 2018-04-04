@@ -1,5 +1,5 @@
 [renderer]
-samples = 10
+samples = 1
 depth-limit = 100
 integrator = "pt"
 
@@ -95,8 +95,8 @@ vector = [0, 0, 0]
 
 [[object]]
 name = "dragon"
-mesh = "dragon"
-material = "mat4"
+mesh = "sphere"
+material = "mat1"
 [[object.transform]]
 type = "translate"
 vector = [0.0, 0.0, 0.0]
@@ -106,7 +106,7 @@ vector = [0.2, 0.2, 0.2]
 
 [[object]]
 name = "sphere"
-mesh = "sphere"
+mesh = "dragon"
 material = "mat1"
 [[object.transform]]
 type = "translate"

@@ -9,7 +9,6 @@ class Light {
         RGB power;
 
         Light() {};
-        virtual ~Light() {};
         Light(const RGB& _power) : power(_power) {};
 
         virtual RGB Le(const Hit& res) const = 0;
@@ -22,7 +21,6 @@ class PointLight : public Light {
         Vec3 lightPos;
 
         PointLight(const Vec3& _lightPos, const RGB& _power) : Light(_power), lightPos(_lightPos) {};
-        ~PointLight() {};
 
         RGB Le(const Hit& res) const {
             return power;
@@ -41,7 +39,6 @@ class AreaLight : public Light {
 
 
         AreaLight(std::shared_ptr<Primitive> _prim, const RGB& _power) : Light(_power), prim(_prim) {};
-        ~AreaLight() {};
 
         
         RGB Le(const Hit& res) const {

@@ -14,7 +14,6 @@ class Integrator {
         std::shared_ptr<Sampler> sampler;
 
         Integrator(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : cam(_cam), film(_film), sampler(_sampler) {};
-        virtual ~Integrator() {};
 
         virtual void render(const Scene& scene) const = 0;
 };
@@ -205,7 +204,6 @@ class PathTrace : public Integrator {
         int maxDepth;
 
         PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
-        ~PathTrace() {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット

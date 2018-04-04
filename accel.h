@@ -12,6 +12,7 @@ class Accel : public Primitive {
 
         Accel() {};
         Accel(const std::vector<std::shared_ptr<Primitive>> &_prims) : prims(_prims) {};
+        virtual ~Accel() {};
 };
 
 
@@ -33,10 +34,6 @@ class BVH : public Accel {
             int nPrims;
 
             BVHNode() {};
-            ~BVHNode() {
-                delete left;
-                delete right;
-            };
 
             void initLeaf(int _indexOffset, int _nPrims, const AABB& _bbox) {
                 bbox = _bbox;

@@ -1,9 +1,11 @@
 *.out
+debug
 *.ppm
 *.png
 *.jpg
 *.obj
 stb_image.h
 *.hdr
+core.*
 tiny_obj_loader.h
 cpptoml.h
