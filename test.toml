@@ -1,7 +1,7 @@
 [renderer]
 samples = 10
 depth-limit = 100
-integrator = "mt"
+integrator = "pt"
 
 [sampler]
 type = "minstd"
@@ -82,6 +82,7 @@ radius = 1.0
 name = "diamond"
 type = "obj"
 path = "diamond.obj"
+
 
 [[object]]
 mesh = "floor"

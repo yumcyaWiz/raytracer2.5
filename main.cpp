@@ -160,6 +160,30 @@ int main(int argc, char** argv) {
 
     //lights
     std::vector<std::shared_ptr<Light>> lights;
+    auto light_toml = toml->get_table_array("light");
+    if(light_toml) {
+        for(const auto& light : *light_toml) {
+            if(!light) continue;
+
+            auto light_emission = *light->get_array_of<double>("emission");
+            Vec3 emission(light_emission[0], light_emission[1], light_emission[2]);
+            auto light_type = *light->get_as<std::string>("type");
+
+            std::shared_ptr<Light> lightPtr;
+            if(light_type == "point") {
+                auto lightPos = *light->get_array_of<double>("light-pos");
+                Vec3 pos(lightPos[0], lightPos[1], lightPos[2]);
+                lightPtr = std::shared_ptr<Light>(new PointLight(pos, emission));
+            }
+            else if(light_type == "directional") {
+            }
+            else if(light_type == "area") {
+            }
+            lights.push_back(lightPtr);
+        }
+    }
+    std::cout << "lights loaded" << std::endl;
+
 
     //objects
     auto objects = toml->get_table_array("object");
