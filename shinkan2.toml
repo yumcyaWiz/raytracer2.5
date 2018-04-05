@@ -1,14 +1,14 @@
 [renderer]
-samples = 200
+samples = 1000
 depth-limit = 100
 integrator = "pt-explicit"
 
 [sampler]
-type = "minstd"
+type = "mt"
 
 [film]
-#resolution = [2138, 1536]
-resolution = [512, 512]
+resolution = [2138, 1536]
+#resolution = [512, 512]
 
 [sky]
 type = "uniform"
@@ -20,18 +20,23 @@ phi-offset = 3.14
 [camera]
 type = "thin-lens"
 fov = 90.0
-lens-distance = 1.1
-focus-point = [0.0, 1.0, 0.0]
+lens-distance = 1.2
+focus-point = [0.0, 2.0, 0.0]
 f-number = 14.0
 [camera.transform]
 type = "look-at"
-origin = [0.0, 2.0, -3.0]
+origin = [-3.0, 2.0, -1.0]
 target = [0.0, 1.0, 0.0]
 
 [[material]]
 name = "mat1"
 type = "lambert"
 albedo = [0.9, 0.9, 0.9]
+
+[[material]]
+name = "blue"
+type = "lambert"
+albedo = [0.2, 0.4, 0.9]
 
 [[material]]
 name = "mat2"
@@ -63,7 +68,7 @@ path = "plane.obj"
 [[mesh]]
 name = "dragon"
 type = "obj"
-path = "dragon.obj"
+path = "dragon2.obj"
 
 [[mesh]]
 name = "teapot"
@@ -85,11 +90,16 @@ name = "diamond"
 type = "obj"
 path = "diamond.obj"
 
+[[mesh]]
+name = "hairball"
+type = "obj"
+path = "hairball.obj"
+
 
 [[object]]
 name = "floor"
 mesh = "floor"
-material = "mat1"
+material = "blue"
 [[object.transform]]
 type = "translate"
 vector = [0, 0, 0]
@@ -97,13 +107,13 @@ vector = [0, 0, 0]
 [[object]]
 name = "dragon"
 mesh = "dragon"
-material = "mat2"
+material = "mat1"
 [[object.transform]]
 type = "translate"
-vector = [0.0, 0.0, 0.0]
+vector = [0.0, 0.65, 0.0]
 [[object.transform]]
 type = "scale"
-vector = [0.2, 0.2, 0.2]
+vector = [2.5, 2.5, 2.5]
 
 [[object]]
 name = "sphere"
@@ -111,7 +121,7 @@ mesh = "sphere"
 material = "mat1"
 [[object.transform]]
 type = "translate"
-vector = [0.0, 4.0, 0.0]
+vector = [0.0, 5.0, 0.0]
 
 
 [[light]]

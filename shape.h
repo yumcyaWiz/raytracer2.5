@@ -66,7 +66,7 @@ class Sphere : public Shape {
             float phi = 2*M_PI*u.y;
             Vec3 samplingPos = center + radius*Vec3(std::cos(phi)*std::sin(theta), std::cos(theta), std::sin(phi)*std::sin(theta));
             normal = normalize(samplingPos - center);
-            pdf = 1.0f/(0.5f*surfaceArea());
+            pdf = 1.0f/(surfaceArea());
             return samplingPos;
         };
 };
