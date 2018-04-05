@@ -1,0 +1,82 @@
+[renderer]
+samples = 10
+depth-limit = 100
+integrator = "pt-explicit"
+
+[sampler]
+type = "minstd"
+
+[film]
+resolution = [128, 128]
+
+[sky]
+type = "uniform"
+path = "PaperMill_E_3k.hdr"
+theta-offset = 0
+phi-offset = 2.0
+color = [0, 0, 0]
+
+[camera]
+type = "ideal-pinhole"
+fov = 90.0
+lens-distance = 1.5
+focus-point = [0.0, 1.6329, 1.1547]
+f-number = 8.0
+[camera.transform]
+type = "look-at"
+origin = [0.0, 4.0, 0.0]
+target = [1.0, 4.0, 0.0]
+[[material]]
+name = "mat1"
+type = "lambert"
+albedo = [0.7, 0.7, 0.7]
+
+[[material]]
+name = "mat2"
+type = "mirror"
+albedo = 0.9
+
+[[material]]
+name = "mat3"
+type = "phong"
+kd = 0.9
+albedo = [1.0, 1.0, 1.0]
+alpha = 500.0 
+
+[[material]]
+name = "glass"
+type = "glass"
+ior = 1.5
+
+[[material]]
+name = "diamond"
+type = "glass"
+ior = 2.4195
+
+[[mesh]]
+name = "floor"
+type = "obj"
+path = "plane.obj"
+
+[[mesh]]
+name = "sponza"
+type = "obj"
+path = "sponza.obj"
+
+
+[[object]]
+name = "sponza"
+mesh = "sponza"
+material = "mat1"
+[[object.transform]]
+type = "translate"
+vector = [0.0, 0.0, 0.0]
+[[object.transform]]
+type = "scale"
+vector = [1.0, 1.0, 1.0]
+
+
+[[light]]
+type = "directional"
+direction = [-0.1, 1.0, 0.0]
+emission = [5.0, 5.0, 5.0]

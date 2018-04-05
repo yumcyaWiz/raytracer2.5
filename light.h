@@ -42,6 +42,23 @@ class PointLight : public Light {
 };
 
 
+class DirectionalLight : public Light {
+    public:
+        Vec3 direction;
+
+        DirectionalLight(const Vec3& _direction, const RGB& _power) : Light(_power, LIGHT_TYPE::DIRECTIONAL), direction(_direction) {};
+        
+        RGB Le(const Hit& res) const {
+            return power;
+        };
+        RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const {
+            pdf = 1.0f;
+            wi = direction;
+            return power;
+        };
+};
+
+
 class AreaLight : public Light {
     public:
         std::shared_ptr<Primitive> prim;

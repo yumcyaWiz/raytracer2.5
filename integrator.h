@@ -373,6 +373,11 @@ class PathTraceExplicit : public Integrator {
                             if(!scene.intersect(shadowRay, shadow_res))
                                 col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::max(wi_light_local.y, 0.0f);
                         }
+                        //DirectionalLight
+                        else if(light->type == LIGHT_TYPE::DIRECTIONAL) {
+                            if(!scene.intersect(shadowRay, shadow_res))
+                                col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::max(wi_light_local.y, 0.0f);
+                        }
                     }
                 }
 

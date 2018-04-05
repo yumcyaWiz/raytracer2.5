@@ -220,6 +220,9 @@ int main(int argc, char** argv) {
                 lightPtr = std::shared_ptr<Light>(new PointLight(pos, emission));
             }
             else if(light_type == "directional") {
+                auto direction = *light->get_array_of<double>("direction");
+                Vec3 dir = normalize(Vec3(direction[0], direction[1], direction[2]));
+                lightPtr = std::shared_ptr<Light>(new DirectionalLight(dir, emission));
             }
             else if(light_type == "area") {
                 auto object = *light->get_as<std::string>("object");
