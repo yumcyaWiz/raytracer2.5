@@ -341,7 +341,8 @@ class PathTraceExplicit : public Integrator {
 
 
                 //各光源からの寄与を計算
-                if(hitMaterial->type == MATERIAL_TYPE::DIFFUSE) {
+                //DiffuseあるいはGlossyの場合のみに寄与を計算する
+                if(hitMaterial->type == MATERIAL_TYPE::DIFFUSE || hitMaterial->type == MATERIAL_TYPE::GLOSSY) {
                     for(const std::shared_ptr<Light> light : scene.lights) {
                         //光源上で点をサンプリング
                         float light_pdf;
@@ -352,12 +353,18 @@ class PathTraceExplicit : public Integrator {
                         //光源に向かうシャドウレイを生成
                         Ray shadowRay(res.hitPos, wi_light);
                         Hit shadow_res;
+                        //AreaLight
+                        if(light->type == LIGHT_TYPE::AREA) {
                         //シャドウレイが物体に当たったとき、それがサンプリング生成元の光源だった場合は寄与を蓄積
-                        if(scene.intersect(shadowRay, shadow_res)) {
-                            if(shadow_res.hitPrimitive->areaLight == light) {
-                                RGB col_s = hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::max(wi_light_local.y, 0.0f);
-                                col += col_s;
+                            if(scene.intersect(shadowRay, shadow_res)) {
+                                if(shadow_res.hitPrimitive->areaLight == light)
+                                    col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::max(wi_light_local.y, 0.0f);
                             }
+                        }
+                        //PointLight
+                        else if(light->type == LIGHT_TYPE::POINT) {
+                            if(!scene.intersect(shadowRay, shadow_res))
+                                col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::max(wi_light_local.y, 0.0f);
                         }
                     }
                 }

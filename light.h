@@ -4,12 +4,20 @@
 #include "primitive.h"
 
 
+enum class LIGHT_TYPE {
+    POINT,
+    DIRECTIONAL,
+    AREA
+};
+
+
 class Light {
     public:
         RGB power;
+        LIGHT_TYPE type;
 
         Light() {};
-        Light(const RGB& _power) : power(_power) {};
+        Light(const RGB& _power, const LIGHT_TYPE& _type) : power(_power), type(_type) {};
 
         virtual RGB Le(const Hit& res) const = 0;
         virtual RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const = 0;
@@ -20,13 +28,14 @@ class PointLight : public Light {
     public:
         Vec3 lightPos;
 
-        PointLight(const Vec3& _lightPos, const RGB& _power) : Light(_power), lightPos(_lightPos) {};
+        PointLight(const Vec3& _lightPos, const RGB& _power) : Light(_power, LIGHT_TYPE::POINT), lightPos(_lightPos) {};
 
         RGB Le(const Hit& res) const {
             return power;
         };
         RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const {
-            pdf = 1.0f;
+            const float distance2 = (lightPos - res.hitPos).length2();
+            pdf = 1.0f * distance2;
             wi = normalize(lightPos - res.hitPos);
             return power;
         };
@@ -38,7 +47,7 @@ class AreaLight : public Light {
         std::shared_ptr<Primitive> prim;
 
 
-        AreaLight(std::shared_ptr<Primitive> _prim, const RGB& _power) : Light(_power), prim(_prim) {};
+        AreaLight(std::shared_ptr<Primitive> _prim, const RGB& _power) : Light(_power, LIGHT_TYPE::AREA), prim(_prim) {};
 
         
         RGB Le(const Hit& res) const {
