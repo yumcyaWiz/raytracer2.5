@@ -68,6 +68,9 @@ int main(int argc, char** argv) {
         auto color = *sky->get_array_of<double>("color");
         sky_ptr = new UniformSky(Vec3(color[0], color[1], color[2]));
     }
+    else if(sky_type == "simple") {
+        sky_ptr = new SimpleSky();
+    }
     std::cout << "sky loaded" << std::endl;
 
 
