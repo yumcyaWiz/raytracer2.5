@@ -108,6 +108,23 @@ class Film {
             file.close();
             std::cout << filename << " written out" << std::endl;
         };
+        void ppm_output(int k) const {
+            std::ofstream file(filename);
+            file << "P3" << std::endl;
+            file << width << " " << height << std::endl;
+            file << 255 << std::endl;
+            for(int j = 0; j < height; j++) {
+                for(int i = 0; i < width; i++) {
+                    RGB c = getPixel(i, j)/k;
+                    c.x = std::pow(c.x, 1.0f/2.2f);
+                    c.y = std::pow(c.y, 1.0f/2.2f);
+                    c.z = std::pow(c.z, 1.0f/2.2f);
+                    file << (int)(255*clamp(c.x, 0.0f, 1.0f)) << " " << (int)(255*clamp(c.y, 0.0f, 1.0f)) << " " << (int)(255*clamp(c.z, 0.0f, 1.0f)) << std::endl;
+                }
+            }
+            file.close();
+            std::cout << filename << " written out" << std::endl;
+        };
 
 
     private:

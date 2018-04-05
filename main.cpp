@@ -256,10 +256,11 @@ int main(int argc, char** argv) {
     int samples = *renderer->get_as<int>("samples");
     int depth_limit = *renderer->get_as<int>("depth-limit");
     std::string integrator = *renderer->get_as<std::string>("integrator");
+    bool renderer_update = *renderer->get_as<bool>("update");
 
     Integrator* integ;
     if(integrator == "pt") {
-        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit);
+        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit, renderer_update);
     }
     else if(integrator == "normal") {
         integ = new NormalRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
@@ -268,10 +269,10 @@ int main(int argc, char** argv) {
         integ = new DotRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
     }
     else if(integrator == "pt-explicit") {
-        integ = new PathTraceExplicit(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit);
+        integ = new PathTraceExplicit(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit, renderer_update);
     }
     else {
-        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, 10, 100);
+        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, 10, 100, false);
     }
 
     //レンダリング

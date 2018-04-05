@@ -202,8 +202,9 @@ class PathTrace : public Integrator {
     public:
         int pixelSamples;
         int maxDepth;
+        bool update;
 
-        PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
+        PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth, bool _update) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth), update(_update) {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
@@ -299,11 +300,16 @@ class PathTrace : public Integrator {
                     }
                 }
                 std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
+                if(update) {
+                    film->ppm_output(k + 1);
+                }
             }
             timer.stop("Rendering Finished");
-            film->divide(pixelSamples);
-            film->gamma_correction();
-            film->ppm_output();
+            if(!update) {
+                film->divide(pixelSamples);
+                film->gamma_correction();
+                film->ppm_output();
+            }
         };
 };
 
@@ -312,8 +318,9 @@ class PathTraceExplicit : public Integrator {
     public:
         int pixelSamples;
         int maxDepth;
+        bool update;
 
-        PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
+        PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth, bool _update) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth), update(_update) {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
@@ -441,11 +448,16 @@ class PathTraceExplicit : public Integrator {
                     }
                 }
                 std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
+                if(update) {
+                    film->ppm_output(k + 1);
+                }
             }
             timer.stop("Rendering Finished");
-            film->divide(pixelSamples);
-            film->gamma_correction();
-            film->ppm_output();
+            if(!update) {
+                film->divide(pixelSamples);
+                film->gamma_correction();
+                film->ppm_output();
+            }
         };
 };
 #endif
