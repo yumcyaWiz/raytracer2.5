@@ -2,12 +2,13 @@
 samples = 1000
 depth-limit = 100
 integrator = "pt"
+update = true
 
 [sampler]
 type = "minstd"
 
 [film]
-resolution = [2138, 1536]
+resolution = [1920, 1080]
 
 [sky]
 type = "ibl"
@@ -20,7 +21,7 @@ type = "thin-lens"
 fov = 40.0
 lens-distance = 1.5
 focus-point = [0.0, 0.5, 0.0]
-f-number = 14.0
+f-number = 20.0
 [camera.transform]
 type = "look-at"
 origin = [0.0, 3.0, -2.5]

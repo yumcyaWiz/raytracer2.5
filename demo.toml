@@ -110,8 +110,20 @@ vector = [0.0, 0.0, 0.0]
 type = "scale"
 vector = [0.2, 0.2, 0.2]
 
+[[object]]
+name = "sphere"
+mesh = "sphere"
+material = "mat1"
+[[object.transform]]
+type = "translate"
+vector = [0.0, 5.0, 0.0]
 
+
+#[[light]]
+#type = "point"
+#light-pos = [0.0, 5.0, 0.0]
+#emission = [100.0, 100.0, 100.0]
 [[light]]
-type = "point"
-light-pos = [0.0, 5.0, 0.0]
-emission = [100.0, 100.0, 100.0]
+type = "area"
+object = "sphere"
+emission = [10.0, 10.0, 10.0]
