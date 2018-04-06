@@ -20,6 +20,7 @@
 #include "material.h"
 #include "integrator.h"
 #include "sky.h"
+#include "rtoutput.h"
 
 
 int main(int argc, char** argv) {
@@ -281,6 +282,12 @@ int main(int argc, char** argv) {
         integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, 10, 100, false);
     }
 
-    //レンダリング
-    integ->render(scene);
+
+    if(renderer_update) {
+        drawgl(argc, argv, integ, scene);
+    }
+    else {
+        //レンダリング
+        integ->render(scene);
+    }
 }

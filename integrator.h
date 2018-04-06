@@ -16,6 +16,7 @@ class Integrator {
         Integrator(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : cam(_cam), film(_film), sampler(_sampler) {};
 
         virtual void render(const Scene& scene) const = 0;
+        virtual void compute(const Scene& scene) const = 0;
 };
 
 
@@ -41,6 +42,7 @@ class NormalRenderer : public Integrator {
             }
             film->ppm_output();
         };
+        void compute(const Scene& scene) const {};
 };
 
 
@@ -68,6 +70,7 @@ class DotRenderer : public Integrator {
             }
             film->ppm_output();
         };
+        void compute(const Scene& scene) const {};
 };
 
 
@@ -103,6 +106,7 @@ class BRDFRenderer : public Integrator {
             }
             film->ppm_output();
         };
+        void compute(const Scene& scene) {};
 };
 
 
@@ -145,6 +149,7 @@ class AORenderer : public Integrator {
             }
             film->ppm_output();
         };
+        void compute(const Scene& scene) const {};
 };
 
 
@@ -195,6 +200,7 @@ class PathTraceDepthRenderer : public Integrator {
             }
             film->ppm_output();
         };
+        void compute(const Scene& scene) const {};
 };
 
 
@@ -300,15 +306,27 @@ class PathTrace : public Integrator {
                     }
                 }
                 std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
-                if(update) {
-                    film->ppm_output(k + 1);
-                }
             }
             timer.stop("Rendering Finished");
-            if(!update) {
-                film->divide(pixelSamples);
-                film->gamma_correction();
-                film->ppm_output();
+            film->divide(pixelSamples);
+            film->gamma_correction();
+            film->ppm_output();
+        };
+        void compute(const Scene& scene) const {
+            #pragma omp parallel for schedule(dynamic, 1)
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float rx = sampler->getNext();
+                    float ry = sampler->getNext();
+                    float px = i + rx;
+                    float py = j + ry;
+                    float u = (2.0*(i + rx) - film->width)/film->height;
+                    float v = -(2.0*(j + ry) - film->height)/film->height;
+                    float w;
+                    Ray ray = cam->getRay(u, v, w, *sampler);
+                    RGB col = Li(ray, scene);
+                    film->addSample(i, j, w*col);
+                }
             }
         };
 };
@@ -453,15 +471,29 @@ class PathTraceExplicit : public Integrator {
                     }
                 }
                 std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
-                if(update) {
-                    film->ppm_output(k + 1);
-                }
             }
             timer.stop("Rendering Finished");
-            if(!update) {
-                film->divide(pixelSamples);
-                film->gamma_correction();
-                film->ppm_output();
+            film->divide(pixelSamples);
+            film->gamma_correction();
+            film->ppm_output();
+        };
+
+
+        void compute(const Scene& scene) const {
+            #pragma omp parallel for schedule(dynamic, 1)
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float rx = sampler->getNext();
+                    float ry = sampler->getNext();
+                    float px = i + rx;
+                    float py = j + ry;
+                    float u = (2.0*(i + rx) - film->width)/film->height;
+                    float v = -(2.0*(j + ry) - film->height)/film->height;
+                    float w;
+                    Ray ray = cam->getRay(u, v, w, *sampler);
+                    RGB col = Li(ray, scene);
+                    film->addSample(i, j, w*col);
+                }
             }
         };
 };
