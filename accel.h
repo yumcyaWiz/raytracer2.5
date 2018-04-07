@@ -6,17 +6,14 @@
 #include <algorithm>
 #include "aabb.h"
 #include "primitive.h"
-class Accel : public Primitive {
+template <typename T>
+class Accel {
     public:
-        std::vector<std::shared_ptr<Primitive>> prims;
+        std::vector<std::shared_ptr<T>> prims;
 
         Accel() {};
-        Accel(const std::vector<std::shared_ptr<Primitive>> &_prims) : prims(_prims) {};
+        Accel(const std::vector<std::shared_ptr<T>> &_prims) : prims(_prims) {};
         virtual ~Accel() {};
-
-        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
-            return Vec3();
-        };
 };
 
 
@@ -85,7 +82,7 @@ class BVH : public Accel {
         linearBVHNode *linearNodes;
 
 
-        BVH(const std::vector<std::shared_ptr<Primitive>>& _prims, int _maxPrimsInLeaf, BVH_PARTITION_TYPE _ptype) : Accel(_prims), maxPrimsInLeaf(_maxPrimsInLeaf), ptype(_ptype) {
+        BVH(const std::vector<std::shared_ptr<T>>& _prims, int _maxPrimsInLeaf, BVH_PARTITION_TYPE _ptype) : Accel(_prims), maxPrimsInLeaf(_maxPrimsInLeaf), ptype(_ptype) {
             totalNodes = 0;
             constructBVH();
         };
