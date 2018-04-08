@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "primitive.h"
+#include "accel.h"
 #include "light.h"
 #include "sky.h"
 class Scene {
@@ -10,11 +11,11 @@ class Scene {
         std::vector<std::shared_ptr<Primitive>> prims;
         std::vector<std::shared_ptr<Light>> lights;
         std::shared_ptr<Sky> sky;
-        std::shared_ptr<Accel> accel;
+        std::shared_ptr<Accel<Primitive>> accel;
 
         Scene() {};
         Scene(const std::vector<std::shared_ptr<Primitive>>& _prims, const std::vector<std::shared_ptr<Light>>& _lights, std::shared_ptr<Sky> _sky) : prims(_prims), lights(_lights), sky(_sky) {
-            accel = std::shared_ptr<Accel>(new BVH(prims, 4, BVH_PARTITION_TYPE::SAH));
+            accel = std::shared_ptr<Accel<Primitive>>(new BVH<Primitive>(prims, 1, BVH_PARTITION_TYPE::SAH));
         };
 
         bool intersect(const Ray& ray, Hit& res) const {

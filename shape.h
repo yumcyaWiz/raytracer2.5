@@ -6,12 +6,16 @@
 #include "hit.h"
 #include "aabb.h"
 #include "util.h"
+#include "accel.h"
+#include "sampler.h"
+
+
 class Shape {
     public:
         virtual bool intersect(const Ray& ray, Hit& res) const = 0;
         virtual AABB worldBound() const = 0;
         virtual float surfaceArea() const = 0;
-        virtual Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const = 0;
+        virtual Vec3 sample(Sampler& sampler, Vec3& normal, float &pdf) const = 0;
 };
 
 
@@ -61,7 +65,8 @@ class Sphere : public Shape {
             return 4*M_PI*radius*radius;
         };
 
-        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
+        Vec3 sample(Sampler& sampler, Vec3& normal, float &pdf) const {
+            Vec2 u = sampler.getNext2D();
             float theta = M_PI*u.x;
             float phi = 2*M_PI*u.y;
             Vec3 samplingPos = center + radius*Vec3(std::cos(phi)*std::sin(theta), std::cos(theta), std::sin(phi)*std::sin(theta));
@@ -127,26 +132,59 @@ class Triangle : public Shape {
             res.dpdu = dpdu;
             res.dpdv = dpdv;
 
-            /*
-            if(dot(-ray.direction, res.hitNormal) < 0.0f) {
-                res.hitNormal = -res.hitNormal;
-                res.dpdu = -res.dpdu;
-                res.dpdv = -res.dpdv;
-            }
-            */
             return true;
         };
 
         AABB worldBound() const {
-            return AABB((1.0f + 1e-3)*min(p1, min(p2, p3)), (1.0f + 1e-3)*max(p1, max(p2, p3)));
+            return AABB(min(p1, min(p2, p3)), max(p1, max(p2, p3)));
         };
 
         float surfaceArea() const {
-            return 1.0f;
+            return 0.5f * std::abs(cross(p2 - p1, p3 - p1).length());
         };
 
-        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
-            return Vec3();
+        Vec3 sample(Sampler& sampler, Vec3& normal, float &pdf) const {
+            Vec2 u = sampler.getNext2D();
+            Vec3 samplePos = (1.0f - u.x - u.y)*p1 + u.x*p2 + u.y*p3;
+            if(vertex_normal)
+                normal = normalize((1.0f - u.x - u.y)*n1 + u.x*n2 + u.y*n3);
+            else
+                normal = face_normal;
+            pdf = 1.0f;
+            return samplePos;
+        };
+};
+
+
+class Polygon : public Shape {
+    public:
+        std::vector<std::shared_ptr<Triangle>> triangles;
+        std::shared_ptr<Accel<Triangle>> accel;
+
+        Polygon(const std::vector<std::shared_ptr<Triangle>>& _triangles) : triangles(_triangles) {
+            accel = std::shared_ptr<Accel<Triangle>>(new BVH<Triangle>(triangles, 4, BVH_PARTITION_TYPE::SAH));
+        };
+
+        bool intersect(const Ray& ray, Hit& res) const {
+            return accel->intersect(ray, res);
+        };
+
+        AABB worldBound() const {
+            return accel->worldBound();
+        };
+
+        float surfaceArea() const {
+            float area = 0.0f;
+            for(const auto& triangle : triangles) {
+                area += triangle->surfaceArea();
+            }
+            return area;
+        };
+
+        Vec3 sample(Sampler& sampler, Vec3& normal, float &pdf) const {
+            int tri_num = (int)(triangles.size()*sampler.getNext());
+            if(tri_num == triangles.size()) tri_num = triangles.size() - 1;
+            return triangles[tri_num]->sample(sampler, normal, pdf);
         };
 };
 #endif

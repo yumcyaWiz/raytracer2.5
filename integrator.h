@@ -208,9 +208,8 @@ class PathTrace : public Integrator {
     public:
         int pixelSamples;
         int maxDepth;
-        bool update;
 
-        PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth, bool _update) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth), update(_update) {};
+        PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
@@ -336,9 +335,8 @@ class PathTraceExplicit : public Integrator {
     public:
         int pixelSamples;
         int maxDepth;
-        bool update;
 
-        PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth, bool _update) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth), update(_update) {};
+        PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
@@ -355,6 +353,11 @@ class PathTraceExplicit : public Integrator {
             Hit res;
             RGB col;
             if(scene.intersect(ray, res)) {
+                //光源に当たった場合は光源のEmissionを返して終了
+                if(res.hitPrimitive->areaLight != nullptr) {
+                    return res.hitPrimitive->areaLight->Le(res);
+                }
+
                 //マテリアル
                 const std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
                 //ローカル座標系の構築
@@ -372,7 +375,7 @@ class PathTraceExplicit : public Integrator {
                         //光源上で点をサンプリング
                         float light_pdf;
                         Vec3 wi_light;
-                        const RGB le = light->sample(res, sampler->getNext2D(), wi_light, light_pdf);
+                        const RGB le = light->sample(res, *sampler, wi_light, light_pdf);
                         const Vec3 wi_light_local = worldToLocal(wi_light, n, s, t);
 
                         //光源に向かうシャドウレイを生成

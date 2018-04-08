@@ -5,18 +5,17 @@
 #include <string>
 #include <algorithm>
 #include "aabb.h"
-#include "primitive.h"
-class Accel : public Primitive {
+template <typename T>
+class Accel {
     public:
-        std::vector<std::shared_ptr<Primitive>> prims;
+        std::vector<std::shared_ptr<T>> prims;
 
         Accel() {};
-        Accel(const std::vector<std::shared_ptr<Primitive>> &_prims) : prims(_prims) {};
+        Accel(const std::vector<std::shared_ptr<T>> &_prims) : prims(_prims) {};
         virtual ~Accel() {};
 
-        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
-            return Vec3();
-        };
+        virtual bool intersect(const Ray& ray, Hit& res) const = 0;
+        virtual AABB worldBound() const = 0;
 };
 
 
@@ -27,7 +26,8 @@ enum class BVH_PARTITION_TYPE {
 };
 
 
-class BVH : public Accel {
+template <typename T>
+class BVH : public Accel<T> {
     public:
         struct BVHNode {
             AABB bbox;
@@ -85,7 +85,7 @@ class BVH : public Accel {
         linearBVHNode *linearNodes;
 
 
-        BVH(const std::vector<std::shared_ptr<Primitive>>& _prims, int _maxPrimsInLeaf, BVH_PARTITION_TYPE _ptype) : Accel(_prims), maxPrimsInLeaf(_maxPrimsInLeaf), ptype(_ptype) {
+        BVH(const std::vector<std::shared_ptr<T>>& _prims, int _maxPrimsInLeaf, BVH_PARTITION_TYPE _ptype) : Accel<T>(_prims), maxPrimsInLeaf(_maxPrimsInLeaf), ptype(_ptype) {
             totalNodes = 0;
             constructBVH();
         };
@@ -95,20 +95,20 @@ class BVH : public Accel {
 
 
         void constructBVH() {
-            if(prims.size() == 0) {
-                std::cerr << "Accel is empty!" << std::endl;
+            if(this->prims.size() == 0) {
+                std::cerr << "prims is empty!" << std::endl;
                 std::exit(1);
             }
 
-            std::vector<BVHPrimitiveInfo> primitiveInfo(prims.size());
-            for(size_t i = 0; i < prims.size(); i++) {
-                primitiveInfo[i] = BVHPrimitiveInfo(i, prims[i]->worldBound());
+            std::vector<BVHPrimitiveInfo> primitiveInfo(this->prims.size());
+            for(size_t i = 0; i < this->prims.size(); i++) {
+                primitiveInfo[i] = BVHPrimitiveInfo(i, this->prims[i]->worldBound());
             }
 
-            std::vector<std::shared_ptr<Primitive>> orderedPrims;
+            std::vector<std::shared_ptr<T>> orderedPrims;
 
-            bvh_root = makeBVHNode(0, prims.size(), primitiveInfo, orderedPrims, ptype, &totalNodes);
-            prims.swap(orderedPrims);
+            bvh_root = makeBVHNode(0, this->prims.size(), primitiveInfo, orderedPrims, ptype, &totalNodes);
+            this->prims.swap(orderedPrims);
             std::cout << "BVH Construction Finished!" << std::endl;
             std::cout << "BVH Nodes:" << totalNodes << std::endl;
 
@@ -119,7 +119,7 @@ class BVH : public Accel {
         };
 
 
-        BVHNode* makeBVHNode(int start, int end, std::vector<BVHPrimitiveInfo> &primitiveInfo, std::vector<std::shared_ptr<Primitive>>& orderedPrims, BVH_PARTITION_TYPE ptype, int *totalNodes) {
+        BVHNode* makeBVHNode(int start, int end, std::vector<BVHPrimitiveInfo> &primitiveInfo, std::vector<std::shared_ptr<T>>& orderedPrims, BVH_PARTITION_TYPE ptype, int *totalNodes) {
             (*totalNodes)++;
             BVHNode* node = new BVHNode();
 
@@ -133,7 +133,7 @@ class BVH : public Accel {
             if(nPrims <= maxPrimsInLeaf) {
                 int indexOffset = orderedPrims.size();
                 for(int i = start; i < end; i++)
-                    orderedPrims.push_back(prims[primitiveInfo[i].primIndex]);
+                    orderedPrims.push_back(this->prims[primitiveInfo[i].primIndex]);
                 node->initLeaf(indexOffset, nPrims, bounds);
                 return node;
             }
@@ -147,7 +147,7 @@ class BVH : public Accel {
             if(centroidBounds.pMin[axis] == centroidBounds.pMax[axis]) {
                 int indexOffset = orderedPrims.size();
                 for(int i = start; i < end; i++)
-                    orderedPrims.push_back(prims[primitiveInfo[i].primIndex]);
+                    orderedPrims.push_back(this->prims[primitiveInfo[i].primIndex]);
                 node->initLeaf(indexOffset, nPrims, bounds);
                 return node;
             }
@@ -233,7 +233,7 @@ class BVH : public Accel {
                         else {
                             int indexOffset = orderedPrims.size();
                             for(int i = start; i < end; i++)
-                                orderedPrims.push_back(prims[primitiveInfo[i].primIndex]);
+                                orderedPrims.push_back(this->prims[primitiveInfo[i].primIndex]);
                             node->initLeaf(indexOffset, nPrims, bounds);
                             return node;
                         }
@@ -284,8 +284,11 @@ class BVH : public Accel {
                     if(node->nPrims > 0) {
                         for(size_t i = 0; i < node->nPrims; i++) {
                             const int index = node->indexOffset + i;
-                            if(prims[index]->intersect(ray, isect))
+                            if(this->prims[index]->intersect(ray, isect)) {
                                 hit = true;
+                                //Primitiveに対して衝突計算するときは最大距離がPrimitive::intersectの方で自動更新されるので不要だが、Shapeに対して衝突計算するときにはShape::intersect内で最大距離が更新されないので必要
+                                ray.tmax = isect.t;
+                            }
                         }
                         if(toVisitOffset == 0) break;
                         currentNodeIndex = nodesToVisit[--toVisitOffset];
@@ -312,7 +315,7 @@ class BVH : public Accel {
 
         AABB worldBound() const {
             AABB bounds;
-            for(auto itr = prims.begin(); itr != prims.end(); itr++) {
+            for(auto itr = this->prims.begin(); itr != this->prims.end(); itr++) {
                 bounds = mergeAABB(bounds, (*itr)->worldBound());
             }
             return bounds;

@@ -179,7 +179,7 @@ int main(int argc, char** argv) {
         std::string material = *object->get_as<std::string>("material");
         auto transforms = object->get_table_array("transform");
         Vec3 center;
-        float scale = 1.0f;
+        Vec3 scale(1, 1, 1);
         for(const auto& transform : *transforms) {
             std::string transform_type = *transform->get_as<std::string>("type");
             if(transform_type == "translate") {
@@ -188,7 +188,7 @@ int main(int argc, char** argv) {
             }
             else if(transform_type == "scale") {
                 auto scale_v = *transform->get_array_of<double>("vector");
-                scale = scale_v[0];
+                scale = Vec3(scale_v[0], scale_v[1], scale_v[2]);
             }
         }
         
@@ -201,7 +201,11 @@ int main(int argc, char** argv) {
             prims_map.insert(std::make_pair(name, prim));
         }
         else if(shapedata.type == "obj") {
-            loadObj(prims, shapedata.path, center, scale, mat);
+            std::vector<std::shared_ptr<Triangle>> triangles = loadObj(shapedata.path, center, scale);
+            std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
+            std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
+            prims.push_back(prim);
+            prims_map.insert(std::make_pair(name, prim));
         }
     }
     std::cout << "objects loaded" << std::endl;
@@ -263,11 +267,11 @@ int main(int argc, char** argv) {
     int samples = *renderer->get_as<int>("samples");
     int depth_limit = *renderer->get_as<int>("depth-limit");
     std::string integrator = *renderer->get_as<std::string>("integrator");
-    bool renderer_update = *renderer->get_as<bool>("update");
+    bool renderer_show = *renderer->get_as<bool>("show");
 
     Integrator* integ;
     if(integrator == "pt") {
-        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit, renderer_update);
+        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit);
     }
     else if(integrator == "normal") {
         integ = new NormalRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
@@ -276,18 +280,19 @@ int main(int argc, char** argv) {
         integ = new DotRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
     }
     else if(integrator == "pt-explicit") {
-        integ = new PathTraceExplicit(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit, renderer_update);
+        integ = new PathTraceExplicit(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit);
     }
     else {
-        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, 10, 100, false);
+        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, 10, 100);
     }
 
 
-    if(renderer_update) {
+    if(renderer_show) {
+        //openGLで表示
         drawgl(argc, argv, integ, scene);
     }
     else {
-        //レンダリング
+        //レンダリングして画像を出力
         integ->render(scene);
     }
 }

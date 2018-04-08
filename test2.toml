@@ -1,14 +1,14 @@
 [renderer]
-samples = 1000
+samples = 100
 depth-limit = 100
 integrator = "pt-explicit"
 show = true
 
 [sampler]
-type = "mt"
+type = "minstd"
 
 [film]
-resolution = [1920, 1080]
+resolution = [512, 512]
 
 [sky]
 type = "uniform"
@@ -20,18 +20,23 @@ phi-offset = 3.14
 [camera]
 type = "thin-lens"
 fov = 90.0
-lens-distance = 1.0 
+lens-distance = 1.2
 focus-point = [0.0, 1.0, 0.0]
-f-number = 8.0 
+f-number = 14.0
 [camera.transform]
 type = "look-at"
-origin = [0.0, 2.0, -3]
+origin = [0.0, 2.0, -4.0]
 target = [0.0, 1.0, 0.0]
 
 [[material]]
 name = "mat1"
 type = "lambert"
 albedo = [0.9, 0.9, 0.9]
+
+[[material]]
+name = "blue"
+type = "lambert"
+albedo = [0.2, 0.4, 0.9]
 
 [[material]]
 name = "mat2"
@@ -54,11 +59,6 @@ ior = 1.5
 name = "diamond"
 type = "glass"
 ior = 2.4195
-
-[[material]]
-name = "blue"
-type = "lambert"
-albedo = [0.2, 0.4, 0.9]
 
 [[mesh]]
 name = "floor"
@@ -90,6 +90,11 @@ name = "diamond"
 type = "obj"
 path = "diamond.obj"
 
+[[mesh]]
+name = "hairball"
+type = "obj"
+path = "hairball.obj"
+
 
 [[object]]
 name = "floor"
@@ -110,20 +115,8 @@ vector = [0.0, 0.0, 0.0]
 type = "scale"
 vector = [0.2, 0.2, 0.2]
 
-[[object]]
-name = "sphere"
-mesh = "sphere"
-material = "mat1"
-[[object.transform]]
-type = "translate"
-vector = [0.0, 5.0, 0.0]
 
-
-#[[light]]
-#type = "point"
-#light-pos = [0.0, 5.0, 0.0]
-#emission = [100.0, 100.0, 100.0]
 [[light]]
 type = "area"
-object = "sphere"
-emission = [10.0, 10.0, 10.0]
+object = "dragon"
+emission = [1.0, 1.0, 1.0]

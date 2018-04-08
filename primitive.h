@@ -1,9 +1,10 @@
 #ifndef PRIMITIVE_H
 #define PRIMITIVE_H
 #include <memory>
-#include "shape.h"
 #include "aabb.h"
 #include "material.h"
+#include "shape.h"
+#include "sampler.h"
 
 
 class Light;
@@ -19,7 +20,7 @@ class Primitive {
 
         virtual bool intersect(const Ray& ray, Hit& res) const = 0;
         virtual AABB worldBound() const = 0;
-        virtual Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const = 0;
+        virtual Vec3 sample(Sampler& sampler, Vec3& normal, float &pdf) const = 0;
 };
 
 
@@ -42,8 +43,8 @@ class GeometricPrimitive : public Primitive {
             return shape->worldBound();
         };
 
-        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
-            return shape->sample(u, normal, pdf);
+        Vec3 sample(Sampler& sampler, Vec3& normal, float &pdf) const {
+            return shape->sample(sampler, normal, pdf);
         };
 };
 #endif
