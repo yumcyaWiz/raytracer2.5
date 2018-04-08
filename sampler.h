@@ -29,6 +29,10 @@ inline Vec3 sampleNCosineHemisphere(const Vec2& u, float alpha) {
     const float phi = 2.0f*M_PI*u.y;
     return Vec3(std::cos(phi)*std::sin(theta), std::cos(theta), std::sin(phi)*std::sin(theta));
 }
+inline Vec2 sampleTriangle(const Vec2& u) {
+    float sqrt = std::sqrt(u.x);
+    return Vec2(1 - sqrt, u.y*sqrt);
+}
 
 
 class Sampler {

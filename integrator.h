@@ -248,7 +248,7 @@ class PathTrace : public Integrator {
                 //サンプリングされた方向をワールド座標系に戻す
                 Vec3 wi = localToWorld(wi_local, n, s, t);
                 //もしbrdfが真っ黒だったらterminate
-                if(brdf_f == RGB(0)) return RGB(0);
+                //if(brdf_f == RGB(0)) return RGB(0);
 
 
                 //コサイン項
@@ -338,7 +338,7 @@ class PathTraceExplicit : public Integrator {
 
         PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
 
-        RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
+        RGB Li(const Ray& ray, const Scene& scene, Vec3& hit_le, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
             if(depth > 10) {
                 if(sampler->getNext() < roulette) {
@@ -353,9 +353,13 @@ class PathTraceExplicit : public Integrator {
             Hit res;
             RGB col;
             if(scene.intersect(ray, res)) {
-                //光源に当たった場合は光源のEmissionを返して終了
+                //光源に当たった場合
                 if(res.hitPrimitive->areaLight != nullptr) {
-                    return res.hitPrimitive->areaLight->Le(res);
+                    //直接光源に当たった場合
+                    if(depth == 0) {
+                        hit_le = res.hitPrimitive->areaLight->Le(res);
+                    }
+                    return RGB(0.0f);
                 }
 
                 //マテリアル
@@ -385,8 +389,12 @@ class PathTraceExplicit : public Integrator {
                         if(light->type == LIGHT_TYPE::AREA) {
                         //シャドウレイが物体に当たったとき、それがサンプリング生成元の光源だった場合は寄与を蓄積
                             if(scene.intersect(shadowRay, shadow_res)) {
-                                if(shadow_res.hitPrimitive->areaLight == light)
+                                if(shadow_res.hitPrimitive->areaLight == light) {
                                     col += hitMaterial->f(wo_local, wi_light_local) * le/light_pdf * std::max(wi_light_local.y, 0.0f);
+                                }
+                                else {
+                                    //std::cout << "shadow ray missed" << std::endl;
+                                }
                             }
                         }
                         //PointLight
@@ -417,7 +425,7 @@ class PathTraceExplicit : public Integrator {
                 //サンプリングされた方向をワールド座標系に戻す
                 Vec3 wi = localToWorld(wi_local, n, s, t);
                 //もしbrdfが真っ黒だったらterminate
-                if(brdf_f == RGB(0)) return RGB(0);
+                //if(brdf_f == RGB(0)) return RGB(0);
 
 
                 //コサイン項
@@ -445,7 +453,7 @@ class PathTraceExplicit : public Integrator {
 
                 //レンダリング方程式の計算
                 Ray nextRay(res.hitPos, wi);
-                col += k * Li(nextRay, scene, depth + 1, roulette);
+                col += k * Li(nextRay, scene, hit_le, depth + 1, roulette);
             }
             else {
                 col = scene.sky->getSky(ray);
@@ -469,8 +477,14 @@ class PathTraceExplicit : public Integrator {
                         float v = -(2.0*(j + ry) - film->height)/film->height;
                         float w;
                         Ray ray = cam->getRay(u, v, w, *sampler);
-                        RGB col = Li(ray, scene);
-                        film->addSample(i, j, w*col);
+                        Vec3 hit_le;
+                        RGB col = Li(ray, scene, hit_le);
+                        if(!nonzero(hit_le)) {
+                            film->addSample(i, j, w*col);
+                        }
+                        else {
+                            film->addSample(i, j, w*hit_le);
+                        };
                     }
                 }
                 std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
@@ -494,8 +508,14 @@ class PathTraceExplicit : public Integrator {
                     float v = -(2.0*(j + ry) - film->height)/film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
-                    RGB col = Li(ray, scene);
-                    film->addSample(i, j, w*col);
+                    Vec3 hit_le;
+                    RGB col = Li(ray, scene, hit_le);
+                    if(!nonzero(hit_le)) {
+                        film->addSample(i, j, w*col);
+                    }
+                    else {
+                        film->addSample(i, j, w*hit_le);
+                    }
                 }
             }
         };

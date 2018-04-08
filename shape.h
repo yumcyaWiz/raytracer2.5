@@ -144,7 +144,7 @@ class Triangle : public Shape {
         };
 
         Vec3 sample(Sampler& sampler, Vec3& normal, float &pdf) const {
-            Vec2 u = sampler.getNext2D();
+            Vec2 u = sampleTriangle(sampler.getNext2D());
             Vec3 samplePos = (1.0f - u.x - u.y)*p1 + u.x*p2 + u.y*p3;
             if(vertex_normal)
                 normal = normalize((1.0f - u.x - u.y)*n1 + u.x*n2 + u.y*n3);
@@ -182,9 +182,11 @@ class Polygon : public Shape {
         };
 
         Vec3 sample(Sampler& sampler, Vec3& normal, float &pdf) const {
-            int tri_num = (int)(triangles.size()*sampler.getNext());
-            if(tri_num == triangles.size()) tri_num = triangles.size() - 1;
-            return triangles[tri_num]->sample(sampler, normal, pdf);
+            int tri_num = std::floor(triangles.size()*sampler.getNext());
+            if(tri_num == triangles.size()) tri_num--;
+            Vec3 samplePos = triangles[tri_num]->sample(sampler, normal, pdf);
+            pdf = 1.0f/this->surfaceArea();
+            return samplePos;
         };
 };
 #endif

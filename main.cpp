@@ -205,7 +205,7 @@ int main(int argc, char** argv) {
             prim_map.insert(std::make_pair(name, prim));
         }
         else if(shapedata.type == "obj") {
-            loadObj(prims, lights, shapedata.path, center, scale, mat);
+            loadObj(prims, lights, shapedata.path, center, scale, mat, name, prim_map, shape_map);
         }
     }
     std::cout << "objects loaded" << std::endl;

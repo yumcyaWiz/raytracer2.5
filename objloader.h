@@ -20,7 +20,7 @@
 
 
 //objファイルを読み込み、std:shared_ptr<Triangle>の配列を返す
-void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::shared_ptr<Light>>& lights, const std::string& filename, const Vec3& center, const Vec3& scale, std::shared_ptr<Material> _mat) {
+void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::shared_ptr<Light>>& lights, const std::string& filename, const Vec3& center, const Vec3& scale, std::shared_ptr<Material> _mat, const std::string& name, std::map<std::string, std::shared_ptr<Primitive>>& prim_map, std::map<std::string, std::shared_ptr<Shape>>& shape_map) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -97,6 +97,11 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::sh
 
         std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, light, shape));
         prims.push_back(prim);
+
+        if(shapes.size() == 1) {
+            shape_map.insert(std::make_pair(name, shape));
+            prim_map.insert(std::make_pair(name, prim));
+        }
     }
 
     std::cout << "total vertex:" << vertex_count << std::endl;
