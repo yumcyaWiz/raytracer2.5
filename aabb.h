@@ -80,6 +80,13 @@ class AABB {
 };
 
 
+inline std::ostream& operator<<(std::ostream& stream, const AABB& aabb) {
+    stream << "pMin:" << aabb.pMin << std::endl;
+    stream << "pMax:" << aabb.pMax << std::endl;
+    return stream;
+}
+
+
 inline AABB mergeAABB(const AABB& b1, const AABB& b2) {
     return AABB(min(b1.pMin, b2.pMin), max(b1.pMax, b2.pMax));
 }

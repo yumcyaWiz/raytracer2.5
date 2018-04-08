@@ -287,9 +287,11 @@ class BVH : public Accel<T> {
                             Hit isect2;
                             if(this->prims[index]->intersect(ray, isect2)) {
                                 hit = true;
-                                //Primitiveに対して衝突計算するときは最大距離がPrimitive::intersectの方で自動更新されるので不要だが、Shapeに対して衝突計算するときにはShape::intersect内で最大距離が更新されないので必要
-                                ray.tmax = isect2.t < ray.tmax ? isect2.t : ray.tmax;
-                                isect = isect2;
+                                //rayの衝突距離を更新する
+                                if(isect2.t <= ray.tmax) {
+                                    ray.tmax = isect2.t;
+                                    isect = isect2;
+                                }
                             }
                         }
                         if(toVisitOffset == 0) break;

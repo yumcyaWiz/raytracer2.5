@@ -2,12 +2,13 @@
 samples = 4000
 depth-limit = 100
 integrator = "pt"
+show = true
 
 [sampler]
 type = "mt"
 
 [film]
-resolution = [2138, 1536]
+resolution = [1920, 1080]
 
 [sky]
 type = "ibl"

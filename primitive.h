@@ -33,8 +33,9 @@ class GeometricPrimitive : public Primitive {
 
 
         bool intersect(const Ray& ray, Hit& res) const {
-            if(!shape->intersect(ray, res)) return false;
-            ray.tmax = res.t;
+            Hit res2;
+            if(!shape->intersect(ray, res2)) return false;
+            res = res2;
             res.hitPrimitive = this;
             return true;
         };

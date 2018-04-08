@@ -19,7 +19,6 @@ class Scene {
         };
 
         bool intersect(const Ray& ray, Hit& res) const {
-            res.t = ray.tmax;
             return accel->intersect(ray, res);
         };
 };

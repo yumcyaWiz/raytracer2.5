@@ -82,14 +82,32 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::sh
         std::shared_ptr<Light> light;
         if(mtl) {
             auto material = materials[shapes[s].mesh.material_ids[0]];
-            Vec3 kd(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
-            Vec3 ke(material.emission[0], material.emission[1], material.emission[2]);
+            int illum = material.illum;
+
             //light
+            Vec3 ke(material.emission[0], material.emission[1], material.emission[2]);
             if(nonzero(ke)) {
                 light = std::shared_ptr<Light>(new AreaLight(shape, ke));
                 lights.push_back(light);
             }
-            mat = std::shared_ptr<Material>(new Lambert(kd));
+
+            //diffuse
+            Vec3 kd(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
+            if(illum == 2) {
+                mat = std::shared_ptr<Material>(new Lambert(kd));
+            }
+            //mirror
+            else if(illum == 5) {
+                Vec3 Ks(material.specular[0], material.specular[1], material.specular[2]);
+                mat = std::shared_ptr<Material>(new Mirror(Ks[0]));
+            }
+            //glass
+            else if(illum == 7) {
+                mat = std::shared_ptr<Material>(new Glass(1.5f));
+            }
+            else {
+                mat = std::shared_ptr<Material>(new Lambert(kd));
+            }
         }
         else {
             mat = _mat;

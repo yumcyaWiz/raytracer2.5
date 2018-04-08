@@ -100,7 +100,7 @@ class Triangle : public Shape {
         };
 
         bool intersect(const Ray& ray, Hit& res) const {
-            const float eps = 1e-8;
+            const float eps = 1e-6;
             const Vec3 edge1 = p2 - p1;
             const Vec3 edge2 = p3 - p1;
             const Vec3 h = cross(ray.direction, edge2);
@@ -136,7 +136,7 @@ class Triangle : public Shape {
         };
 
         AABB worldBound() const {
-            return AABB((1.0f + 1e-3)*min(p1, min(p2, p3)), (1.0f + 1e-3)*max(p1, max(p2, p3)));
+            return AABB(min(p1, min(p2, p3)) - 1e-3, max(p1, max(p2, p3)) + 1e-3);
         };
 
         float surfaceArea() const {
