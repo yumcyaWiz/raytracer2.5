@@ -20,7 +20,7 @@ class Light {
         Light(const RGB& _power, const LIGHT_TYPE& _type) : power(_power), type(_type) {};
 
         virtual RGB Le(const Hit& res) const = 0;
-        virtual RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const = 0;
+        virtual RGB sample(const Hit& res, Sampler& sampler, Vec3& wi, float &pdf) const = 0;
 };
 
 
@@ -33,7 +33,7 @@ class PointLight : public Light {
         RGB Le(const Hit& res) const {
             return power;
         };
-        RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const {
+        RGB sample(const Hit& res, Sampler& sampler, Vec3& wi, float &pdf) const {
             const float distance2 = (lightPos - res.hitPos).length2();
             pdf = 1.0f * distance2;
             wi = normalize(lightPos - res.hitPos);
@@ -51,7 +51,7 @@ class DirectionalLight : public Light {
         RGB Le(const Hit& res) const {
             return power;
         };
-        RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const {
+        RGB sample(const Hit& res, Sampler& sampler, Vec3& wi, float &pdf) const {
             pdf = 1.0f;
             wi = direction;
             return power;
@@ -70,11 +70,11 @@ class AreaLight : public Light {
         RGB Le(const Hit& res) const {
             return power;
         };
-        RGB sample(const Hit& res, const Vec2& u, Vec3& wi, float &pdf) const {
+        RGB sample(const Hit& res, Sampler& sampler, Vec3& wi, float &pdf) const {
             float point_pdf;
             //Primitive上で点をサンプリング
             Vec3 normal;
-            Vec3 primPos = prim->sample(u, normal, point_pdf);
+            Vec3 primPos = prim->sample(sampler, normal, point_pdf);
             float distance2 = (primPos - res.hitPos).length2();
             //衝突点からサンプリングされた点に向かう方向ベクトルを生成
             wi = normalize(primPos - res.hitPos);
