@@ -1,7 +1,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 #include "vec3.h"
-#include "primitive.h"
+#include "shape.h"
 
 
 enum class LIGHT_TYPE {
@@ -61,10 +61,10 @@ class DirectionalLight : public Light {
 
 class AreaLight : public Light {
     public:
-        std::shared_ptr<Primitive> prim;
+        std::shared_ptr<Shape> shape;
 
 
-        AreaLight(std::shared_ptr<Primitive> _prim, const RGB& _power) : Light(_power, LIGHT_TYPE::AREA), prim(_prim) {};
+        AreaLight(std::shared_ptr<Shape> _shape, const RGB& _power) : Light(_power, LIGHT_TYPE::AREA), shape(_shape) {};
 
         
         RGB Le(const Hit& res) const {
@@ -74,10 +74,10 @@ class AreaLight : public Light {
             float point_pdf;
             //Primitive上で点をサンプリング
             Vec3 normal;
-            Vec3 primPos = prim->sample(sampler, normal, point_pdf);
-            float distance2 = (primPos - res.hitPos).length2();
+            Vec3 shapePos = shape->sample(sampler, normal, point_pdf);
+            float distance2 = (shapePos - res.hitPos).length2();
             //衝突点からサンプリングされた点に向かう方向ベクトルを生成
-            wi = normalize(primPos - res.hitPos);
+            wi = normalize(shapePos - res.hitPos);
             float cos_term = std::max(dot(-wi, normal), 0.0f);
             //面積測度を立体角測度に変換
             pdf = point_pdf * distance2/cos_term;

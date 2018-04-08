@@ -79,15 +79,23 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::sh
 
         std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
         std::shared_ptr<Material> mat;
+        std::shared_ptr<Light> light;
         if(mtl) {
             auto material = materials[shapes[s].mesh.material_ids[0]];
             Vec3 kd(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
+            Vec3 ke(material.emission[0], material.emission[1], material.emission[2]);
+            //light
+            if(nonzero(ke)) {
+                light = std::shared_ptr<Light>(new AreaLight(shape, ke));
+                lights.push_back(light);
+            }
             mat = std::shared_ptr<Material>(new Lambert(kd));
         }
         else {
             mat = _mat;
         }
-        std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
+
+        std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, light, shape));
         prims.push_back(prim);
     }
 

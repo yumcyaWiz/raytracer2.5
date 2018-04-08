@@ -1,7 +1,7 @@
 [renderer]
 samples = 100
 depth-limit = 100
-integrator = "pt"
+integrator = "pt-explicit"
 show = true
 
 [sampler]
@@ -12,7 +12,7 @@ resolution = [512, 512]
 
 [sky]
 type = "uniform"
-color = [1, 1, 1]
+color = [0, 0, 0]
 path = "Mans_Outside_2k.hdr"
 theta-offset = 0
 phi-offset = 3.14

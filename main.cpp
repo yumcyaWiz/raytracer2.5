@@ -173,8 +173,9 @@ int main(int argc, char** argv) {
     std::vector<std::shared_ptr<Primitive>> prims;
     //ライトの配列
     std::vector<std::shared_ptr<Light>> lights;
-    //プリミティブの連想配列(lightの読み込みで名前で参照するときに使用する)
-    std::map<std::string, std::shared_ptr<Primitive>> prims_map;
+    //ShapeとPrimitiveの連想配列(lightの読み込みで名前で参照するときに使用する)
+    std::map<std::string, std::shared_ptr<Shape>> shape_map;
+    std::map<std::string, std::shared_ptr<Primitive>> prim_map;
     for(const auto& object : *objects) {
         std::string name = *object->get_as<std::string>("name");
         std::string mesh = *object->get_as<std::string>("mesh");
@@ -200,7 +201,8 @@ int main(int argc, char** argv) {
             std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Sphere(center, shapedata.radius));
             std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
             prims.push_back(prim);
-            prims_map.insert(std::make_pair(name, prim));
+            shape_map.insert(std::make_pair(name, shape));
+            prim_map.insert(std::make_pair(name, prim));
         }
         else if(shapedata.type == "obj") {
             loadObj(prims, lights, shapedata.path, center, scale, mat);
@@ -231,8 +233,9 @@ int main(int argc, char** argv) {
             }
             else if(light_type == "area") {
                 auto object = *light->get_as<std::string>("object");
-                std::shared_ptr<Primitive> prim = prims_map.at(object);
-                lightPtr = std::shared_ptr<Light>(new AreaLight(prim, emission));
+                std::shared_ptr<Shape> shape = shape_map.at(object);
+                std::shared_ptr<Primitive> prim = prim_map.at(object);
+                lightPtr = std::shared_ptr<Light>(new AreaLight(shape, emission));
                 prim->areaLight = lightPtr;
             }
             lights.push_back(lightPtr);

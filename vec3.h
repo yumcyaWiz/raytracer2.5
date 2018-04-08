@@ -151,4 +151,7 @@ inline bool isnan(const Vec3& v) {
 inline bool isinf(const Vec3& v) {
     return std::isinf(v.x) || std::isinf(v.y) || std::isinf(v.z);
 }
+inline bool nonzero(const Vec3& v) {
+    return v.x || v.y || v.z;
+}
 #endif
