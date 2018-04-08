@@ -1,7 +1,7 @@
 [renderer]
 samples = 1000
 depth-limit = 100
-integrator = "pt-explicit"
+integrator = "pt"
 update = true
 
 [sampler]
