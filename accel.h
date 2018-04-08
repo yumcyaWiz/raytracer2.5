@@ -96,7 +96,7 @@ class BVH : public Accel<T> {
 
         void constructBVH() {
             if(this->prims.size() == 0) {
-                std::cerr << "Accel is empty!" << std::endl;
+                std::cerr << "prims is empty!" << std::endl;
                 std::exit(1);
             }
 
@@ -284,8 +284,11 @@ class BVH : public Accel<T> {
                     if(node->nPrims > 0) {
                         for(size_t i = 0; i < node->nPrims; i++) {
                             const int index = node->indexOffset + i;
-                            if(this->prims[index]->intersect(ray, isect))
+                            if(this->prims[index]->intersect(ray, isect)) {
                                 hit = true;
+                                //Primitiveに対して衝突計算するときは最大距離がPrimitive::intersectの方で自動更新されるので不要だが、Shapeに対して衝突計算するときにはShape::intersect内で最大距離が更新されないので必要
+                                ray.tmax = isect.t;
+                            }
                         }
                         if(toVisitOffset == 0) break;
                         currentNodeIndex = nodesToVisit[--toVisitOffset];

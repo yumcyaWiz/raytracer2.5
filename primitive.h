@@ -3,6 +3,7 @@
 #include <memory>
 #include "aabb.h"
 #include "material.h"
+#include "shape.h"
 
 
 class Light;

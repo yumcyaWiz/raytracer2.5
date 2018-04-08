@@ -20,7 +20,7 @@
 
 
 //objファイルを読み込み、std:shared_ptr<Triangle>の配列を返す
-std::vector<std::shared_ptr<Triangle>> loadObj(const std::string& filename, const Vec3& center, float scale) {
+std::vector<std::shared_ptr<Triangle>> loadObj(const std::string& filename, const Vec3& center, const Vec3& scale) {
     std::vector<std::shared_ptr<Triangle>> triangles;
 
     tinyobj::attrib_t attrib;

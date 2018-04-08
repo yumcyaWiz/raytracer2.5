@@ -208,9 +208,8 @@ class PathTrace : public Integrator {
     public:
         int pixelSamples;
         int maxDepth;
-        bool update;
 
-        PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth, bool _update) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth), update(_update) {};
+        PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
@@ -336,9 +335,8 @@ class PathTraceExplicit : public Integrator {
     public:
         int pixelSamples;
         int maxDepth;
-        bool update;
 
-        PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth, bool _update) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth), update(_update) {};
+        PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット

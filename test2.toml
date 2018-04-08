@@ -2,7 +2,7 @@
 samples = 100
 depth-limit = 100
 integrator = "pt-explicit"
-update = true
+show = true
 
 [sampler]
 type = "minstd"

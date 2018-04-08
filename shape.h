@@ -130,18 +130,11 @@ class Triangle : public Shape {
             res.dpdu = dpdu;
             res.dpdv = dpdv;
 
-            /*
-            if(dot(-ray.direction, res.hitNormal) < 0.0f) {
-                res.hitNormal = -res.hitNormal;
-                res.dpdu = -res.dpdu;
-                res.dpdv = -res.dpdv;
-            }
-            */
             return true;
         };
 
         AABB worldBound() const {
-            return AABB((1.0f + 1e-3)*min(p1, min(p2, p3)), (1.0f + 1e-3)*max(p1, max(p2, p3)));
+            return AABB(min(p1, min(p2, p3)), max(p1, max(p2, p3)));
         };
 
         float surfaceArea() const {
