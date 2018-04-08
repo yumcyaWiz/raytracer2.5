@@ -1,4 +1,5 @@
 *.out
+*.s
 debug
 *.ppm
 *.png

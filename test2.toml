@@ -1,0 +1,122 @@
+[renderer]
+samples = 100
+depth-limit = 100
+integrator = "pt-explicit"
+update = true
+
+[sampler]
+type = "minstd"
+
+[film]
+resolution = [512, 512]
+
+[sky]
+type = "uniform"
+color = [0, 0, 0]
+path = "Mans_Outside_2k.hdr"
+theta-offset = 0
+phi-offset = 3.14
+
+[camera]
+type = "thin-lens"
+fov = 90.0
+lens-distance = 1.2
+focus-point = [0.0, 1.0, 0.0]
+f-number = 14.0
+[camera.transform]
+type = "look-at"
+origin = [0.0, 2.0, -4.0]
+target = [0.0, 1.0, 0.0]
+
+[[material]]
+name = "mat1"
+type = "lambert"
+albedo = [0.9, 0.9, 0.9]
+
+[[material]]
+name = "blue"
+type = "lambert"
+albedo = [0.2, 0.4, 0.9]
+
+[[material]]
+name = "mat2"
+type = "mirror"
+albedo = 0.9
+
+[[material]]
+name = "mat3"
+type = "phong"
+kd = 0.9
+albedo = [1.0, 1.0, 1.0]
+alpha = 500.0 
+
+[[material]]
+name = "mat4"
+type = "glass"
+ior = 1.5
+
+[[material]]
+name = "diamond"
+type = "glass"
+ior = 2.4195
+
+[[mesh]]
+name = "floor"
+type = "obj"
+path = "plane.obj"
+
+[[mesh]]
+name = "dragon"
+type = "obj"
+path = "dragon.obj"
+
+[[mesh]]
+name = "teapot"
+type = "obj"
+path = "teapot.obj"
+
+[[mesh]]
+name = "bunny"
+type = "obj"
+path = "bunny.obj"
+
+[[mesh]]
+name = "sphere"
+type = "sphere"
+radius = 1.0
+
+[[mesh]]
+name = "diamond"
+type = "obj"
+path = "diamond.obj"
+
+[[mesh]]
+name = "hairball"
+type = "obj"
+path = "hairball.obj"
+
+
+[[object]]
+name = "floor"
+mesh = "floor"
+material = "blue"
+[[object.transform]]
+type = "translate"
+vector = [0, 0, 0]
+
+[[object]]
+name = "dragon"
+mesh = "dragon"
+material = "mat1"
+[[object.transform]]
+type = "translate"
+vector = [0.0, 0.0, 0.0]
+[[object.transform]]
+type = "scale"
+vector = [0.2, 0.2, 0.2]
+
+
+[[light]]
+type = "point"
+light-pos = [0.0, 5.0, 0.0]
+emission = [100.0, 100.0, 100.0]
