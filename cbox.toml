@@ -1,0 +1,48 @@
+[renderer]
+samples = 100
+depth-limit = 100
+integrator = "pt"
+show = true
+
+[sampler]
+type = "minstd"
+
+[film]
+resolution = [512, 512]
+
+[sky]
+type = "uniform"
+color = [1, 1, 1]
+path = "Mans_Outside_2k.hdr"
+theta-offset = 0
+phi-offset = 3.14
+
+[camera]
+type = "ideal-pinhole"
+fov = 90.0
+lens-distance = 1.2
+focus-point = [0.0, 1.0, 0.0]
+f-number = 14.0
+[camera.transform]
+type = "look-at"
+origin = [0.0, 1.0, 2.5]
+target = [0.0, 1.0, 0.0]
+
+[[material]]
+name = "mat1"
+type = "lambert"
+albedo = [0.9, 0.9, 0.9]
+
+[[mesh]]
+name = "cbox"
+type = "obj"
+path = "CornellBox-Original.obj"
+
+
+[[object]]
+name = "cbox"
+mesh = "cbox"
+material = "mat1"
+[[object.transform]]
+type = "translate"
+vector = [0.0, 0.0, 0.0]

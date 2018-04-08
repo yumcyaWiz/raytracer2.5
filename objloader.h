@@ -20,9 +20,7 @@
 
 
 //objファイルを読み込み、std:shared_ptr<Triangle>の配列を返す
-std::vector<std::shared_ptr<Triangle>> loadObj(const std::string& filename, const Vec3& center, const Vec3& scale) {
-    std::vector<std::shared_ptr<Triangle>> triangles;
-
+void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::shared_ptr<Light>>& lights, const std::string& filename, const Vec3& center, const Vec3& scale, std::shared_ptr<Material> _mat) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
@@ -34,9 +32,15 @@ std::vector<std::shared_ptr<Triangle>> loadObj(const std::string& filename, cons
     if(!ret)
         std::exit(1);
 
+    bool mtl = !materials.empty();
+
     int face_count = 0;
     int vertex_count = 0;
     for(size_t s = 0; s < shapes.size(); s++) {
+        std::cout << "Loading " << shapes[s].name << std::endl;
+
+        //三角形の配列
+        std::vector<std::shared_ptr<Triangle>> triangles;
         size_t index_offset = 0;
         for(size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
             int fv = shapes[s].mesh.num_face_vertices[f];
@@ -61,22 +65,34 @@ std::vector<std::shared_ptr<Triangle>> loadObj(const std::string& filename, cons
             }
             index_offset += fv;
 
-            std::shared_ptr<Triangle> shape;
+            std::shared_ptr<Triangle> triangle;
             if(normal.size() > 0) {
-                shape = std::shared_ptr<Triangle>(new Triangle(center + scale*vertex[0], center + scale*vertex[1], center + scale*vertex[2], normal[0], normal[1], normal[2]));
+                triangle = std::shared_ptr<Triangle>(new Triangle(center + scale*vertex[0], center + scale*vertex[1], center + scale*vertex[2], normal[0], normal[1], normal[2]));
             }
             else {
-                shape = std::shared_ptr<Triangle>(new Triangle(center + scale*vertex[0], center + scale*vertex[1], center + scale*vertex[2]));
+                triangle = std::shared_ptr<Triangle>(new Triangle(center + scale*vertex[0], center + scale*vertex[1], center + scale*vertex[2]));
             }
 
-            triangles.push_back(shape);
+            triangles.push_back(triangle);
             face_count++;
         }
+
+        std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
+        std::shared_ptr<Material> mat;
+        if(mtl) {
+            auto material = materials[shapes[s].mesh.material_ids[0]];
+            Vec3 kd(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
+            mat = std::shared_ptr<Material>(new Lambert(kd));
+        }
+        else {
+            mat = _mat;
+        }
+        std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
+        prims.push_back(prim);
     }
 
-    std::cout << "vertex:" << vertex_count << std::endl;
-    std::cout << "face:" << face_count << std::endl;
-    return triangles;
+    std::cout << "total vertex:" << vertex_count << std::endl;
+    std::cout << "total face:" << face_count << std::endl;
 }
 
 

@@ -136,7 +136,7 @@ class Triangle : public Shape {
         };
 
         AABB worldBound() const {
-            return AABB(min(p1, min(p2, p3)), max(p1, max(p2, p3)));
+            return AABB((1.0f + 1e-3)*min(p1, min(p2, p3)), (1.0f + 1e-3)*max(p1, max(p2, p3)));
         };
 
         float surfaceArea() const {

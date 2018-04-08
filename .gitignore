@@ -5,6 +5,7 @@ debug
 *.png
 *.jpg
 *.obj
+*.mtl
 stb_image.h
 *.hdr
 core.*

@@ -171,6 +171,8 @@ int main(int argc, char** argv) {
     auto objects = toml->get_table_array("object");
     //プリミティブの配列
     std::vector<std::shared_ptr<Primitive>> prims;
+    //ライトの配列
+    std::vector<std::shared_ptr<Light>> lights;
     //プリミティブの連想配列(lightの読み込みで名前で参照するときに使用する)
     std::map<std::string, std::shared_ptr<Primitive>> prims_map;
     for(const auto& object : *objects) {
@@ -201,11 +203,7 @@ int main(int argc, char** argv) {
             prims_map.insert(std::make_pair(name, prim));
         }
         else if(shapedata.type == "obj") {
-            std::vector<std::shared_ptr<Triangle>> triangles = loadObj(shapedata.path, center, scale);
-            std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
-            std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, nullptr, shape));
-            prims.push_back(prim);
-            prims_map.insert(std::make_pair(name, prim));
+            loadObj(prims, lights, shapedata.path, center, scale, mat);
         }
     }
     std::cout << "objects loaded" << std::endl;
@@ -213,7 +211,6 @@ int main(int argc, char** argv) {
 
 
     //lights
-    std::vector<std::shared_ptr<Light>> lights;
     auto light_toml = toml->get_table_array("light");
     if(light_toml) {
         for(const auto& light : *light_toml) {
