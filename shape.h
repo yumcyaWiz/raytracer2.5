@@ -6,6 +6,9 @@
 #include "hit.h"
 #include "aabb.h"
 #include "util.h"
+#include "accel.h"
+
+
 class Shape {
     public:
         virtual bool intersect(const Ray& ray, Hit& res) const = 0;
@@ -139,6 +142,33 @@ class Triangle : public Shape {
 
         AABB worldBound() const {
             return AABB((1.0f + 1e-3)*min(p1, min(p2, p3)), (1.0f + 1e-3)*max(p1, max(p2, p3)));
+        };
+
+        float surfaceArea() const {
+            return 1.0f;
+        };
+
+        Vec3 sample(const Vec2& u, Vec3& normal, float &pdf) const {
+            return Vec3();
+        };
+};
+
+
+class Polygon : public Shape {
+    public:
+        std::vector<std::shared_ptr<Triangle>> triangles;
+        std::shared_ptr<Accel<Triangle>> accel;
+
+        Polygon(const std::vector<std::shared_ptr<Triangle>>& _triangles) : triangles(_triangles) {
+            accel = std::shared_ptr<Accel<Triangle>>(new BVH<Triangle>(triangles, 4, BVH_PARTITION_TYPE::SAH));
+        };
+
+        bool intersect(const Ray& ray, Hit& res) const {
+            return accel->intersect(ray, res);
+        };
+
+        AABB worldBound() const {
+            return accel->worldBound();
         };
 
         float surfaceArea() const {

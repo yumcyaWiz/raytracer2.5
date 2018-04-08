@@ -5,7 +5,6 @@
 #include <string>
 #include <algorithm>
 #include "aabb.h"
-#include "primitive.h"
 template <typename T>
 class Accel {
     public:
@@ -13,8 +12,10 @@ class Accel {
 
         Accel() {};
         Accel(const std::vector<std::shared_ptr<T>> &_prims) : prims(_prims) {};
-        virtual bool intersect(const Ray& ray, Hit& res) const = 0;
         virtual ~Accel() {};
+
+        virtual bool intersect(const Ray& ray, Hit& res) const = 0;
+        virtual AABB worldBound() const = 0;
 };
 
 

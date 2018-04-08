@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "primitive.h"
+#include "accel.h"
 #include "light.h"
 #include "sky.h"
 class Scene {

@@ -1,7 +1,6 @@
 #ifndef PRIMITIVE_H
 #define PRIMITIVE_H
 #include <memory>
-#include "shape.h"
 #include "aabb.h"
 #include "material.h"
 
