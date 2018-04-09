@@ -166,9 +166,7 @@ class WireframeRenderer : public Integrator {
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
-                        RGB col;
-                        if(res.uv.x < 0.01 || res.uv.y > 0.99 || res.uv.y < 0.01 || res.uv.y > 0.99)
-                            col = RGB(1.0f);
+                        RGB col(res.uv.x, res.uv.y, 0.0f);
                         film->setPixel(i, j, w*col);
                     }
                     else {

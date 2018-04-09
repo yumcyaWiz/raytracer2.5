@@ -1,8 +1,8 @@
 [renderer]
 samples = 100
 depth-limit = 100
-integrator = "wireframe"
-show = false
+integrator = "pt-explicit"
+show = true
 
 [sampler]
 type = "minstd"
