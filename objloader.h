@@ -19,6 +19,53 @@
 #include "primitive.h"
 
 
+void loadPolygon(const std::vector<std::shared_ptr<Triangle>>& triangles, const std::shared_ptr<Material> _mat, bool mtl, const tinyobj::material_t material, std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::shared_ptr<Light>>& lights, bool map_insert, const std::string& name, std::map<std::string, std::shared_ptr<Primitive>>& prim_map, std::map<std::string, std::shared_ptr<Shape>>& shape_map) {
+    std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
+    std::shared_ptr<Material> mat;
+    std::shared_ptr<Light> light;
+    if(mtl) {
+        int illum = material.illum;
+
+        //light
+        Vec3 ke(material.emission[0], material.emission[1], material.emission[2]);
+        if(nonzero(ke)) {
+            light = std::shared_ptr<Light>(new AreaLight(shape, ke));
+            lights.push_back(light);
+        }
+
+        //diffuse
+        Vec3 kd(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
+        if(illum == 2) {
+            mat = std::shared_ptr<Material>(new Lambert(kd));
+        }
+        //mirror
+        else if(illum == 5) {
+            Vec3 Ks(material.specular[0], material.specular[1], material.specular[2]);
+            mat = std::shared_ptr<Material>(new Mirror(Ks[0]));
+        }
+        //glass
+        else if(illum == 7) {
+            mat = std::shared_ptr<Material>(new Glass(1.5f));
+        }
+        else {
+            if(!nonzero(kd)) kd = Vec3(0.9);
+            mat = std::shared_ptr<Material>(new Lambert(kd));
+        }
+    }
+    else {
+        mat = _mat;
+    }
+
+    std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, light, shape));
+    prims.push_back(prim);
+
+    if(map_insert) {
+        shape_map.insert(std::make_pair(name, shape));
+        prim_map.insert(std::make_pair(name, prim));
+    }
+}
+
+
 //objファイルを読み込み、std:shared_ptr<Triangle>の配列を返す
 void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::shared_ptr<Light>>& lights, const std::string& filename, const Vec3& center, const Vec3& scale, std::shared_ptr<Material> _mat, const std::string& name, std::map<std::string, std::shared_ptr<Primitive>>& prim_map, std::map<std::string, std::shared_ptr<Shape>>& shape_map) {
     tinyobj::attrib_t attrib;
@@ -79,102 +126,22 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::sh
 
             //マテリアルの変更を検出
             if(f != 0 && shapes[s].mesh.material_ids[f] != prev_material_id) {
-                std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
-                std::shared_ptr<Material> mat;
-                std::shared_ptr<Light> light;
-                if(mtl) {
-                    auto material = materials[shapes[s].mesh.material_ids[f]];
-                    int illum = material.illum;
-
-                    //light
-                    Vec3 ke(material.emission[0], material.emission[1], material.emission[2]);
-                    if(nonzero(ke)) {
-                        light = std::shared_ptr<Light>(new AreaLight(shape, ke));
-                        lights.push_back(light);
-                    }
-
-                    //diffuse
-                    Vec3 kd(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
-                    if(illum == 2) {
-                        mat = std::shared_ptr<Material>(new Lambert(kd));
-                    }
-                    //mirror
-                    else if(illum == 5) {
-                        Vec3 Ks(material.specular[0], material.specular[1], material.specular[2]);
-                        mat = std::shared_ptr<Material>(new Mirror(Ks[0]));
-                    }
-                    //glass
-                    else if(illum == 7) {
-                        mat = std::shared_ptr<Material>(new Glass(1.5f));
-                    }
-                    else {
-                        if(!nonzero(kd)) kd = Vec3(0.9);
-                        mat = std::shared_ptr<Material>(new Lambert(kd));
-                    }
-                }
-                else {
-                    mat = _mat;
-                }
-
-                std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, light, shape));
-                prims.push_back(prim);
-
-                if(shapes.size() == 1) {
-                    shape_map.insert(std::make_pair(name, shape));
-                    prim_map.insert(std::make_pair(name, prim));
-                }
-
+                auto material = materials[shapes[s].mesh.material_ids[f]];
+                loadPolygon(triangles, _mat, mtl, material, prims, lights, false, name, prim_map, shape_map);
                 triangles = std::vector<std::shared_ptr<Triangle>>();
             }
             prev_material_id = shapes[s].mesh.material_ids[f];
         }
 
-        std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
-        std::shared_ptr<Material> mat;
-        std::shared_ptr<Light> light;
+        tinyobj::material_t material;
         if(mtl) {
-            auto material = materials[shapes[s].mesh.material_ids[0]];
-            int illum = material.illum;
-
-            //light
-            Vec3 ke(material.emission[0], material.emission[1], material.emission[2]);
-            if(nonzero(ke)) {
-                light = std::shared_ptr<Light>(new AreaLight(shape, ke));
-                lights.push_back(light);
-            }
-
-            //diffuse
-            Vec3 kd(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
-            if(illum == 2) {
-                mat = std::shared_ptr<Material>(new Lambert(kd));
-            }
-            //mirror
-            else if(illum == 5) {
-                Vec3 Ks(material.specular[0], material.specular[1], material.specular[2]);
-                mat = std::shared_ptr<Material>(new Mirror(Ks[0]));
-            }
-            //glass
-            else if(illum == 7) {
-                mat = std::shared_ptr<Material>(new Glass(1.5f));
-            }
-            else {
-                if(!nonzero(kd)) kd = Vec3(0.9);
-                mat = std::shared_ptr<Material>(new Lambert(kd));
-            }
+            material = materials[shapes[s].mesh.material_ids[0]];
+            loadPolygon(triangles, _mat, mtl, material, prims, lights, shapes.size() == 1, name, prim_map, shape_map);
         }
         else {
-            mat = _mat;
-        }
-
-        std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, light, shape));
-        prims.push_back(prim);
-
-        if(shapes.size() == 1) {
-            shape_map.insert(std::make_pair(name, shape));
-            prim_map.insert(std::make_pair(name, prim));
+            loadPolygon(triangles, _mat, false, material, prims, lights, shapes.size() == 1, name, prim_map, shape_map);
         }
     }
-
     std::cout << "total vertex:" << vertex_count << std::endl;
     std::cout << "total face:" << face_count << std::endl;
 }

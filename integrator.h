@@ -42,7 +42,23 @@ class NormalRenderer : public Integrator {
             }
             film->ppm_output();
         };
-        void compute(const Scene& scene) const {};
+        void compute(const Scene& scene) const {
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float u = (2.0*i - film->width)/film->width;
+                    float v = -(2.0*j - film->height)/film->height;
+                    float w;
+                    Ray ray = cam->getRay(u, v, w, *sampler);
+                    Hit res;
+                    if(scene.intersect(ray, res)) {
+                        film->addSample(i, j, w*(res.hitNormal + 1.0f)/2.0f);
+                    }
+                    else {
+                        film->addSample(i, j, w*RGB(0.0f));
+                    }
+                }
+            }
+        };
 };
 
 

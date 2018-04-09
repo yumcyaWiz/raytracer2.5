@@ -1,7 +1,7 @@
 [renderer]
 samples = 100
 depth-limit = 100
-integrator = "pt-explicit"
+integrator = "normal"
 show = true
 
 [sampler]
@@ -12,7 +12,7 @@ resolution = [512, 512]
 
 [sky]
 type = "uniform"
-color = [0, 0, 0]
+color = [1, 1, 1]
 
 [camera]
 type = "ideal-pinhole"
@@ -22,8 +22,8 @@ focus-point = [0.0, 1.0, 0.0]
 f-number = 14.0
 [camera.transform]
 type = "look-at"
-origin = [0, 1, 3]
-target = [0, 1, 0]
+origin = [2, 2, 5]
+target = [-2, 2, 0]
 
 [[material]]
 name = "mat1"
@@ -33,7 +33,7 @@ albedo = [0.9, 0.9, 0.9]
 [[mesh]]
 name = "cbox"
 type = "obj"
-path = "CornellBox-Original.obj"
+path = "living_room.obj"
 
 
 [[object]]
