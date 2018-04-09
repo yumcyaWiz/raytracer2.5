@@ -279,6 +279,9 @@ int main(int argc, char** argv) {
     else if(integrator == "dot") {
         integ = new DotRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
     }
+    else if(integrator == "wireframe") {
+        integ = new WireframeRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
+    }
     else if(integrator == "pt-explicit") {
         integ = new PathTraceExplicit(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit);
     }

@@ -1,8 +1,8 @@
 [renderer]
 samples = 100
 depth-limit = 100
-integrator = "pt-explicit"
-show = true
+integrator = "wireframe"
+show = false
 
 [sampler]
 type = "minstd"
@@ -33,7 +33,7 @@ albedo = [0.9, 0.9, 0.9]
 [[mesh]]
 name = "cbox"
 type = "obj"
-path = "test.obj"
+path = "CornellBox-Original.obj"
 
 
 [[object]]

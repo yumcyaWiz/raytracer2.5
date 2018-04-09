@@ -153,6 +153,35 @@ class AORenderer : public Integrator {
 };
 
 
+class WireframeRenderer : public Integrator {
+    public:
+        WireframeRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+
+        void render(const Scene& scene) const {
+            for(int i = 0; i < film->width; i++) {
+                for(int j = 0; j < film->height; j++) {
+                    float u = (2.0*i - film->width)/film->width;
+                    float v = -(2.0*j - film->height)/film->height;
+                    float w;
+                    Ray ray = cam->getRay(u, v, w, *sampler);
+                    Hit res;
+                    if(scene.intersect(ray, res)) {
+                        RGB col;
+                        if(res.uv.x < 0.01 || res.uv.y > 0.99 || res.uv.y < 0.01 || res.uv.y > 0.99)
+                            col = RGB(1.0f);
+                        film->setPixel(i, j, w*col);
+                    }
+                    else {
+                        film->setPixel(i, j, w*RGB(0.0f));
+                    }
+                }
+            }
+            film->ppm_output();
+        };
+        void compute(const Scene& scene) const {};
+};
+
+
 class PathTraceDepthRenderer : public Integrator {
     public:
         int maxDepth;
