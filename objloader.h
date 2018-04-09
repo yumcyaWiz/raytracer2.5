@@ -42,6 +42,7 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::sh
         //三角形の配列
         std::vector<std::shared_ptr<Triangle>> triangles;
         size_t index_offset = 0;
+        int prev_material_id = 0;
         for(size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
             int fv = shapes[s].mesh.num_face_vertices[f];
             std::vector<Vec3> vertex;
@@ -75,6 +76,57 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::sh
 
             triangles.push_back(triangle);
             face_count++;
+
+            //マテリアルの変更を検出
+            if(f != 0 && shapes[s].mesh.material_ids[f] != prev_material_id) {
+                std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
+                std::shared_ptr<Material> mat;
+                std::shared_ptr<Light> light;
+                if(mtl) {
+                    auto material = materials[shapes[s].mesh.material_ids[f]];
+                    int illum = material.illum;
+
+                    //light
+                    Vec3 ke(material.emission[0], material.emission[1], material.emission[2]);
+                    if(nonzero(ke)) {
+                        light = std::shared_ptr<Light>(new AreaLight(shape, ke));
+                        lights.push_back(light);
+                    }
+
+                    //diffuse
+                    Vec3 kd(material.diffuse[0], material.diffuse[1], material.diffuse[2]);
+                    if(illum == 2) {
+                        mat = std::shared_ptr<Material>(new Lambert(kd));
+                    }
+                    //mirror
+                    else if(illum == 5) {
+                        Vec3 Ks(material.specular[0], material.specular[1], material.specular[2]);
+                        mat = std::shared_ptr<Material>(new Mirror(Ks[0]));
+                    }
+                    //glass
+                    else if(illum == 7) {
+                        mat = std::shared_ptr<Material>(new Glass(1.5f));
+                    }
+                    else {
+                        if(!nonzero(kd)) kd = Vec3(0.9);
+                        mat = std::shared_ptr<Material>(new Lambert(kd));
+                    }
+                }
+                else {
+                    mat = _mat;
+                }
+
+                std::shared_ptr<Primitive> prim = std::shared_ptr<Primitive>(new GeometricPrimitive(mat, light, shape));
+                prims.push_back(prim);
+
+                if(shapes.size() == 1) {
+                    shape_map.insert(std::make_pair(name, shape));
+                    prim_map.insert(std::make_pair(name, prim));
+                }
+
+                triangles = std::vector<std::shared_ptr<Triangle>>();
+            }
+            prev_material_id = shapes[s].mesh.material_ids[f];
         }
 
         std::shared_ptr<Shape> shape = std::shared_ptr<Shape>(new Polygon(triangles));
@@ -106,6 +158,7 @@ void loadObj(std::vector<std::shared_ptr<Primitive>>& prims, std::vector<std::sh
                 mat = std::shared_ptr<Material>(new Glass(1.5f));
             }
             else {
+                if(!nonzero(kd)) kd = Vec3(0.9);
                 mat = std::shared_ptr<Material>(new Lambert(kd));
             }
         }
