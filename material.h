@@ -11,8 +11,6 @@
 //wi, woは基本的にローカル座標系で記述されているものとする
 
 
-
-
 //Thetaは法線からの角度
 inline float cosTheta(const Vec3& w) {
     return w.y;

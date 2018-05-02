@@ -91,6 +91,9 @@ int main(int argc, char** argv) {
         auto fov = *camera->get_as<double>("fov");
         cam = new PinholeCamera(camPos, camForward, toRad(fov));
     }
+    else if(camera_type == "full-degree") {
+        cam = new FullDegreeCamera(camPos, camForward);
+    }
     else if(camera_type == "thin-lens") {
         auto lensDistance = *camera->get_as<double>("lens-distance");
         auto focusPoint = *camera->get_array_of<double>("focus-point");

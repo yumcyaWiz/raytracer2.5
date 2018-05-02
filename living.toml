@@ -1,7 +1,7 @@
 [renderer]
 samples = 100
 depth-limit = 100
-integrator = "normal"
+integrator = "pt"
 show = true
 
 [sampler]

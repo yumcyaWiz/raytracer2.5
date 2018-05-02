@@ -1,14 +1,14 @@
 [renderer]
-samples = 4000
+samples = 100
 depth-limit = 100
 integrator = "pt"
-show = true
+show = false
 
 [sampler]
 type = "mt"
 
 [film]
-resolution = [1920, 1080]
+resolution = [4000, 4000]
 
 [sky]
 type = "ibl"
@@ -17,7 +17,7 @@ theta-offset = 0
 phi-offset = 2.0
 
 [camera]
-type = "thin-lens"
+type = "full-degree"
 fov = 40.0
 lens-distance = 1.5
 focus-point = [0.0, 1.6329, 1.1547]

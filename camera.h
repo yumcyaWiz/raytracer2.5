@@ -38,6 +38,24 @@ class PinholeCamera : public Camera {
 };
 
 
+class FullDegreeCamera : public Camera {
+    public:
+        FullDegreeCamera(const Vec3& _camPos, const Vec3& _camForward) : Camera(_camPos, _camForward) {
+        };
+
+        Ray getRay(float u, float v, float &w, Sampler& sampler) const {
+            float phi = M_PI * u;
+            float theta = M_PI/2 * (-v + 1.0f);
+            float x = std::sin(theta)*std::cos(phi);
+            float y = std::cos(theta);
+            float z = std::sin(theta)*std::sin(phi);
+            Vec3 rayDir = normalize(x*camRight + y*camUp + z*camForward);
+            w = 1.0f;
+            return Ray(camPos, rayDir);
+        };
+};
+
+
 class ThinLensCamera : public Camera {
     public:
         //センサー面からレンズ面までの距離

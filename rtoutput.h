@@ -1,6 +1,7 @@
 #ifndef RTOUTPUT_H
 #define RTOUTPUT_H
 #include <GL/glut.h>
+#include <omp.h>
 #include "integrator.h"
 
 

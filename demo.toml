@@ -8,7 +8,7 @@ show = true
 type = "mt"
 
 [film]
-resolution = [1920, 1080]
+resolution = [1024, 768]
 
 [sky]
 type = "uniform"
@@ -43,7 +43,7 @@ name = "mat3"
 type = "phong"
 kd = 0.9
 albedo = [1.0, 1.0, 1.0]
-alpha = 500.0 
+alpha = 32.0
 
 [[material]]
 name = "mat4"
@@ -102,7 +102,7 @@ vector = [0, 0, 0]
 [[object]]
 name = "dragon"
 mesh = "dragon"
-material = "mat1"
+material = "mat3"
 [[object.transform]]
 type = "translate"
 vector = [0.0, 0.0, 0.0]
