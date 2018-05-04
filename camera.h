@@ -56,6 +56,34 @@ class FullDegreeCamera : public Camera {
 };
 
 
+class ODSCamera : public Camera {
+    public:
+        float IPD;
+
+        ODSCamera(const Vec3& _camPos, const Vec3& _camForward, float _IPD) : Camera(_camPos, _camForward), IPD(_IPD)  {};
+
+        Ray getRay(float u, float v, float &w, Sampler& sampler) const {
+            float phi = M_PI * u;
+            float theta = M_PI/2 * (-v + 1.0f);
+            float x = std::sin(theta)*std::cos(phi);
+            float y = std::cos(theta);
+            float z = std::sin(theta)*std::sin(phi);
+            Vec3 rayDir = normalize(x*camRight + y*camUp + z*camForward);
+
+            bool isLeft = false;
+            Vec3 dp = Vec3(std::cos(phi), 0, std::sin(phi));
+            Vec3 rayOrigin;
+            if(isLeft) {
+                rayOrigin = camPos - IPD/2*dp;
+            }
+            else {
+                rayOrigin = camPos + IPD/2*dp;
+            }
+            return Ray(rayOrigin, rayDir);
+        };
+};
+
+
 class ThinLensCamera : public Camera {
     public:
         //センサー面からレンズ面までの距離

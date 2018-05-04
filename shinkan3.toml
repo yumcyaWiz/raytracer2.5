@@ -24,7 +24,7 @@ focus-point = [0.0, 1.6329, 1.1547]
 f-number = 8.0
 [camera.transform]
 type = "look-at"
-origin = [3.0, 4.0, -4.5]
+origin = [3.05, 4.0, -4.5]
 target = [0.0, 1.6329, 1.1547]
 [[material]]
 name = "mat1"

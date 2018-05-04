@@ -100,6 +100,10 @@ int main(int argc, char** argv) {
         auto fnumber = *camera->get_as<double>("f-number");
         cam = new ThinLensCamera(camPos, camForward, lensDistance, Vec3(focusPoint[0], focusPoint[1], focusPoint[2]), fnumber);
     }
+    else if(camera_type == "ods") {
+        auto IPD = *camera->get_as<double>("ipd");
+        cam = new ODSCamera(camPos, camForward, IPD);
+    }
     else {
         std::cerr << "invalid camera type" << std::endl;
         std::exit(1);
