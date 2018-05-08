@@ -13,6 +13,7 @@ class Camera {
         Vec3 camRight;
         Vec3 camUp;
         std::shared_ptr<Film> film;
+        bool two_eyes = false;
 
         Camera(const Vec3& _camPos, const Vec3& _camForward, std::shared_ptr<Film> _film) : camPos(_camPos) {
             camForward = normalize(_camForward);
@@ -63,9 +64,11 @@ class ODSCamera : public Camera {
     public:
         float IPD;
 
-        ODSCamera(const Vec3& _camPos, const Vec3& _camForward, std::shared_ptr<Film> _film, float _IPD) : Camera(_camPos, _camForward, _film), IPD(_IPD)  {};
+        ODSCamera(const Vec3& _camPos, const Vec3& _camForward, std::shared_ptr<Film> _film, float _IPD) : Camera(_camPos, _camForward, _film), IPD(_IPD)  {
+            two_eyes = true;
+        }
 
-        Ray getRay(float u, float v, float &w, Sampler& sampler, bool isLeft) const {
+        Ray getRay(float u, float v, float &w, Sampler& sampler, bool isLeft = true) const {
             float phi = M_PI * u;
             float theta = M_PI/2 * (-v + 1.0f);
             float x = std::sin(theta)*std::cos(phi);
@@ -81,6 +84,7 @@ class ODSCamera : public Camera {
             else {
                 rayOrigin = camPos + IPD/2*dp;
             }
+            w = 1.0f;
             return Ray(rayOrigin, rayDir);
         };
 };

@@ -18,7 +18,8 @@ theta-offset = 0
 phi-offset = 3.14
 
 [camera]
-type = "full-degree"
+type = "ods"
+ipd = 0.1
 fov = 60.0
 lens-distance = 1.2
 focus-point = [0.0, 1.0, 0.0]
