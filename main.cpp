@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     if(!film_toml) { std::cerr << "[film] missing" << std::endl; std::exit(1); }
     auto resolution = *film_toml->get_array_of<int64_t>("resolution");
     Filter* filter = new GaussianFilter(Vec2(1), 1.0f);
-    Film* film = new Film(resolution[0], resolution[1], std::unique_ptr<Filter>(filter), "output.ppm");
+    std::shared_ptr<Film> film = std::make_shared<Film>(resolution[0], resolution[1], std::unique_ptr<Filter>(filter), "output.ppm");
     std::cout << "film loaded" << std::endl;
 
 
@@ -86,23 +86,23 @@ int main(int argc, char** argv) {
     Vec3 camPos(camera_transform_origin[0], camera_transform_origin[1], camera_transform_origin[2]);
     Vec3 camTarget(camera_transform_target[0], camera_transform_target[1], camera_transform_target[2]);
     Vec3 camForward = normalize(camTarget - camPos);
-    Camera* cam;
+    std::shared_ptr<Camera> cam;
     if(camera_type == "ideal-pinhole") {
         auto fov = *camera->get_as<double>("fov");
-        cam = new PinholeCamera(camPos, camForward, toRad(fov));
+        cam = std::make_shared<PinholeCamera>(camPos, camForward, film, toRad(fov));
     }
     else if(camera_type == "full-degree") {
-        cam = new FullDegreeCamera(camPos, camForward);
+        cam = std::make_shared<FullDegreeCamera>(camPos, camForward, film); 
     }
     else if(camera_type == "thin-lens") {
         auto lensDistance = *camera->get_as<double>("lens-distance");
         auto focusPoint = *camera->get_array_of<double>("focus-point");
         auto fnumber = *camera->get_as<double>("f-number");
-        cam = new ThinLensCamera(camPos, camForward, lensDistance, Vec3(focusPoint[0], focusPoint[1], focusPoint[2]), fnumber);
+        cam = std::make_shared<ThinLensCamera>(camPos, camForward, film, lensDistance, Vec3(focusPoint[0], focusPoint[1], focusPoint[2]), fnumber);
     }
     else if(camera_type == "ods") {
         auto IPD = *camera->get_as<double>("ipd");
-        cam = new ODSCamera(camPos, camForward, IPD);
+        cam = std::make_shared<ODSCamera>(camPos, camForward, film, IPD);
     }
     else {
         std::cerr << "invalid camera type" << std::endl;
@@ -278,22 +278,22 @@ int main(int argc, char** argv) {
 
     Integrator* integ;
     if(integrator == "pt") {
-        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit);
+        integ = new PathTrace(cam, sampler, samples, depth_limit);
     }
     else if(integrator == "normal") {
-        integ = new NormalRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
+        integ = new NormalRenderer(cam, sampler);
     }
     else if(integrator == "dot") {
-        integ = new DotRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
+        integ = new DotRenderer(cam, sampler);
     }
     else if(integrator == "wireframe") {
-        integ = new WireframeRenderer(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler);
+        integ = new WireframeRenderer(cam, sampler);
     }
     else if(integrator == "pt-explicit") {
-        integ = new PathTraceExplicit(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, samples, depth_limit);
+        integ = new PathTraceExplicit(cam, sampler, samples, depth_limit);
     }
     else {
-        integ = new PathTrace(std::shared_ptr<Camera>(cam), std::shared_ptr<Film>(film), sampler, 10, 100);
+        integ = new PathTrace(cam, sampler, 10, 100);
     }
 
 

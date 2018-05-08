@@ -5,20 +5,23 @@
 #include "vec3.h"
 #include "ray.h"
 #include "sampler.h"
+#include "film.h"
 class Camera {
     public:
         Vec3 camPos;
         Vec3 camForward;
         Vec3 camRight;
         Vec3 camUp;
+        std::shared_ptr<Film> film;
 
-        Camera(const Vec3& _camPos, const Vec3& _camForward) : camPos(_camPos) {
+        Camera(const Vec3& _camPos, const Vec3& _camForward, std::shared_ptr<Film> _film) : camPos(_camPos) {
             camForward = normalize(_camForward);
             camRight = normalize(cross(camForward, Vec3(0, 1, 0)));
             camUp = normalize(cross(camRight, camForward));
+            film = _film;
         };
 
-        virtual Ray getRay(float u, float v, float &w, Sampler& sampler) const = 0;
+        virtual Ray getRay(float u, float v, float &w, Sampler& sampler, bool isLeft = true) const = 0;
 };
 
 
@@ -26,11 +29,11 @@ class PinholeCamera : public Camera {
     public:
         float focus;
 
-        PinholeCamera(const Vec3& _camPos, const Vec3& _camForward, float fov) : Camera(_camPos, _camForward) {
+        PinholeCamera(const Vec3& _camPos, const Vec3& _camForward, std::shared_ptr<Film> _film, float fov) : Camera(_camPos, _camForward, _film) {
             focus = 1.0f/std::tan(fov/2.0f);
         };
 
-        Ray getRay(float u, float v, float &w, Sampler& sampler) const {
+        Ray getRay(float u, float v, float &w, Sampler& sampler, bool isLeft = true) const {
             Vec3 rayDir = normalize(focus*camForward + u*camRight + v*camUp);
             w = std::pow(dot(camForward, rayDir), 4.0f);
             return Ray(camPos, rayDir);
@@ -40,10 +43,10 @@ class PinholeCamera : public Camera {
 
 class FullDegreeCamera : public Camera {
     public:
-        FullDegreeCamera(const Vec3& _camPos, const Vec3& _camForward) : Camera(_camPos, _camForward) {
+        FullDegreeCamera(const Vec3& _camPos, const Vec3& _camForward, std::shared_ptr<Film> _film) : Camera(_camPos, _camForward, _film) {
         };
 
-        Ray getRay(float u, float v, float &w, Sampler& sampler) const {
+        Ray getRay(float u, float v, float &w, Sampler& sampler, bool isLeft = true) const {
             float phi = M_PI * u;
             float theta = M_PI/2 * (-v + 1.0f);
             float x = std::sin(theta)*std::cos(phi);
@@ -60,9 +63,9 @@ class ODSCamera : public Camera {
     public:
         float IPD;
 
-        ODSCamera(const Vec3& _camPos, const Vec3& _camForward, float _IPD) : Camera(_camPos, _camForward), IPD(_IPD)  {};
+        ODSCamera(const Vec3& _camPos, const Vec3& _camForward, std::shared_ptr<Film> _film, float _IPD) : Camera(_camPos, _camForward, _film), IPD(_IPD)  {};
 
-        Ray getRay(float u, float v, float &w, Sampler& sampler) const {
+        Ray getRay(float u, float v, float &w, Sampler& sampler, bool isLeft) const {
             float phi = M_PI * u;
             float theta = M_PI/2 * (-v + 1.0f);
             float x = std::sin(theta)*std::cos(phi);
@@ -70,7 +73,6 @@ class ODSCamera : public Camera {
             float z = std::sin(theta)*std::sin(phi);
             Vec3 rayDir = normalize(x*camRight + y*camUp + z*camForward);
 
-            bool isLeft = false;
             Vec3 dp = Vec3(std::cos(phi), 0, std::sin(phi));
             Vec3 rayOrigin;
             if(isLeft) {
@@ -101,7 +103,7 @@ class ThinLensCamera : public Camera {
         //レンズ中心位置
         Vec3 lensCenterPos;
 
-        ThinLensCamera(const Vec3& _camPos, const Vec3& _camForward, float _lensDistance, const Vec3& _focusPoint, float _Fnumber) : Camera(_camPos, _camForward), lensDistance(_lensDistance), focusPoint(_focusPoint), Fnumber(_Fnumber) {
+        ThinLensCamera(const Vec3& _camPos, const Vec3& _camForward, std::shared_ptr<Film> _film, float _lensDistance, const Vec3& _focusPoint, float _Fnumber) : Camera(_camPos, _camForward, _film), lensDistance(_lensDistance), focusPoint(_focusPoint), Fnumber(_Fnumber) {
             objectDistance = (focusPoint - camPos).length() - lensDistance;
             focalLength = 1.0f/(1.0f/lensDistance + 1.0f/objectDistance);
             std::cout << "lensDistance:" << lensDistance << std::endl;
@@ -113,7 +115,7 @@ class ThinLensCamera : public Camera {
             std::cout << "lensCenterPos:" << lensCenterPos << std::endl;
         };
 
-        Ray getRay(float u, float v, float &w, Sampler& sampler) const {
+        Ray getRay(float u, float v, float &w, Sampler& sampler, bool isLeft = true) const {
             //像が逆になるので修正する
             u = -u;
             v = -v;

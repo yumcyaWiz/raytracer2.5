@@ -18,11 +18,11 @@ void idle(void) {
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_POINTS);
-    int width = integ_rtoutput->film->width;
-    int height = integ_rtoutput->film->height;
+    int width = integ_rtoutput->cam->film->width;
+    int height = integ_rtoutput->cam->film->height;
     for(int i = 0; i < width; i++) {
         for(int j = 0; j < height; j++) {
-            RGB c = integ_rtoutput->film->getPixel(i, j)/n_rtoutput;
+            RGB c = integ_rtoutput->cam->film->getPixel(i, j)/n_rtoutput;
             c.x = std::pow(c.x, 1.0f/2.2f);
             c.y = std::pow(c.y, 1.0f/2.2f);
             c.z = std::pow(c.z, 1.0f/2.2f);
@@ -49,7 +49,7 @@ void init(void) {
 void drawgl(int argc, char** argv, Integrator* integ, const Scene& scene) {
     integ_rtoutput = integ;
     scene_rtoutput = scene;
-    glutInitWindowSize(integ->film->width, integ->film->height);
+    glutInitWindowSize(integ->cam->film->width, integ->cam->film->height);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA);
     glutCreateWindow(argv[0]);

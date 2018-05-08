@@ -10,10 +10,9 @@
 class Integrator {
     public:
         std::shared_ptr<Camera> cam;
-        std::shared_ptr<Film> film;
         std::shared_ptr<Sampler> sampler;
 
-        Integrator(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : cam(_cam), film(_film), sampler(_sampler) {};
+        Integrator(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : cam(_cam), sampler(_sampler) {};
 
         virtual void render(const Scene& scene) const = 0;
         virtual void compute(const Scene& scene) const = 0;
@@ -22,39 +21,39 @@ class Integrator {
 
 class NormalRenderer : public Integrator {
     public:
-        NormalRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+        NormalRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _sampler) {};
 
         void render(const Scene& scene) const {
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
-                    float u = (2.0*i - film->width)/film->width;
-                    float v = -(2.0*j - film->height)/film->height;
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
+                    float u = (2.0*i - cam->film->width)/cam->film->width;
+                    float v = -(2.0*j - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
-                        film->setPixel(i, j, w*(res.hitNormal + 1.0f)/2.0f);
+                        cam->film->setPixel(i, j, w*(res.hitNormal + 1.0f)/2.0f);
                     }
                     else {
-                        film->setPixel(i, j, w*RGB(0.0f));
+                        cam->film->setPixel(i, j, w*RGB(0.0f));
                     }
                 }
             }
-            film->ppm_output();
+            cam->film->ppm_output();
         };
         void compute(const Scene& scene) const {
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
-                    float u = (2.0*i - film->width)/film->width;
-                    float v = -(2.0*j - film->height)/film->height;
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
+                    float u = (2.0*i - cam->film->width)/cam->film->width;
+                    float v = -(2.0*j - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
-                        film->addSample(i, j, w*(res.hitNormal + 1.0f)/2.0f);
+                        cam->film->addSample(i, j, w*(res.hitNormal + 1.0f)/2.0f);
                     }
                     else {
-                        film->addSample(i, j, w*RGB(0.0f));
+                        cam->film->addSample(i, j, w*RGB(0.0f));
                     }
                 }
             }
@@ -64,27 +63,27 @@ class NormalRenderer : public Integrator {
 
 class DotRenderer : public Integrator {
     public:
-        DotRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+        DotRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _sampler) {};
 
         void render(const Scene& scene) const {
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
-                    float u = (2.0*i - film->width)/film->width;
-                    float v = -(2.0*j - film->height)/film->height;
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
+                    float u = (2.0*i - cam->film->width)/cam->film->width;
+                    float v = -(2.0*j - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
                         float d = dot(-ray.direction, res.hitNormal);
                         std::cout << d << std::endl;
-                        film->setPixel(i, j, w*(std::max(dot(-ray.direction, res.hitNormal), 0.0f)));
+                        cam->film->setPixel(i, j, w*(std::max(dot(-ray.direction, res.hitNormal), 0.0f)));
                     }
                     else {
-                        film->setPixel(i, j, w*RGB(0.0f));
+                        cam->film->setPixel(i, j, w*RGB(0.0f));
                     }
                 }
             }
-            film->ppm_output();
+            cam->film->ppm_output();
         };
         void compute(const Scene& scene) const {};
 };
@@ -92,13 +91,13 @@ class DotRenderer : public Integrator {
 
 class BRDFRenderer : public Integrator {
     public:
-        BRDFRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+        BRDFRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _sampler) {};
 
         void render(const Scene& scene) const {
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
-                    float u = (2.0*i - film->width)/film->width;
-                    float v = -(2.0*j - film->height)/film->height;
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
+                    float u = (2.0*i - cam->film->width)/cam->film->width;
+                    float v = -(2.0*j - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
@@ -113,14 +112,14 @@ class BRDFRenderer : public Integrator {
                         float brdf_pdf;
                         RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
                         Vec3 wi = localToWorld(wi_local, n, s, t);
-                        film->setPixel(i, j, w*(wi + 1.0f)/2.0f);
+                        cam->film->setPixel(i, j, w*(wi + 1.0f)/2.0f);
                     }
                     else {
-                        film->setPixel(i, j, w*RGB(0.0f));
+                        cam->film->setPixel(i, j, w*RGB(0.0f));
                     }
                 }
             }
-            film->ppm_output();
+            cam->film->ppm_output();
         };
         void compute(const Scene& scene) {};
 };
@@ -128,13 +127,13 @@ class BRDFRenderer : public Integrator {
 
 class AORenderer : public Integrator {
     public:
-        AORenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+        AORenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _sampler) {};
 
         void render(const Scene& scene) const {
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
-                    float u = (2.0*i - film->width)/film->width;
-                    float v = -(2.0*j - film->height)/film->height;
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
+                    float u = (2.0*i - cam->film->width)/cam->film->width;
+                    float v = -(2.0*j - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
@@ -156,14 +155,14 @@ class AORenderer : public Integrator {
                             if(scene.intersect(nextRay, res2))
                                 hit_count++;
                         }
-                        film->setPixel(i, j, hit_count/100.0f*RGB(1.0f));
+                        cam->film->setPixel(i, j, hit_count/100.0f*RGB(1.0f));
                     }
                     else {
-                        film->setPixel(i, j, w*RGB(0.0f));
+                        cam->film->setPixel(i, j, w*RGB(0.0f));
                     }
                 }
             }
-            film->ppm_output();
+            cam->film->ppm_output();
         };
         void compute(const Scene& scene) const {};
 };
@@ -171,26 +170,26 @@ class AORenderer : public Integrator {
 
 class WireframeRenderer : public Integrator {
     public:
-        WireframeRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _film, _sampler) {};
+        WireframeRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _sampler) {};
 
         void render(const Scene& scene) const {
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
-                    float u = (2.0*i - film->width)/film->width;
-                    float v = -(2.0*j - film->height)/film->height;
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
+                    float u = (2.0*i - cam->film->width)/cam->film->width;
+                    float v = -(2.0*j - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
                         RGB col(res.uv.x, res.uv.y, 0.0f);
-                        film->setPixel(i, j, w*col);
+                        cam->film->setPixel(i, j, w*col);
                     }
                     else {
-                        film->setPixel(i, j, w*RGB(0.0f));
+                        cam->film->setPixel(i, j, w*RGB(0.0f));
                     }
                 }
             }
-            film->ppm_output();
+            cam->film->ppm_output();
         };
         void compute(const Scene& scene) const {};
 };
@@ -200,7 +199,7 @@ class PathTraceDepthRenderer : public Integrator {
     public:
         int maxDepth;
 
-        PathTraceDepthRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _maxDepth) : Integrator(_cam, _film, _sampler), maxDepth(_maxDepth) {};
+        PathTraceDepthRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler, int _maxDepth) : Integrator(_cam, _sampler), maxDepth(_maxDepth) {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             if(depth > maxDepth)
@@ -231,17 +230,17 @@ class PathTraceDepthRenderer : public Integrator {
         };
 
         void render(const Scene& scene) const {
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
-                    float u = (2.0*i - film->width)/film->width;
-                    float v = -(2.0*j - film->height)/film->height;
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
+                    float u = (2.0*i - cam->film->width)/cam->film->width;
+                    float v = -(2.0*j - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     RGB col = Li(ray, scene);
-                    film->setPixel(i, j, w*col);
+                    cam->film->setPixel(i, j, w*col);
                 }
             }
-            film->ppm_output();
+            cam->film->ppm_output();
         };
         void compute(const Scene& scene) const {};
 };
@@ -252,7 +251,7 @@ class PathTrace : public Integrator {
         int pixelSamples;
         int maxDepth;
 
-        PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
+        PathTrace(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
 
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
@@ -333,41 +332,41 @@ class PathTrace : public Integrator {
             timer.start();
             for(int k = 0; k < pixelSamples; k++) {
                 #pragma omp parallel for schedule(dynamic, 1)
-                for(int i = 0; i < film->width; i++) {
-                    for(int j = 0; j < film->height; j++) {
+                for(int i = 0; i < cam->film->width; i++) {
+                    for(int j = 0; j < cam->film->height; j++) {
                         float rx = sampler->getNext();
                         float ry = sampler->getNext();
                         float px = i + rx;
                         float py = j + ry;
-                        float u = (2.0*(i + rx) - film->width)/film->height;
-                        float v = -(2.0*(j + ry) - film->height)/film->height;
+                        float u = (2.0*(i + rx) - cam->film->width)/cam->film->height;
+                        float v = -(2.0*(j + ry) - cam->film->height)/cam->film->height;
                         float w;
                         Ray ray = cam->getRay(u, v, w, *sampler);
                         RGB col = Li(ray, scene);
-                        film->addSample(i, j, w*col);
+                        cam->film->addSample(i, j, w*col);
                     }
                 }
                 std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
             }
             timer.stop("Rendering Finished");
-            film->divide(pixelSamples);
-            film->gamma_correction();
-            film->ppm_output();
+            cam->film->divide(pixelSamples);
+            cam->film->gamma_correction();
+            cam->film->ppm_output();
         };
         void compute(const Scene& scene) const {
             #pragma omp parallel for schedule(dynamic, 1)
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
                     float rx = sampler->getNext();
                     float ry = sampler->getNext();
                     float px = i + rx;
                     float py = j + ry;
-                    float u = (2.0*(i + rx) - film->width)/film->height;
-                    float v = -(2.0*(j + ry) - film->height)/film->height;
+                    float u = (2.0*(i + rx) - cam->film->width)/cam->film->height;
+                    float v = -(2.0*(j + ry) - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     RGB col = Li(ray, scene);
-                    film->addSample(i, j, w*col);
+                    cam->film->addSample(i, j, w*col);
                 }
             }
         };
@@ -379,7 +378,7 @@ class PathTraceExplicit : public Integrator {
         int pixelSamples;
         int maxDepth;
 
-        PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Film> _film, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _film, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
+        PathTraceExplicit(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler, int _pixelSamples, int _maxDepth) : Integrator(_cam, _sampler), pixelSamples(_pixelSamples), maxDepth(_maxDepth) {};
 
         RGB Li(const Ray& ray, const Scene& scene, Vec3& hit_le, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
@@ -510,54 +509,54 @@ class PathTraceExplicit : public Integrator {
             timer.start();
             for(int k = 0; k < pixelSamples; k++) {
                 #pragma omp parallel for schedule(dynamic, 1)
-                for(int i = 0; i < film->width; i++) {
-                    for(int j = 0; j < film->height; j++) {
+                for(int i = 0; i < cam->film->width; i++) {
+                    for(int j = 0; j < cam->film->height; j++) {
                         float rx = sampler->getNext();
                         float ry = sampler->getNext();
                         float px = i + rx;
                         float py = j + ry;
-                        float u = (2.0*(i + rx) - film->width)/film->height;
-                        float v = -(2.0*(j + ry) - film->height)/film->height;
+                        float u = (2.0*(i + rx) - cam->film->width)/cam->film->height;
+                        float v = -(2.0*(j + ry) - cam->film->height)/cam->film->height;
                         float w;
                         Ray ray = cam->getRay(u, v, w, *sampler);
                         Vec3 hit_le;
                         RGB col = Li(ray, scene, hit_le);
                         if(!nonzero(hit_le)) {
-                            film->addSample(i, j, w*col);
+                            cam->film->addSample(i, j, w*col);
                         }
                         else {
-                            film->addSample(i, j, w*hit_le);
+                            cam->film->addSample(i, j, w*hit_le);
                         };
                     }
                 }
                 std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
             }
             timer.stop("Rendering Finished");
-            film->divide(pixelSamples);
-            film->gamma_correction();
-            film->ppm_output();
+            cam->film->divide(pixelSamples);
+            cam->film->gamma_correction();
+            cam->film->ppm_output();
         };
 
 
         void compute(const Scene& scene) const {
             #pragma omp parallel for schedule(dynamic, 1)
-            for(int i = 0; i < film->width; i++) {
-                for(int j = 0; j < film->height; j++) {
+            for(int i = 0; i < cam->film->width; i++) {
+                for(int j = 0; j < cam->film->height; j++) {
                     float rx = sampler->getNext();
                     float ry = sampler->getNext();
                     float px = i + rx;
                     float py = j + ry;
-                    float u = (2.0*(i + rx) - film->width)/film->height;
-                    float v = -(2.0*(j + ry) - film->height)/film->height;
+                    float u = (2.0*(i + rx) - cam->film->width)/cam->film->height;
+                    float v = -(2.0*(j + ry) - cam->film->height)/cam->film->height;
                     float w;
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Vec3 hit_le;
                     RGB col = Li(ray, scene, hit_le);
                     if(!nonzero(hit_le)) {
-                        film->addSample(i, j, w*col);
+                        cam->film->addSample(i, j, w*col);
                     }
                     else {
-                        film->addSample(i, j, w*hit_le);
+                        cam->film->addSample(i, j, w*hit_le);
                     }
                 }
             }
