@@ -534,7 +534,42 @@ class PathTraceExplicit : public Integrator {
             timer.stop("Rendering Finished");
             cam->film->divide(pixelSamples);
             cam->film->gamma_correction();
-            cam->film->ppm_output("output.ppm");
+            if(!cam->two_eyes)
+                cam->film->ppm_output("output.ppm");
+            else
+                cam->film->ppm_output("left.ppm");
+
+            if(cam->two_eyes) {
+                timer.start();
+                for(int k = 0; k < pixelSamples; k++) {
+                    #pragma omp parallel for schedule(dynamic, 1)
+                    for(int i = 0; i < cam->film->width; i++) {
+                        for(int j = 0; j < cam->film->height; j++) {
+                            float rx = sampler->getNext();
+                            float ry = sampler->getNext();
+                            float px = i + rx;
+                            float py = j + ry;
+                            float u = (2.0*(i + rx) - cam->film->width)/cam->film->height;
+                            float v = -(2.0*(j + ry) - cam->film->height)/cam->film->height;
+                            float w;
+                            Ray ray = cam->getRay(u, v, w, *sampler, false);
+                            Vec3 hit_le;
+                            RGB col = Li(ray, scene, hit_le);
+                            if(!nonzero(hit_le)) {
+                                cam->film->addSample(i, j, w*col);
+                            }
+                            else {
+                                cam->film->addSample(i, j, w*hit_le);
+                            };
+                        }
+                    }
+                    std::cout << progressbar(k, pixelSamples) << " " << percentage(k, pixelSamples) << '\r' << std::flush;
+                }
+                timer.stop("Rendering Finished");
+                cam->film->divide(pixelSamples);
+                cam->film->gamma_correction();
+                cam->film->ppm_output("right.ppm");
+            }
         };
 
 
