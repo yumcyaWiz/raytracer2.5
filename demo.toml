@@ -1,8 +1,8 @@
 [renderer]
-samples = 1000
+samples = 10
 depth-limit = 100
 integrator = "pt-explicit"
-show = true
+show = false
 
 [sampler]
 type = "mt"

@@ -39,7 +39,7 @@ class NormalRenderer : public Integrator {
                     }
                 }
             }
-            cam->film->ppm_output();
+            cam->film->ppm_output("output.ppm");
         };
         void compute(const Scene& scene) const {
             for(int i = 0; i < cam->film->width; i++) {
@@ -83,7 +83,7 @@ class DotRenderer : public Integrator {
                     }
                 }
             }
-            cam->film->ppm_output();
+            cam->film->ppm_output("output.ppm");
         };
         void compute(const Scene& scene) const {};
 };
@@ -119,7 +119,7 @@ class BRDFRenderer : public Integrator {
                     }
                 }
             }
-            cam->film->ppm_output();
+            cam->film->ppm_output("output.ppm");
         };
         void compute(const Scene& scene) {};
 };
@@ -162,7 +162,7 @@ class AORenderer : public Integrator {
                     }
                 }
             }
-            cam->film->ppm_output();
+            cam->film->ppm_output("output.ppm");
         };
         void compute(const Scene& scene) const {};
 };
@@ -189,7 +189,7 @@ class WireframeRenderer : public Integrator {
                     }
                 }
             }
-            cam->film->ppm_output();
+            cam->film->ppm_output("output.ppm");
         };
         void compute(const Scene& scene) const {};
 };
@@ -240,7 +240,7 @@ class PathTraceDepthRenderer : public Integrator {
                     cam->film->setPixel(i, j, w*col);
                 }
             }
-            cam->film->ppm_output();
+            cam->film->ppm_output("output.ppm");
         };
         void compute(const Scene& scene) const {};
 };
@@ -351,7 +351,7 @@ class PathTrace : public Integrator {
             timer.stop("Rendering Finished");
             cam->film->divide(pixelSamples);
             cam->film->gamma_correction();
-            cam->film->ppm_output();
+            cam->film->ppm_output("output.ppm");
         };
         void compute(const Scene& scene) const {
             #pragma omp parallel for schedule(dynamic, 1)
@@ -534,7 +534,7 @@ class PathTraceExplicit : public Integrator {
             timer.stop("Rendering Finished");
             cam->film->divide(pixelSamples);
             cam->film->gamma_correction();
-            cam->film->ppm_output();
+            cam->film->ppm_output("output.ppm");
         };
 
 

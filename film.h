@@ -22,10 +22,9 @@ class Film {
         int height;
         Pixel* pixels;
         std::unique_ptr<Filter> filter;
-        const std::string filename;
 
 
-        Film(int _width, int _height, std::unique_ptr<Filter> _filter, const std::string& _filename) : width(_width), height(_height), filter(std::move(_filter)), filename(_filename) {
+        Film(int _width, int _height, std::unique_ptr<Filter> _filter) : width(_width), height(_height), filter(std::move(_filter)) {
             pixels = new Pixel[width*height];
         };
         ~Film() {
@@ -94,7 +93,7 @@ class Film {
         };
 
 
-        void ppm_output() const {
+        void ppm_output(const std::string filename) const {
             std::ofstream file(filename);
             file << "P3" << std::endl;
             file << width << " " << height << std::endl;
@@ -108,7 +107,7 @@ class Film {
             file.close();
             std::cout << filename << " written out" << std::endl;
         };
-        void ppm_output(int k) const {
+        void ppm_output(const std::string filename, int k) const {
             std::ofstream file(filename);
             file << "P3" << std::endl;
             file << width << " " << height << std::endl;

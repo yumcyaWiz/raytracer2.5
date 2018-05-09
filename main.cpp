@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     if(!film_toml) { std::cerr << "[film] missing" << std::endl; std::exit(1); }
     auto resolution = *film_toml->get_array_of<int64_t>("resolution");
     Filter* filter = new GaussianFilter(Vec2(1), 1.0f);
-    std::shared_ptr<Film> film = std::make_shared<Film>(resolution[0], resolution[1], std::unique_ptr<Filter>(filter), "output.ppm");
+    std::shared_ptr<Film> film = std::make_shared<Film>(resolution[0], resolution[1], std::unique_ptr<Filter>(filter));
     std::cout << "film loaded" << std::endl;
 
 
