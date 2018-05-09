@@ -63,6 +63,16 @@ class Film {
         };
 
 
+        void clear() {
+            for(int i = 0; i < width; i++) {
+                for(int j = 0; j < height; j++) {
+                    pixels[i + width*j].color_sum = 0;
+                    pixels[i + width*j].filter_sum = 0;
+                }
+            }
+        };
+
+
         void divide(int k) {
             for(int i = 0; i < width; i++) {
                 for(int j = 0; j < height; j++) {

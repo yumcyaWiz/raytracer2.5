@@ -1,11 +1,11 @@
 [renderer]
-samples = 30
+samples = 10
 depth-limit = 100
 integrator = "pt-explicit"
 show = true
 
 [sampler]
-type = "minstd"
+type = "mt"
 
 [film]
 resolution = [1024, 1024]
@@ -18,15 +18,15 @@ theta-offset = 0
 phi-offset = 3.14
 
 [camera]
-type = "ods"
-ipd = 0.1
+type = "thin-lens"
+ipd = 1.0
 fov = 60.0
-lens-distance = 1.2
+lens-distance = 0.8
 focus-point = [0.0, 1.0, 0.0]
 f-number = 14.0
 [camera.transform]
 type = "look-at"
-origin = [278.1, 273, 100]
+origin = [278, 273, 100]
 target = [278, 273, 101]
 
 [[material]]

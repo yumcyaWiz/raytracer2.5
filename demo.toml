@@ -8,7 +8,7 @@ show = false
 type = "mt"
 
 [film]
-resolution = [1024, 768]
+resolution = [4096, 4096]
 
 [sky]
 type = "uniform"

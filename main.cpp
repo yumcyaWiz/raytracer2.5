@@ -102,6 +102,10 @@ int main(int argc, char** argv) {
     }
     else if(camera_type == "ods") {
         auto IPD = *camera->get_as<double>("ipd");
+        if(resolution[0] != resolution[1]) {
+            std::cerr << "Invalid Resolution" << std::endl;
+            std::exit(1);
+        }
         cam = std::make_shared<ODSCamera>(camPos, camForward, film, IPD);
     }
     else {

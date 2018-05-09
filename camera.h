@@ -76,7 +76,7 @@ class ODSCamera : public Camera {
             float z = std::sin(theta)*std::sin(phi);
             Vec3 rayDir = normalize(x*camRight + y*camUp + z*camForward);
 
-            Vec3 dp = Vec3(std::cos(phi), 0, std::sin(phi));
+            Vec3 dp(std::sin(phi), 0, std::cos(phi));
             Vec3 rayOrigin;
             if(isLeft) {
                 rayOrigin = camPos - IPD/2*dp;

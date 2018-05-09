@@ -3,8 +3,8 @@
 #include "vec3.h"
 class Ray {
     public:
-        const Vec3 origin;
-        const Vec3 direction;
+        Vec3 origin;
+        Vec3 direction;
         mutable float tmax;
         constexpr static float tmin = 1e-5;
 
