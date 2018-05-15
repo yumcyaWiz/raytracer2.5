@@ -280,6 +280,7 @@ int main(int argc, char** argv) {
     int depth_limit = *renderer->get_as<int>("depth-limit");
     std::string integrator = *renderer->get_as<std::string>("integrator");
     bool renderer_show = *renderer->get_as<bool>("show");
+    bool renderer_profile = *renderer->get_as<bool>("profile");
 
     Integrator* integ;
     if(integrator == "pt") {
@@ -307,11 +308,14 @@ int main(int argc, char** argv) {
         drawgl(argc, argv, integ, scene);
     }
     else {
-        //profileでmakeするとgperftoolが有効になる
-        ProfilerStart("profiler.prof");
-        //レンダリングして画像を出力
-        integ->render(scene);
-        ProfilerStop();
+        if(renderer_profile) {
+            ProfilerStart("profiler.prof");
+            integ->render(scene);
+            ProfilerStop();
+        }
+        else {
+            integ->render(scene);
+        }
     }
     return 0;
 }

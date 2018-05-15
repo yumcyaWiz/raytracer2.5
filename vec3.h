@@ -2,6 +2,55 @@
 #define VEC3_H
 #include <iostream>
 #include <cmath>
+#include <valarray>
+
+
+template<typename L, typename R>
+struct Plus {
+    const L& l;
+    const R& r;
+
+    Plus(const L& _l, const R& _r) : l(_l), r(_r) {};
+
+    std::valarray<float> operator()() const {
+        return l + r;
+    }
+};
+template<typename L, typename R>
+struct Minus {
+    const L& l;
+    const R& r;
+
+    Minus(const L& _l, const R& _r) : l(_l), r(_r) {};
+
+    std::valarray<float> operator()() const {
+        return l - r;
+    }
+};
+template<typename L, typename R>
+struct Mult {
+    const L& l;
+    const R& r;
+
+    Mult(const L& _l, const R& _r) : l(_l), r(_r) {};
+
+    std::valarray<float> operator()() const {
+        return l * r;
+    }
+}; 
+template<typename L, typename R>
+struct Div {
+    const L& l;
+    const R& r;
+
+    Div(const L& _l, const R& _r) : l(_l), r(_r) {};
+
+    std::valarray<float> operator()() const {
+        return l / r;
+    }
+}; 
+
+
 class Vec3 {
     public:
         float x;
