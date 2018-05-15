@@ -11,3 +11,4 @@ stb_image.h
 core.*
 tiny_obj_loader.h
 cpptoml.h
+*.prof

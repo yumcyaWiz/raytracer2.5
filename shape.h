@@ -58,7 +58,7 @@ class Sphere : public Shape {
             return true;
         };
         AABB worldBound() const {
-            return AABB(Vec3(-radius - 1e-3) + center, Vec3(radius + 1e-3) + center);
+            return AABB(Vec3(-radius) + center, Vec3(radius) + center);
         };
 
         float surfaceArea() const {
@@ -136,7 +136,7 @@ class Triangle : public Shape {
         };
 
         AABB worldBound() const {
-            return AABB(min(p1, min(p2, p3)) - 1e-3, max(p1, max(p2, p3)) + 1e-3);
+            return AABB(min(p1, min(p2, p3)), max(p1, max(p2, p3)));
         };
 
         float surfaceArea() const {

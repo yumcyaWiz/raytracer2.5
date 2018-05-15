@@ -1,5 +1,5 @@
 [renderer]
-samples = 10
+samples = 100
 depth-limit = 100
 integrator = "pt-explicit"
 show = false
@@ -8,7 +8,7 @@ show = false
 type = "mt"
 
 [film]
-resolution = [512, 512]
+resolution = [2048, 2048]
 
 [sky]
 type = "uniform"
@@ -18,7 +18,7 @@ theta-offset = 0
 phi-offset = 3.14
 
 [camera]
-type = "thin-lens"
+type = "ods"
 ipd = 0.1
 fov = 90.0
 lens-distance = 1.0 
@@ -26,8 +26,8 @@ focus-point = [0.0, 1.0, 0.0]
 f-number = 8.0 
 [camera.transform]
 type = "look-at"
-origin = [3.0, 2.0, 0.0] 
-target = [0.0, 1.0, 0.0]
+origin = [0.0, 1.0, 0.0]
+target = [-1.0, 1.0, 0.0]
 
 [[material]]
 name = "mat1"
@@ -60,6 +60,11 @@ ior = 2.4195
 name = "blue"
 type = "lambert"
 albedo = [0.2, 0.4, 0.9]
+
+[[material]]
+name = "red"
+type = "lambert"
+albedo = [0.8, 0.2, 0.0]
 
 [[mesh]]
 name = "floor"
@@ -98,7 +103,11 @@ mesh = "floor"
 material = "blue"
 [[object.transform]]
 type = "translate"
-vector = [0, 0, 0]
+vector = [0.0, 0.0, 0.0]
+[[object.transform]]
+type = "scale"
+vector = [1.0, 1.0, 1.0]
+
 
 [[object]]
 name = "dragon"
@@ -106,10 +115,42 @@ mesh = "dragon"
 material = "mat1"
 [[object.transform]]
 type = "translate"
-vector = [0.0, 0.0, 0.0]
+vector = [3.0, 0.0, 0.0]
 [[object.transform]]
 type = "scale"
 vector = [0.2, 0.2, 0.2]
+
+#[[object]]
+#name = "sphere1"
+#mesh = "sphere"
+#material = "mat1"
+#[[object.transform]]
+#type = "translate"
+#vector = [-2.0, 1.0, 0.0]
+
+[[object]]
+name = "sphere2"
+mesh = "sphere"
+material = "mat2"
+[[object.transform]]
+type = "translate"
+vector = [-3.0, 1.0, 0.0]
+
+[[object]]
+name = "sphere3"
+mesh = "sphere"
+material = "red"
+[[object.transform]]
+type = "translate"
+vector = [0.0, 1.0, -3.0]
+
+[[object]]
+name = "sphere4"
+mesh = "sphere"
+material = "mat1"
+[[object.transform]]
+type = "translate"
+vector = [0.0, 1.0, 3.0]
 
 [[object]]
 name = "sphere"
@@ -120,11 +161,7 @@ type = "translate"
 vector = [0.0, 5.0, 0.0]
 
 
-#[[light]]
-#type = "point"
-#light-pos = [0.0, 5.0, 0.0]
-#emission = [100.0, 100.0, 100.0]
 [[light]]
 type = "area"
 object = "sphere"
-emission = [10.0, 10.0, 10.0]
+emission = [15.0, 15.0, 15.0]

@@ -1,4 +1,5 @@
 #include "cpptoml.h"
+#include <gperftools/profiler.h>
 
 #include <iostream>
 #include <map>
@@ -306,7 +307,11 @@ int main(int argc, char** argv) {
         drawgl(argc, argv, integ, scene);
     }
     else {
+        //profileでmakeするとgperftoolが有効になる
+        ProfilerStart("profiler.prof");
         //レンダリングして画像を出力
         integ->render(scene);
+        ProfilerStop();
     }
+    return 0;
 }
