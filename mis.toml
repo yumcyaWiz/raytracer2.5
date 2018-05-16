@@ -1,5 +1,5 @@
 [renderer]
-samples = 10
+samples = 100
 depth-limit = 100
 integrator = "pt-explicit"
 show = true
@@ -33,21 +33,21 @@ target = [0.0, 0.5, 0.0]
 [[material]]
 name = "mat1"
 type = "phong"
-kd = 0.9
+kd = 0.0
 albedo = [1.0, 1.0, 1.0]
-alpha = 1.0
+alpha = 10000.0
 [[material]]
 name = "mat2"
 type = "phong"
-kd = 1.0 
+kd = 0.0
 albedo = [1.0, 1.0, 1.0]
-alpha = 1.0
+alpha = 100.0
 [[material]]
 name = "mat3"
 type = "phong"
-kd = 1.0 
+kd = 0.0
 albedo = [1.0, 1.0, 1.0]
-alpha = 1.0
+alpha = 1000.0
 [[material]]
 name = "mat4"
 type = "phong"
@@ -94,7 +94,7 @@ type = "translate"
 vector = [0, 0, 0]
 [[object.transform]]
 type = "scale"
-vector = [1.0, 1.0, 0.3]
+vector = [2.0, 1.0, 0.3]
 [[object]]
 name = "plate2"
 mesh = "floor"
@@ -104,7 +104,7 @@ type = "translate"
 vector = [0, 0, 3]
 [[object.transform]]
 type = "scale"
-vector = [1.0, 1.0, 0.3]
+vector = [2.0, 1.0, 0.3]
 [[object]]
 name = "plate3"
 mesh = "floor"
@@ -114,7 +114,7 @@ type = "translate"
 vector = [0, 0, 6]
 [[object.transform]]
 type = "scale"
-vector = [1.0, 1.0, 0.3]
+vector = [2.0, 1.0, 0.3]
 
 [[object]]
 name = "light1"
@@ -122,32 +122,43 @@ mesh = "sphere1"
 material = "mat1"
 [[object.transform]]
 type = "translate"
-vector = [3.0, 10.0, 10.0]
+vector = [7.5, 5.0, 10.0]
 [[object]]
 name = "light2"
 mesh = "sphere2"
 material = "mat1"
 [[object.transform]]
 type = "translate"
-vector = [0.0, 10.0, 10.0]
+vector = [2.5, 5.0, 10.0]
 [[object]]
 name = "light3"
 mesh = "sphere3"
 material = "mat1"
 [[object.transform]]
 type = "translate"
-vector = [-3.0, 10.0, 10.0]
+vector = [-2.5, 5.0, 10.0]
+[[object]]
+name = "light4"
+mesh = "sphere4"
+material = "mat1"
+[[object.transform]]
+type = "translate"
+vector = [-7.0, 5.0, 10.0]
 
 [[light]]
 type = "area"
 object = "light1"
-emission = [1000.0, 0.0, 300.0]
+emission = [100.0, 0.0, 30.0]
 [[light]]
 type = "area"
 object = "light2"
-emission = [1000.0, 300.0, 0.0]
+emission = [100.0, 30.0, 0.0]
 [[light]]
 type = "area"
 object = "light3"
-emission = [0.0, 300.0, 1000.0]
+emission = [0.0, 100.0, 30.0]
+[[light]]
+type = "area"
+object = "light4"
+emission = [0.0, 30.0, 100.0]
 
