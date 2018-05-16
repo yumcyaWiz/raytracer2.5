@@ -2,53 +2,84 @@
 #define VEC3_H
 #include <iostream>
 #include <cmath>
-#include <valarray>
 
 
-template<typename L, typename R>
+/*
+template <typename L, typename Op, typename R>
+class Expression {
+    const L& l;
+    const R& r;
+    
+    public:
+    Expression(const L& l, const R& r) : l(l), r(r) {};
+
+    float operator[](size_t i) const {
+        return Op::apply(l[i], r[i]);
+    };
+};
+template <typename L, typename Op>
+class Expression<L, Op, float> {
+    const L& l;
+    const float r;
+
+    public:
+    Expression(const L& l, const float r) : l(l), r(r) {};
+
+    float operator[](size_t i) const {
+        return Op::apply(l[i], r);
+    };
+};
+template <typename Op, typename R>
+class Expression<float, Op, R> {
+    const float l;
+    const R& r;
+
+    public:
+    Expression(const float l, const R& r) : l(l), r(r) {};
+
+    float operator[](size_t i) const {
+        return Op::apply(l, r[i]);
+    };
+};
+
+
 struct Plus {
-    const L& l;
-    const R& r;
-
-    Plus(const L& _l, const R& _r) : l(_l), r(_r) {};
-
-    std::valarray<float> operator()() const {
+    constexpr static float apply(float l, float r) {
         return l + r;
-    }
+    };
 };
-template<typename L, typename R>
 struct Minus {
-    const L& l;
-    const R& r;
-
-    Minus(const L& _l, const R& _r) : l(_l), r(_r) {};
-
-    std::valarray<float> operator()() const {
+    constexpr static float apply(float l, float r) {
         return l - r;
-    }
+    };
 };
-template<typename L, typename R>
 struct Mult {
-    const L& l;
-    const R& r;
-
-    Mult(const L& _l, const R& _r) : l(_l), r(_r) {};
-
-    std::valarray<float> operator()() const {
+    constexpr static float apply(float l, float r) {
         return l * r;
-    }
-}; 
-template<typename L, typename R>
+    };
+};
 struct Div {
-    const L& l;
-    const R& r;
-
-    Div(const L& _l, const R& _r) : l(_l), r(_r) {};
-
-    std::valarray<float> operator()() const {
+    constexpr static float apply(float l, float r) {
         return l / r;
-    }
-}; 
+    };
+};
+template <typename L, typename R>
+inline Expression<L, Plus, R> operator+(const L& l, const R& r) {
+    return Expression<L, Plus, R>(l, r);
+}
+template <typename L, typename R>
+inline Expression<L, Minus, R> operator-(const L& l, const R& r) {
+    return Expression<L, Minus, R>(l, r);
+}
+template <typename L, typename R>
+inline Expression<L, Mult, R> operator*(const L& l, const R& r) {
+    return Expression<L, Mult, R>(l, r);
+}
+template <typename L, typename R>
+inline Expression<L, Div, R> operator/(const L& l, const R& r) {
+    return Expression<L, Div, R>(l, r);
+}
+*/
 
 
 class Vec3 {
@@ -60,6 +91,14 @@ class Vec3 {
         Vec3() { x = y = z = 0; };
         Vec3(float _x) : x(_x), y(_x), z(_x) {};
         Vec3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {};
+        /*
+        template <typename E>
+        Vec3(const E& e) {
+            x = e[0];
+            y = e[1];
+            z = e[2];
+        };
+        */
 
         Vec3 operator+(const Vec3& v) const {
             return Vec3(x + v.x, y + v.y, z + v.z);
@@ -126,7 +165,17 @@ class Vec3 {
             else return z;
         };
 
-            
+
+        /*
+        template <typename E>
+        Vec3& operator=(const E& e) {
+            x = e[0];
+            y = e[1];
+            z = e[2];
+            return *this;
+        };
+        */
+
 
         float length() const {
             return std::sqrt(x*x + y*y + z*z);
