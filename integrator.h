@@ -277,6 +277,9 @@ class PathTrace : public Integrator {
 
                 //ローカル座標系の構築
                 const Vec3 wo = -ray.direction;
+                if(iszero(wo)) {
+                    std::cout << res.t << std::endl;
+                }
                 const Vec3 n = res.hitNormal;
                 const Vec3 s = res.dpdu;
                 const Vec3 t = normalize(cross(s, n));
@@ -285,8 +288,10 @@ class PathTrace : public Integrator {
 
                 //BRDFの計算と方向のサンプリング
                 Vec3 wi_local;
-                float brdf_pdf;
+                float brdf_pdf = 1.0f;
                 const RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
+                //もしサンプリングが失敗したら終了
+                if(iszero(wi_local)) return RGB(0.0f);
                 //サンプリングされた方向をワールド座標系に戻す
                 Vec3 wi = localToWorld(wi_local, n, s, t);
                 //もしbrdfが真っ黒だったらterminate
@@ -313,6 +318,8 @@ class PathTrace : public Integrator {
                 }
                 if(isnan(k) || isinf(k)) {
                     std::cout << "inf or nan k detected" << std::endl;
+                    std::cout << "brdf_pdf: " << brdf_pdf << std::endl;
+                    std::cout << "brdf_f: " << brdf_f << std::endl;
                     return RGB(0);
                 }
 
@@ -472,7 +479,7 @@ class PathTraceExplicit : public Integrator {
                 if(hitMaterial->type == MATERIAL_TYPE::DIFFUSE || hitMaterial->type == MATERIAL_TYPE::GLOSSY) {
                     for(const std::shared_ptr<Light> light : scene.lights) {
                         //光源上で点をサンプリング
-                        float light_pdf;
+                        float light_pdf = 1.0f;
                         Vec3 wi_light;
                         const RGB le = light->sample(res, *sampler, wi_light, light_pdf);
                         const Vec3 wi_light_local = worldToLocal(wi_light, n, s, t);
@@ -517,6 +524,8 @@ class PathTraceExplicit : public Integrator {
                 Vec3 wi_local;
                 float brdf_pdf = 1.0f;
                 const RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
+                //もしサンプリングが失敗したら終了
+                if(iszero(wi_local)) return RGB(0.0f);
                 //サンプリングされた方向をワールド座標系に戻す
                 Vec3 wi = localToWorld(wi_local, n, s, t);
                 //もしbrdfが真っ黒だったらterminate
