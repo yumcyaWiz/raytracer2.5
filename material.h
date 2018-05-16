@@ -150,7 +150,7 @@ class Phong : public Material {
                 //ハーフベクトルのpdf
                 float pdf_wh = (alpha + 2.0f)/(2*M_PI) * std::pow(absCosTheta(wh), alpha);
                 //入射ベクトルのpdf
-                pdf = (1.0f - kd) * pdf_wh/(4.0f*std::abs(dot(wo, wh)));
+                pdf = (1.0f - kd) * pdf_wh/(4.0f*std::abs(dot(wo, wh)) + 1e-6);
                 return f(wo, wi);
             }
         };

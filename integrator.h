@@ -515,7 +515,7 @@ class PathTraceExplicit : public Integrator {
 
                 //BRDFの計算と方向のサンプリング
                 Vec3 wi_local;
-                float brdf_pdf;
+                float brdf_pdf = 1.0f;
                 const RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
                 //サンプリングされた方向をワールド座標系に戻す
                 Vec3 wi = localToWorld(wi_local, n, s, t);
