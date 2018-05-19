@@ -2,13 +2,14 @@
 samples = 100
 depth-limit = 100
 integrator = "pt-explicit"
+show = true
 
 [sampler]
 type = "minstd"
 
 [film]
 #resolution = [2138, 1536]
-resolution = [1920, 1080]
+resolution = [512, 512]
 
 [sky]
 type = "uniform"

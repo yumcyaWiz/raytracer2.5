@@ -1,5 +1,5 @@
 [renderer]
-samples = 100
+samples = 1000
 depth-limit = 100
 integrator = "pt"
 show = false
@@ -8,7 +8,7 @@ show = false
 type = "mt"
 
 [film]
-resolution = [2048, 2048]
+resolution = [512, 512]
 
 [sky]
 type = "ibl"
@@ -17,7 +17,7 @@ theta-offset = 0
 phi-offset = 2.0
 
 [camera]
-type = "ods"
+type = "ideal-pinhole"
 ipd = 0.1
 fov = 40.0
 lens-distance = 1.5

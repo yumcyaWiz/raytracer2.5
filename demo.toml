@@ -1,8 +1,8 @@
 [renderer]
-samples = 1000
+samples = 100
 depth-limit = 100
-integrator = "pt"
-show = false
+integrator = "pt-explicit"
+show = true
 profile = false
 
 [sampler]
@@ -27,7 +27,7 @@ focus-point = [0.0, 1.0, 0.0]
 f-number = 8.0 
 [camera.transform]
 type = "look-at"
-origin = [3.0, 2.0, 0.0] 
+origin = [0.0, 2.0, 3.0] 
 target = [0.0, 1.0, 0.0]
 
 [[material]]
@@ -43,9 +43,9 @@ albedo = 0.9
 [[material]]
 name = "mat3"
 type = "phong"
-kd = 0.9
+kd = 0.8
 albedo = [1.0, 1.0, 1.0]
-alpha = 32.0
+alpha = 32.0 
 
 [[material]]
 name = "mat4"
@@ -96,21 +96,21 @@ path = "diamond.obj"
 [[object]]
 name = "floor"
 mesh = "floor"
-material = "mat1"
+material = "blue"
 [[object.transform]]
 type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
-name = "dragon"
-mesh = "dragon"
-material = "mat1"
+name = "bunny"
+mesh = "bunny"
+material = "mat3"
 [[object.transform]]
 type = "translate"
 vector = [0.0, 0.0, 0.0]
 [[object.transform]]
 type = "scale"
-vector = [0.2, 0.2, 0.2]
+vector = [10.0, 10.0, 10.0]
 
 [[object]]
 name = "sphere"

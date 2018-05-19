@@ -125,7 +125,7 @@ class Phong : public Material {
         RGB f(const Vec3& wo, const Vec3& wi) const {
             //ハーフベクトル
             const Vec3 wh = normalize(wo + wi);
-            return kd*reflectance/M_PI + (1.0f - kd)*RGB(1.0f)*(alpha + 2.0f)/(2.0f*M_PI) * std::pow(absCosTheta(wh), alpha);
+            return RGB(1.0f)*(alpha + 2.0f)/(2.0f*M_PI) * std::pow(absCosTheta(wh), alpha);
         };
         RGB sample(const Vec3& wo, Vec3& wi, Sampler& sampler, float &pdf) const {
             Vec2 u = sampler.getNext2D();
@@ -134,8 +134,8 @@ class Phong : public Material {
                 //コサインに比例した半球サンプリング
                 wi = sampleCosineHemisphere(u);
                 //入射レイのpdf
-                pdf = kd * absCosTheta(wi)/M_PI;
-                return f(wo, wi);
+                pdf = kd * absCosTheta(wi)/M_PI + 1e-6;
+                return reflectance/M_PI;
             }
             //specular
             else {
