@@ -268,9 +268,9 @@ class PathTrace : public Integrator {
             Hit res;
             RGB col;
             if(scene.intersect(ray, res)) {
-                //もし光源に当たったら放射輝度を蓄積
+                //もし光源に当たったら終了
                 if(res.hitPrimitive->areaLight != nullptr) {
-                    col += res.hitPrimitive->areaLight->Le(res);
+                    return res.hitPrimitive->areaLight->Le(res)/roulette;
                 }
                 //マテリアル
                 const std::shared_ptr<Material> hitMaterial = res.hitPrimitive->material;
