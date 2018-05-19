@@ -256,7 +256,7 @@ class PathTrace : public Integrator {
         RGB Li(const Ray& ray, const Scene& scene, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
             if(depth > 10) {
-                if(sampler->getNext() < roulette) {
+                if(sampler->getNext() < 1.0f - roulette) {
                     return RGB(0.0f);
                 }
                 roulette *= 0.9f;
@@ -441,7 +441,7 @@ class PathTraceExplicit : public Integrator {
         RGB Li(const Ray& ray, const Scene& scene, Vec3& hit_le, int depth = 0, float roulette = 1.0f) const {
             //ロシアンルーレット
             if(depth > 10) {
-                if(sampler->getNext() < roulette) {
+                if(sampler->getNext() < 1.0f - roulette) {
                     return RGB(0.0f);
                 }
                 roulette *= 0.9f;
