@@ -294,8 +294,6 @@ class PathTrace : public Integrator {
                 if(iszero(wi_local)) return RGB(0.0f);
                 //サンプリングされた方向をワールド座標系に戻す
                 Vec3 wi = localToWorld(wi_local, n, s, t);
-                //もしbrdfが真っ黒だったらterminate
-                //if(brdf_f == RGB(0)) return RGB(0);
 
 
                 //コサイン項
@@ -314,7 +312,7 @@ class PathTrace : public Integrator {
                     std::cout << "cos_term: " << cos_term << std::endl;
                     std::cout << "brdf_f:" << brdf_f << std::endl;
                     std::cout << "k: " << k << std::endl;
-                    k = -k;
+                    k = abs(k);
                 }
                 if(isnan(k) || isinf(k)) {
                     std::cout << "inf or nan k detected" << std::endl;
@@ -528,8 +526,6 @@ class PathTraceExplicit : public Integrator {
                 if(iszero(wi_local)) return RGB(0.0f);
                 //サンプリングされた方向をワールド座標系に戻す
                 Vec3 wi = localToWorld(wi_local, n, s, t);
-                //もしbrdfが真っ黒だったらterminate
-                //if(brdf_f == RGB(0)) return RGB(0);
 
 
                 //コサイン項
@@ -548,7 +544,7 @@ class PathTraceExplicit : public Integrator {
                     std::cout << "cos_term: " << cos_term << std::endl;
                     std::cout << "brdf_f:" << brdf_f << std::endl;
                     std::cout << "k: " << k << std::endl;
-                    k = -k;
+                    k = abs(k);
                 }
                 if(isnan(k) || isinf(k)) {
                     std::cout << "inf or nan k detected" << std::endl;

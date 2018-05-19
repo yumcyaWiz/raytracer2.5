@@ -1,8 +1,8 @@
 [renderer]
-samples = 10
+samples = 1000
 depth-limit = 100
-integrator = "pt-explicit"
-show = true
+integrator = "pt"
+show = false
 profile = false
 
 [sampler]
@@ -96,7 +96,7 @@ path = "diamond.obj"
 [[object]]
 name = "floor"
 mesh = "floor"
-material = "blue"
+material = "mat1"
 [[object.transform]]
 type = "translate"
 vector = [0, 0, 0]

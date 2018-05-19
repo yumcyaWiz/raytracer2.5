@@ -138,7 +138,7 @@ class Vec3 {
         void operator*=(const Vec3& v) {
             x *= v.x;
             y *= v.y;
-            z += v.z;
+            z *= v.z;
         };
         void operator/=(const Vec3& v) {
             x /= v.x;
@@ -254,5 +254,10 @@ inline bool iszero(const Vec3& v) {
 }
 inline bool nonzero(const Vec3& v) {
     return v.x || v.y || v.z;
+}
+
+
+inline Vec3 abs(const Vec3& v) {
+    return Vec3(std::abs(v.x), std::abs(v.y), std::abs(v.z));
 }
 #endif
