@@ -207,4 +207,9 @@ class Glass : public Material {
             }
         };
 };
+
+
+class GGX : public Material {
+
+};
 #endif

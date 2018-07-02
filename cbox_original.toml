@@ -26,8 +26,8 @@ focus-point = [0.0, 1.0, 0.0]
 f-number = 14.0
 [camera.transform]
 type = "look-at"
-origin = [278, 273, -100]
-target = [278, 273, 100]
+origin = [0.0, 1.0, 2.0]
+target = [0.0, 1.0, 0.0] 
 
 [[material]]
 name = "mat1"
@@ -37,16 +37,7 @@ albedo = [0.9, 0.9, 0.9]
 [[mesh]]
 name = "cbox"
 type = "obj"
-path = "cbox.obj"
-[[mesh]]
-name = "light"
-type = "obj"
-path = "cbox_luminaire.obj"
-[[mesh]]
-name = "dragon"
-type = "obj"
-path = "dragon.obj"
-
+path = "CornellBox-Original.obj"
 
 [[object]]
 name = "cbox"
@@ -56,27 +47,3 @@ material = "mat1"
 type = "translate"
 vector = [0.0, 0.0, 0.0]
 
-[[object]]
-name = "light"
-mesh = "light"
-material = "mat1"
-[[object.transform]]
-type = "translate"
-vector = [0.0, 0.0, 0.0]
-
-[[object]]
-name = "dragon"
-mesh = "dragon"
-material = "mat1"
-[[object.transform]]
-type = "translate"
-vector = [278, 0, 300]
-[[object.transform]]
-type = "scale"
-vector = [30.0, 30.0, 30.0]
-
-
-[[light]]
-type = "area"
-object = "light"
-emission = [40, 30, 22]

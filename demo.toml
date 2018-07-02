@@ -1,7 +1,7 @@
 [renderer]
 samples = 100
 depth-limit = 100
-integrator = "pt-explicit"
+integrator = "pt"
 show = true
 profile = false
 
@@ -102,15 +102,15 @@ type = "translate"
 vector = [0, 0, 0]
 
 [[object]]
-name = "bunny"
-mesh = "bunny"
-material = "mat3"
+name = "dragon"
+mesh = "dragon"
+material = "mat1"
 [[object.transform]]
 type = "translate"
 vector = [0.0, 0.0, 0.0]
 [[object.transform]]
 type = "scale"
-vector = [10.0, 10.0, 10.0]
+vector = [0.2, 0.2, 0.2]
 
 [[object]]
 name = "sphere"

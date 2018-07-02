@@ -510,13 +510,6 @@ class PathTraceExplicit : public Integrator {
                     }
                 }
 
-                /*
-                //もし光源に当たったら放射輝度を蓄積
-                if(res.hitPrimitive->areaLight != nullptr) {
-                    col += res.hitPrimitive->areaLight->Le(res) * std::max(wo_local.y, 0.0f);
-                }
-                */
-
 
                 //BRDFの計算と方向のサンプリング
                 Vec3 wi_local;

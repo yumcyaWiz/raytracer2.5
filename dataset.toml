@@ -1,36 +1,34 @@
 [renderer]
-samples = 10
+samples = 100
 depth-limit = 100
 integrator = "pt-explicit"
-show = true
+show = false
 
 [sampler]
 type = "mt"
 
 [film]
-resolution = [512, 512]
+resolution = [256, 256]
 
 [sky]
 type = "uniform"
 color = [0, 0, 0]
-path = "Mans_Outside_2k.hdr"
-theta-offset = 0
-phi-offset = 3.14
 
 [camera]
 type = "ideal-pinhole"
 ipd = 1.0
 fov = 90.0
-lens-distance = 0.8
-focus-point = [0.0, 1.0, 0.0]
-f-number = 14.0
 [camera.transform]
 type = "look-at"
 origin = [278, 273, -100]
 target = [278, 273, 100]
 
 [[material]]
-name = "mat1"
+name = "blue"
+type = "lambert"
+albedo = [0.2, 0.2, 0.8]
+[[material]]
+name = "white"
 type = "lambert"
 albedo = [0.9, 0.9, 0.9]
 
@@ -43,15 +41,18 @@ name = "light"
 type = "obj"
 path = "cbox_luminaire.obj"
 [[mesh]]
-name = "dragon"
-type = "obj"
-path = "dragon.obj"
-
+name = "sphere"
+type = "sphere"
+radius = 80.0
+[[mesh]]
+name = "sphere2"
+type = "sphere"
+radius = 100.0
 
 [[object]]
 name = "cbox"
 mesh = "cbox"
-material = "mat1"
+material = "white"
 [[object.transform]]
 type = "translate"
 vector = [0.0, 0.0, 0.0]
@@ -59,22 +60,26 @@ vector = [0.0, 0.0, 0.0]
 [[object]]
 name = "light"
 mesh = "light"
-material = "mat1"
+material = "white"
 [[object.transform]]
 type = "translate"
 vector = [0.0, 0.0, 0.0]
 
 [[object]]
-name = "dragon"
-mesh = "dragon"
-material = "mat1"
+name = "sphere"
+mesh = "sphere"
+material = "blue"
 [[object.transform]]
 type = "translate"
-vector = [278, 0, 300]
-[[object.transform]]
-type = "scale"
-vector = [30.0, 30.0, 30.0]
+vector = [390, 150, 350]
 
+[[object]]
+name = "sphere2"
+mesh = "sphere2"
+material = "white"
+[[object.transform]]
+type = "translate"
+vector = [200, 150, 270]
 
 [[light]]
 type = "area"
