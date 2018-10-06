@@ -32,10 +32,10 @@ class NormalRenderer : public Integrator {
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
-                        cam->film->setPixel(i, j, w*(res.hitNormal + 1.0f)/2.0f);
+                        cam->film->setPixel(i, j, (res.hitNormal + 1.0f)/2.0f);
                     }
                     else {
-                        cam->film->setPixel(i, j, w*RGB(0.0f));
+                        cam->film->setPixel(i, j, RGB(0.0f));
                     }
                 }
             }
@@ -50,14 +50,40 @@ class NormalRenderer : public Integrator {
                     Ray ray = cam->getRay(u, v, w, *sampler);
                     Hit res;
                     if(scene.intersect(ray, res)) {
-                        cam->film->addSample(i, j, w*(res.hitNormal + 1.0f)/2.0f);
+                        cam->film->addSample(i, j, (res.hitNormal + 1.0f)/2.0f);
                     }
                     else {
-                        cam->film->addSample(i, j, w*RGB(0.0f));
+                        cam->film->addSample(i, j, RGB(0.0f));
                     }
                 }
             }
         };
+};
+
+
+class DepthRenderer : public Integrator {
+  public:
+    DepthRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _sampler) {};
+
+    void render(const Scene& scene) const {
+      for(int i = 0; i < cam->film->width; i++) {
+        for(int j = 0; j < cam->film->height; j++) {
+          float u = (2.0*i - cam->film->width)/cam->film->width;
+          float v = -(2.0*j - cam->film->height)/cam->film->height;
+          float w;
+          Ray ray = cam->getRay(u, v, w, *sampler);
+          Hit res;
+          if(scene.intersect(ray, res)) {
+            cam->film->setPixel(i, j, res.t);
+          }
+          else {
+            cam->film->setPixel(i, j, RGB(0));
+          }
+        }
+      }
+      cam->film->ppm_output("output.ppm");
+    };
+    void compute(const Scene& scene) const {};
 };
 
 
@@ -89,9 +115,9 @@ class DotRenderer : public Integrator {
 };
 
 
-class BRDFRenderer : public Integrator {
+class AlbedoRenderer : public Integrator {
     public:
-        BRDFRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _sampler) {};
+        AlbedoRenderer(std::shared_ptr<Camera> _cam, std::shared_ptr<Sampler> _sampler) : Integrator(_cam, _sampler) {};
 
         void render(const Scene& scene) const {
             for(int i = 0; i < cam->film->width; i++) {
@@ -112,16 +138,16 @@ class BRDFRenderer : public Integrator {
                         float brdf_pdf;
                         RGB brdf_f = hitMaterial->sample(wo_local, wi_local, *sampler, brdf_pdf);
                         Vec3 wi = localToWorld(wi_local, n, s, t);
-                        cam->film->setPixel(i, j, w*(wi + 1.0f)/2.0f);
+                        cam->film->setPixel(i, j, brdf_f);
                     }
                     else {
-                        cam->film->setPixel(i, j, w*RGB(0.0f));
+                        cam->film->setPixel(i, j, RGB(0.0f));
                     }
                 }
             }
             cam->film->ppm_output("output.ppm");
         };
-        void compute(const Scene& scene) {};
+        void compute(const Scene& scene) const {};
 };
 
 

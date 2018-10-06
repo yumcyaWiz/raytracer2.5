@@ -289,6 +289,12 @@ int main(int argc, char** argv) {
     else if(integrator == "normal") {
         integ = new NormalRenderer(cam, sampler);
     }
+    else if(integrator == "depth") {
+      integ = new DepthRenderer(cam, sampler);
+    }
+    else if(integrator == "albedo") {
+      integ = new AlbedoRenderer(cam, sampler);
+    }
     else if(integrator == "dot") {
         integ = new DotRenderer(cam, sampler);
     }

@@ -1,0 +1,84 @@
+[renderer]
+samples = 1
+depth-limit = 100
+integrator = "normal"
+show = false
+
+[sampler]
+type = "mt"
+
+[film]
+resolution = [589, 695]
+
+[sky]
+type = "uniform"
+color = [2, 2, 2]
+path = "Mans_Outside_2k.hdr"
+theta-offset = 0
+phi-offset = 3.14
+
+
+[camera]
+type = "thin-lens"
+fov = 60.0
+lens-distance = 2.0
+focus-point = [0.0, 1.0, 0.0]
+f-number = 20.0
+[camera.transform]
+type = "look-at"
+origin = [0.0, 1.0, -7]
+target = [0.0, 1.0, 0.0]
+
+[[material]]
+name = "mat1"
+type = "lambert"
+albedo = [0.9, 0.9, 0.9]
+
+[[material]]
+name = "blue"
+type = "lambert"
+albedo = [0.0, 0.2, 0.8]
+
+[[material]]
+name = "mirror"
+type = "mirror"
+albedo = 0.9
+
+[[mesh]]
+name = "floor"
+type = "obj"
+path = "plane.obj"
+
+[[mesh]]
+name = "dragon"
+type = "obj"
+path = "dragon.obj"
+
+[[mesh]]
+name = "teapot"
+type = "obj"
+path = "teapot.obj"
+
+[[mesh]]
+name = "sphere"
+type = "sphere"
+radius = 1.0
+
+[[object]]
+name = "floor"
+mesh = "floor"
+material = "mirror"
+[[object.transform]]
+type = "translate"
+vector = [0, 0, 0]
+
+[[object]]
+name = "dragon"
+mesh = "dragon"
+material = "blue"
+[[object.transform]]
+type = "translate"
+vector = [0.0, 0.0, 0.0]
+[[object.transform]]
+type = "scale"
+vector = [0.2, 0.2, 0.2]
